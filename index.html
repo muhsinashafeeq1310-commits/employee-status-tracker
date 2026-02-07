@@ -2,36 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Eman Bakery – Employee Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
+        :root {
+            --app-height: 100%;
+        }
+
         body {
             background-color: #020617;
             color: #f8fafc;
             font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            height: var(--app-height);
         }
+
+        /* Native App Feel: Full Screen on Mobile, Centered on Desktop */
+        .app-container {
+            width: 100%;
+            max-width: 640px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto;
+        }
+
         .emerald-gradient {
             background: linear-gradient(145deg, #064e3b 0%, #065f46 100%);
         }
+
         .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
+
+        /* Tab Bar: Bottom on Mobile, Top on Desktop */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            padding-bottom: env(safe-area-inset-bottom);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        @media (min-width: 768px) {
+            .tab-bar {
+                position: static;
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                padding-bottom: 0;
+                border-radius: 1rem;
+            }
+        }
+
         .status-card-interactive {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        .status-card-interactive:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(16, 185, 129, 0.4);
         }
         .status-card-interactive:active {
             transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.1);
         }
+
         .loader {
             border: 2px solid rgba(255,255,255,0.1);
             border-top: 2px solid #10b981;
@@ -41,75 +79,111 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        /* Smooth scroll for the list */
+        #employeesView {
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+        }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body>
 
-    <!-- Login Screen -->
-    <div id="loginScreen" class="w-full max-w-md emerald-gradient p-10 rounded-[3rem] shadow-2xl border border-white/10">
-        <div class="text-center mb-10">
-            <p class="text-[10px] tracking-[0.4em] text-emerald-300/60 uppercase mb-2">E M A N</p>
-            <h1 class="text-4xl font-extrabold mb-2 tracking-tight">Eman Bakery</h1>
-            <p class="text-sm text-emerald-100/60">Employee Onboarding Portal</p>
-        </div>
+    <!-- App Wrapper -->
+    <div class="app-container">
 
-        <div class="space-y-5">
-            <div>
-                <input type="email" id="emailInput" placeholder="Email address" 
-                    class="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-white/20">
-            </div>
-            <div>
-                <input type="password" id="passwordInput" placeholder="Password" 
-                    class="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-white/20">
-            </div>
+        <!-- Login Screen -->
+        <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-6 sm:p-10">
+            <div class="w-full max-w-sm emerald-gradient p-10 rounded-[3rem] shadow-2xl border border-white/10 animate-in fade-in zoom-in duration-500">
+                <div class="text-center mb-10">
+                    <p class="text-[10px] tracking-[0.4em] text-emerald-300/60 uppercase mb-2">E M A N</p>
+                    <h1 class="text-4xl font-extrabold mb-2 tracking-tight">Eman Bakery</h1>
+                    <p class="text-sm text-emerald-100/60">Onboarding Portal</p>
+                </div>
 
-            <button id="loginBtn" class="w-full bg-white text-emerald-900 py-4 rounded-2xl font-bold text-lg hover:bg-emerald-50 transition-all active:scale-[0.98] shadow-xl">
-                Sign in
-            </button>
-        </div>
-    </div>
+                <div class="space-y-4">
+                    <input type="email" id="emailInput" placeholder="Email" 
+                        class="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 placeholder:text-white/20">
+                    
+                    <input type="password" id="passwordInput" placeholder="Password" 
+                        class="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 placeholder:text-white/20">
 
-    <!-- Main Dashboard -->
-    <div id="mainScreen" class="hidden w-full max-w-3xl space-y-8 animate-in fade-in duration-700">
-        <header class="flex justify-between items-end pb-2 border-b border-white/5">
-            <div>
-                <h2 class="text-3xl font-bold tracking-tight">Onboarding Dashboard</h2>
-                <div class="flex items-center gap-2 mt-1">
-                    <span id="roleBadge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-bold uppercase tracking-widest"></span>
-                    <p id="currentUserRole" class="text-[11px] text-white/40 font-medium"></p>
+                    <button id="loginBtn" class="w-full bg-white text-emerald-900 py-4 rounded-2xl font-bold text-lg hover:bg-emerald-50 transition-all active:scale-[0.98] shadow-xl mt-4">
+                        Sign in
+                    </button>
                 </div>
             </div>
-            <button id="logoutBtn" class="text-[10px] uppercase tracking-widest bg-white/5 border border-white/10 px-4 py-2 rounded-full hover:bg-white/10 transition-colors">Sign Out</button>
-        </header>
-
-        <!-- Navigation (Hidden for Updaters) -->
-        <nav id="mainNav" class="flex gap-3 p-1.5 glass rounded-2xl">
-            <button id="tabEmployees" class="flex-1 py-3 rounded-xl transition-all font-bold text-sm bg-emerald-600 shadow-lg text-white">Dashboard</button>
-            <button id="tabAdd" class="flex-1 py-3 rounded-xl transition-all font-semibold text-sm text-white/40 hover:text-white">Add New Employee</button>
-        </nav>
-
-        <!-- List View -->
-        <div id="employeesView" class="grid gap-4">
-            <!-- Cards will appear here -->
         </div>
 
-        <!-- Add Form (Only for Creators) -->
-        <div id="addView" class="hidden glass p-8 rounded-[2rem] space-y-6">
-            <h3 class="text-xl font-bold">New Employee Profile</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input id="newName" type="text" placeholder="Full Name" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:ring-1 ring-emerald-500">
-                <input id="newId" type="text" placeholder="National ID" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:ring-1 ring-emerald-500">
-                <input id="newMobile" type="text" placeholder="Mobile Number" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:ring-1 ring-emerald-500">
-                <input id="newEmail" type="email" placeholder="Email" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:ring-1 ring-emerald-500">
-                <input id="newIban" type="text" placeholder="IBAN" class="md:col-span-2 bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:ring-1 ring-emerald-500">
+        <!-- Main Dashboard -->
+        <div id="mainScreen" class="hidden flex-1 flex flex-col p-4 sm:p-8 space-y-6">
+            
+            <!-- Sticky Header -->
+            <header class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-lg pt-4 pb-2 -mx-4 px-4 flex justify-between items-center border-b border-white/5">
+                <div>
+                    <h2 class="text-xl font-extrabold tracking-tight">Onboarding</h2>
+                    <div class="flex items-center gap-2">
+                        <span id="roleBadge" class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[8px] font-black uppercase tracking-widest"></span>
+                        <p id="currentUserRole" class="text-[10px] text-white/40 font-medium truncate max-w-[120px]"></p>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="text-[9px] font-bold uppercase tracking-widest bg-white/5 border border-white/10 px-4 py-2 rounded-full active:bg-red-500/20 transition-all">Logout</button>
+            </header>
+
+            <!-- Navigation: Tab Bar for Mobile -->
+            <nav id="mainNav" class="tab-bar glass md:mt-4">
+                <div class="flex items-center justify-around md:gap-4 p-2 md:p-1.5">
+                    <button id="tabEmployees" class="flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+                        <span class="text-[10px] md:text-sm font-bold uppercase md:capitalize">Dashboard</span>
+                    </button>
+                    <button id="tabAdd" class="flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        <span class="text-[10px] md:text-sm font-bold uppercase md:capitalize">Add Entry</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Content Area -->
+            <div id="employeesView" class="flex-1 space-y-4">
+                <!-- Cards injected here -->
             </div>
-            <button id="saveEmployeeBtn" class="w-full bg-emerald-600 py-4 rounded-xl font-bold shadow-lg shadow-emerald-900/20 hover:bg-emerald-500 transition-colors">Create Employee Entry</button>
+
+            <!-- Add Form -->
+            <div id="addView" class="hidden glass p-6 rounded-[2rem] space-y-5 mb-24">
+                <h3 class="text-lg font-bold">New Employee Profile</h3>
+                <div class="space-y-3">
+                    <input id="newName" type="text" placeholder="Full Name" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 outline-none focus:ring-1 ring-emerald-500">
+                    <input id="newId" type="text" placeholder="National ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 outline-none focus:ring-1 ring-emerald-500">
+                    <input id="newMobile" type="text" placeholder="Mobile Number" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 outline-none focus:ring-1 ring-emerald-500">
+                    <input id="newEmail" type="email" placeholder="Email Address" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 outline-none focus:ring-1 ring-emerald-500">
+                    <input id="newIban" type="text" placeholder="IBAN" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 outline-none focus:ring-1 ring-emerald-500">
+                </div>
+                <button id="saveEmployeeBtn" class="w-full bg-emerald-600 py-4 rounded-2xl font-bold shadow-lg shadow-emerald-900/40 active:scale-[0.98] transition-transform">Save Profile</button>
+            </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 opacity-0 transition-all duration-300 pointer-events-none z-50">
-        <div class="bg-emerald-500 text-white font-bold px-8 py-3 rounded-full shadow-2xl flex items-center gap-3">
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 modal-overlay z-[100] flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-slate-900 border border-white/10 w-full max-w-sm p-8 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300" id="modalContent">
+            <h3 class="text-xl font-bold mb-2" id="modalTitle">Confirm</h3>
+            <p class="text-sm text-white/60 mb-8" id="modalText"></p>
+            <div class="flex gap-3">
+                <button id="modalCancel" class="flex-1 py-4 rounded-2xl bg-white/5 font-bold">Cancel</button>
+                <button id="modalConfirm" class="flex-1 py-4 rounded-2xl bg-emerald-600 font-bold shadow-lg shadow-emerald-900/40">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 opacity-0 transition-all duration-300 pointer-events-none z-[60]">
+        <div class="bg-emerald-500 text-white font-bold px-6 py-3 rounded-full shadow-2xl text-xs whitespace-nowrap">
             <span id="toastMsg"></span>
         </div>
     </div>
@@ -119,26 +193,41 @@
       
         const SUPABASE_URL = 'https://ftkwyywgoutsvdcdvyja.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU';
-      
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       
         let currentUser = null; 
         let employees = [];     
+
+        // Fix mobile height issues
+        const setAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+        window.addEventListener('resize', setAppHeight);
+        setAppHeight();
       
+        function askConfirmation(title, text, onConfirm) {
+            const modal = document.getElementById('confirmModal');
+            const content = document.getElementById('modalContent');
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalText').textContent = text;
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('translate-y-full', 'sm:scale-95');
+            document.getElementById('modalConfirm').onclick = () => { onConfirm(); close(); };
+            document.getElementById('modalCancel').onclick = close;
+            function close() { 
+                modal.classList.add('opacity-0', 'pointer-events-none'); 
+                content.classList.add('translate-y-full', 'sm:scale-95'); 
+            }
+        }
+
         function showToast(message) {
           const toast = document.getElementById('toast');
           document.getElementById('toastMsg').textContent = message;
-          toast.classList.remove('opacity-0', 'translate-y-4');
-          toast.classList.add('opacity-100', '-translate-y-2');
-          setTimeout(() => {
-            toast.classList.add('opacity-0', 'translate-y-4');
-            toast.classList.remove('opacity-100', '-translate-y-2');
-          }, 3000);
+          toast.classList.remove('opacity-0', '-translate-y-4');
+          toast.classList.add('opacity-100', 'translate-y-0');
+          setTimeout(() => { toast.classList.add('opacity-0', '-translate-y-4'); toast.classList.remove('opacity-100', 'translate-y-0'); }, 3000);
         }
       
         async function fetchUserRole(userId) {
           const { data, error } = await supabaseClient.from('user_roles').select('role').eq('user_id', userId).maybeSingle();
-          if (error) return null;
           return data?.role;
         }
       
@@ -146,15 +235,8 @@
           const { data, error } = await supabaseClient.from('employees').select('*').order('created_at', { ascending: false });
           if (error) return;
           employees = data.map(row => ({
-            id: row.id,
-            name: row.name,
-            nationalId: row.identification_number,
-            mobile: row.mobile,
-            iban: row.iban,
-            email: row.email,
-            qiwa: row.qiwa_status,
-            gosi: row.gosi_status,
-            mudad: row.mudad_status
+            id: row.id, name: row.name, nationalId: row.identification_number, mobile: row.mobile,
+            iban: row.iban, email: row.email, qiwa: row.qiwa_status, gosi: row.gosi_status, mudad: row.mudad_status
           }));
           renderEmployees();
         }
@@ -163,71 +245,47 @@
         loginBtn.addEventListener('click', async () => {
           const email = document.getElementById('emailInput').value.trim();
           const password = document.getElementById('passwordInput').value.trim();
-          if (!email || !password) return showToast('Enter Credentials');
-
-          loginBtn.textContent = 'Verifying...';
+          if (!email || !password) return showToast('Check credentials');
+          loginBtn.textContent = 'Signing in...';
           const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-          if (error) {
-            showToast('Access Denied');
-            loginBtn.textContent = 'Sign in';
-            return;
-          }
-      
+          if (error) { showToast('Login Failed'); loginBtn.textContent = 'Sign in'; return; }
           const role = await fetchUserRole(data.user.id);
-          if (!role) {
-            await supabaseClient.auth.signOut();
-            showToast('Permission Error');
-            return;
-          }
-      
+          if (!role) { await supabaseClient.auth.signOut(); showToast('Role Error'); return; }
           currentUser = { id: data.user.id, email: data.user.email, role };
-          
-          // Setup UI based on Role
           document.getElementById('loginScreen').classList.add('hidden');
           document.getElementById('mainScreen').classList.remove('hidden');
-          document.body.classList.remove('items-center', 'justify-center');
-          document.body.classList.add('pt-12', 'flex', 'flex-col', 'items-center');
-          
           document.getElementById('roleBadge').textContent = role;
           document.getElementById('currentUserRole').textContent = data.user.email;
-          
-          const mainNav = document.getElementById('mainNav');
-          const tabAdd = document.getElementById('tabAdd');
-          
-          if (role === 'updater') {
-            // UPDATER: Hide the entire Navigation bar (since they only have one tab)
-            mainNav.classList.add('hidden');
-          } else {
-            // CREATOR: Show Navigation bar
-            mainNav.classList.remove('hidden');
-          }
-          
+          if (role === 'updater') document.getElementById('tabAdd').classList.add('hidden');
           fetchEmployees();
         });
       
-        document.getElementById('logoutBtn').addEventListener('click', () => location.reload());
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            askConfirmation('Logout', 'Are you sure you want to sign out?', () => {
+                supabaseClient.auth.signOut().then(() => location.reload());
+            });
+        });
       
         const tabEmployees = document.getElementById('tabEmployees');
         const tabAdd = document.getElementById('tabAdd');
         function activateTab(isEmployees) {
           if (isEmployees) {
-            tabEmployees.className = "flex-1 py-3 rounded-xl transition-all font-bold text-sm bg-emerald-600 shadow-lg text-white";
-            tabAdd.className = "flex-1 py-3 rounded-xl transition-all font-semibold text-sm text-white/40 hover:text-white";
+            tabEmployees.className = "flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all bg-emerald-600 text-white shadow-lg";
+            tabAdd.className = "flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all text-white/40";
             document.getElementById('employeesView').classList.remove('hidden');
             document.getElementById('addView').classList.add('hidden');
           } else {
-            tabAdd.className = "flex-1 py-3 rounded-xl transition-all font-bold text-sm bg-emerald-600 shadow-lg text-white";
-            tabEmployees.className = "flex-1 py-3 rounded-xl transition-all font-semibold text-sm text-white/40 hover:text-white";
+            tabAdd.className = "flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all bg-emerald-600 text-white shadow-lg";
+            tabEmployees.className = "flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all text-white/40";
             document.getElementById('employeesView').classList.add('hidden');
             document.getElementById('addView').classList.remove('hidden');
           }
         }
         tabEmployees.addEventListener('click', () => activateTab(true));
         tabAdd.addEventListener('click', () => activateTab(false));
-      
+        activateTab(true);
+
         document.getElementById('saveEmployeeBtn').addEventListener('click', async () => {
-          if (currentUser?.role !== 'creator') return;
-          
           const btn = document.getElementById('saveEmployeeBtn');
           const payload = {
             name: document.getElementById('newName').value.trim(),
@@ -240,93 +298,67 @@
           if (!payload.name || !payload.identification_number) return showToast('Name & ID Required');
           btn.disabled = true; btn.textContent = 'Saving...';
           const { error } = await supabaseClient.from('employees').insert(payload);
-          if (error) showToast('Database Error');
-          else { fetchEmployees(); showToast('Created Successfully'); activateTab(true); }
-          btn.disabled = false; btn.textContent = 'Create Employee Entry';
+          if (error) showToast('Error');
+          else { fetchEmployees(); showToast('Created!'); activateTab(true); }
+          btn.disabled = false; btn.textContent = 'Save Profile';
         });
       
         function renderEmployees() {
           const view = document.getElementById('employeesView');
-          view.innerHTML = employees.length ? '' : '<div class="glass p-12 text-center rounded-3xl text-white/20">System ready. No files found.</div>';
-          
+          view.innerHTML = employees.length ? '' : '<div class="glass p-12 text-center rounded-3xl text-white/20">No active files</div>';
           employees.forEach(emp => {
             const card = document.createElement('div');
-            card.className = 'glass rounded-[2rem] p-6 space-y-5 border-l-4 border-emerald-500 shadow-xl';
-            
+            card.className = 'glass rounded-[2rem] p-5 space-y-4 border-l-4 border-emerald-500 shadow-xl';
             card.innerHTML = `
-              <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+              <div class="flex justify-between items-start">
                 <div>
-                  <h4 class="text-xl font-bold tracking-tight">${emp.name}</h4>
-                  <div class="flex gap-4 mt-1 text-[10px] uppercase tracking-widest text-white/40 font-bold">
-                    <span>ID: ${emp.nationalId}</span>
-                    <span>•</span>
-                    <span>${emp.mobile || 'No Mobile'}</span>
-                  </div>
+                  <h4 class="text-base font-extrabold tracking-tight">${emp.name}</h4>
+                  <p class="text-[9px] uppercase tracking-widest text-white/40 font-bold mt-0.5">ID: ${emp.nationalId} • ${emp.mobile || 'No Mobile'}</p>
                 </div>
-                <div class="text-[10px] text-white/30 italic truncate max-w-[200px]">${emp.iban || ''}</div>
+                <div class="text-[8px] text-white/20 italic truncate max-w-[100px]">${emp.iban || ''}</div>
               </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="grid grid-cols-1 gap-2.5">
                 ${['qiwa', 'gosi', 'mudad'].map(key => {
                   const done = emp[key] === 'done';
                   const isUpdater = currentUser?.role === 'updater';
-                  
-                  // Conditional styling based on role
-                  const cardClass = isUpdater ? 'status-card-interactive' : '';
-                  const roleHint = isUpdater ? '<span class="text-[7px] text-emerald-400/40 mt-1 uppercase tracking-tighter">Click to toggle</span>' : '';
-
                   return `
-                    <div id="tile-${emp.id}-${key}" data-id="${emp.id}" data-key="${key}" 
-                         class="${cardClass} flex items-center justify-between p-4 rounded-2xl border ${done ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white/5 border-white/5'}">
+                    <div data-id="${emp.id}" data-key="${key}" 
+                         class="${isUpdater ? 'status-card-interactive cursor-pointer' : ''} ${done ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-white/5 border-white/5'} border flex items-center justify-between p-3.5 rounded-2xl relative">
                         <div class="flex flex-col">
-                            <span class="text-[9px] uppercase font-black tracking-tighter text-white/40 mb-1">${key}</span>
-                            <span class="text-xs font-bold ${done ? 'text-emerald-400' : 'text-zinc-500'}">${done ? 'DONE' : 'PENDING'}</span>
-                            ${roleHint}
+                            <span class="text-[8px] uppercase font-black tracking-tighter text-white/30">${key} file</span>
+                            <span class="text-xs font-bold ${done ? 'text-emerald-400' : 'text-slate-500'}">${done ? 'Completed' : 'Pending'}</span>
                         </div>
-                        <div class="flex items-center justify-center w-8 h-8 rounded-full ${done ? 'bg-emerald-500 text-white' : 'bg-white/5 text-white/10'}">
+                        <div class="flex items-center justify-center w-7 h-7 rounded-full ${done ? 'bg-emerald-500 text-white' : 'bg-white/5 text-white/10'}">
                             ${done ? '✓' : '○'}
                         </div>
-                        <div id="loader-${emp.id}-${key}" class="hidden absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center">
-                            <div class="loader"></div>
-                        </div>
+                        <div id="loader-${emp.id}-${key}" class="hidden absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center"><div class="loader"></div></div>
                     </div>`;
                 }).join('')}
               </div>`;
             view.appendChild(card);
           });
-      
-          // ONLY attach click listeners if the role is UPDATER
           if (currentUser?.role === 'updater') {
               document.querySelectorAll('.status-card-interactive').forEach(tile => {
-                tile.onclick = () => handleUpdateStatus(tile.dataset.id, tile.dataset.key);
+                tile.onclick = () => {
+                    const id = tile.dataset.id;
+                    const key = tile.dataset.key;
+                    const emp = employees.find(e => e.id == id);
+                    const action = emp[key] === 'done' ? 'PENDING' : 'COMPLETED';
+                    askConfirmation('Update File', `Set ${key.toUpperCase()} for ${emp.name} to ${action}?`, () => handleUpdateStatus(id, key));
+                };
               });
           }
         }
       
         async function handleUpdateStatus(empId, key) {
-          // Double-check role in the function for extra safety
-          if (currentUser?.role !== 'updater') return;
-
           const emp = employees.find(e => e.id == empId);
           const newStatus = emp[key] === 'done' ? 'pending' : 'done';
           const loader = document.getElementById(`loader-${empId}-${key}`);
-          
           loader.classList.remove('hidden');
-          
-          const { error } = await supabaseClient
-            .from('employees')
-            .update({ [key + '_status']: newStatus })
-            .eq('id', empId);
-
+          const { error } = await supabaseClient.from('employees').update({ [key + '_status']: newStatus }).eq('id', empId);
           loader.classList.add('hidden');
-
-          if (error) {
-            showToast('Sync Error: ' + error.message);
-          } else {
-            emp[key] = newStatus;
-            showToast(`${key.toUpperCase()} marked as ${newStatus}`);
-            renderEmployees();
-          }
+          if (error) showToast('Sync Error');
+          else { emp[key] = newStatus; showToast('Updated'); renderEmployees(); }
         }
     </script>
 </body>
