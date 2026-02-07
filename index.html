@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- ANTI-CACHE HEADERS (Forces iPhone to check for updates) -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <title>Eman Bakery Tracker</title>
     
     <!-- iOS Native App Config -->
@@ -21,7 +27,7 @@
         body { 
             /* VELVET SMOKE GRADIENT */
             background: linear-gradient(180deg, #F2F2F2 0%, #ADA996 100%);
-            color: #1e293b; /* Dark Slate Text */
+            color: #1e293b; 
             font-family: 'Inter', sans-serif; 
             height: var(--app-height); 
             width: 100%;
@@ -34,7 +40,6 @@
 
         .app-container { width: 100%; max-width: 640px; min-height: 100%; display: flex; flex-direction: column; margin: 0 auto; }
         
-        /* Light Glass Effect */
         .glass { 
             background: rgba(255, 255, 255, 0.65); 
             backdrop-filter: blur(20px); 
@@ -43,23 +48,11 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         }
 
-        /* Status Tiles */
-        .tile-pending { 
-            background: rgba(255, 255, 255, 0.5); 
-            border: 1px solid rgba(0, 0, 0, 0.05); 
-        }
-        .tile-done { 
-            background: #fff; 
-            border: 1px solid #10b981; 
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
-        }
+        .tile-pending { background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(0, 0, 0, 0.05); }
+        .tile-done { background: #fff; border: 1px solid #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); }
         
         .tab-bar { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            z-index: 50; 
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; 
             padding-bottom: max(10px, env(safe-area-inset-bottom)); 
             border-top: 1px solid rgba(255, 255, 255, 0.5); 
             background: rgba(242, 242, 242, 0.9);
@@ -74,11 +67,7 @@
         #globalLoader { position: fixed; inset: 0; background: #F2F2F2; z-index: 200; display: none; align-items: center; justify-content: center; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
 
-        /* Button Styling for Velvet Theme */
-        .btn-primary {
-            background-color: #1f2937; /* Dark Charcoal */
-            color: white;
-        }
+        .btn-primary { background-color: #1f2937; color: white; }
         .btn-active:active { transform: scale(0.98); }
     </style>
 </head>
@@ -98,12 +87,16 @@
                 <div class="text-center mb-10">
                     <p class="text-[10px] tracking-[0.4em] text-slate-400 uppercase mb-2 font-bold">E M A N</p>
                     <h1 class="text-4xl font-black mb-2 tracking-tight text-slate-800">Eman Bakery</h1>
-                    <p class="text-sm text-slate-500">Employee Portal</p>
+                    <p class="text-sm text-slate-500">Employee Portal v2.0</p>
                 </div>
                 <div class="space-y-4">
                     <input type="email" id="emailInput" placeholder="Email" class="w-full bg-white/60 border border-slate-200 rounded-2xl px-5 py-4 text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 placeholder:text-slate-400 font-medium">
                     <input type="password" id="passwordInput" placeholder="Password" class="w-full bg-white/60 border border-slate-200 rounded-2xl px-5 py-4 text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 placeholder:text-slate-400 font-medium">
                     <button id="loginBtn" class="w-full btn-primary py-4 rounded-2xl font-bold text-lg shadow-lg mt-4 btn-active transition-all">Sign in</button>
+                    <!-- Refresh Button on Login Screen -->
+                     <button onclick="window.location.reload(true)" class="w-full py-2 text-xs text-slate-400 uppercase font-bold tracking-widest hover:text-slate-600">
+                        ↻ Check for Updates
+                    </button>
                 </div>
             </div>
         </div>
@@ -111,14 +104,18 @@
         <!-- Dashboard -->
         <div id="mainScreen" class="hidden flex-1 flex flex-col p-4 space-y-4">
             <header class="sticky top-0 z-40 pt-2 pb-2 flex justify-between items-center">
-                <!-- Added backdrop-blur manually via inline style for header to blend with gradient -->
                 <div style="background: rgba(242,242,242,0.8); backdrop-filter: blur(10px); position: absolute; inset: 0; z-index: -1; margin: 0 -1rem; mask-image: linear-gradient(to bottom, black 80%, transparent 100%);"></div>
                 
                 <div>
                     <h2 class="text-xl font-black tracking-tight text-slate-800">Eman Bakery</h2>
                     <p id="currentUserRole" class="text-[10px] text-slate-400 font-bold uppercase tracking-widest"></p>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <!-- Update Button -->
+                    <button onclick="window.location.reload(true)" class="p-2 rounded-full bg-slate-200/50 border border-white/60 active:scale-90 transition-all text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </button>
+                    
                     <button id="notifBell" class="relative p-2 rounded-full bg-white/40 border border-white/60 active:scale-90 transition-all shadow-sm">
                         <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                         <div id="bellDot" class="notification-dot hidden"></div>
@@ -141,7 +138,6 @@
                 <!-- Empty State -->
             </div>
 
-            <!-- Tab Bar -->
             <nav id="mainNav" class="tab-bar">
                 <div class="flex justify-around p-2">
                     <button id="tabEmployees" class="flex-1 py-2 rounded-xl flex flex-col items-center gap-1">
@@ -222,7 +218,6 @@
         let employees = [];
         let logs = [];
 
-        // UI Setup
         const nameDropdown = document.getElementById('nameDropdown');
         PRE_EMPLOYEES.forEach(e => {
             const opt = document.createElement('option');
@@ -334,7 +329,6 @@
             if (!roleData.data) { await supabaseClient.auth.signOut(); showToast('Role Missing'); return; }
             currentUser = { id: data.user.id, email: data.user.email, role: roleData.data.role };
             
-            // LOCK 1: Visual Hide immediately
             if (currentUser.role === 'updater') {
                 document.getElementById('tabAdd').style.display = 'none'; 
             } else {
@@ -349,7 +343,8 @@
             fetchLogs();
         };
 
-        document.getElementById('logoutBtn').onclick = () => askConfirmation('Exit', 'Sign out of Eman Bakery?', () => location.reload());
+        document.getElementById('logoutBtn').onclick = () => askConfirmation('Exit', 'Sign out of Eman Bakery?', () => location.reload(true));
+        
         document.getElementById('notifBell').onclick = () => {
             const p = document.getElementById('notifPanel');
             p.style.display = p.style.display === 'block' ? 'none' : 'block';
@@ -360,7 +355,6 @@
         const tabEmployees = document.getElementById('tabEmployees');
         const tabAdd = document.getElementById('tabAdd');
         function activateTab(isEmployees) {
-            // LOCK 2: Logic Guard
             if (!isEmployees && currentUser?.role === 'updater') {
                 showToast('Restricted Access');
                 return;
@@ -384,7 +378,6 @@
         activateTab(true);
 
         document.getElementById('saveEmployeeBtn').onclick = async () => {
-            // LOCK 3: Database Guard
             if (currentUser?.role !== 'creator') {
                 showToast('Unauthorized');
                 return;
@@ -443,7 +436,6 @@
                                 <div data-id="${emp.id}" data-key="${key}" 
                                      class="${isUpdater ? 'cursor-pointer active:scale-95' : ''} ${done ? 'tile-done' : 'tile-pending'} flex items-center justify-between p-3.5 rounded-2xl relative transition-all">
                                     <div class="flex flex-col">
-                                        <!-- NOTICEABLE TITLES: BIGGER AND DARKER -->
                                         <span class="text-xs font-black uppercase text-slate-700 tracking-tight">${key} FILE</span>
                                         <span class="text-[10px] font-bold ${done ? 'text-emerald-600' : 'text-slate-400'}">${done ? 'COMPLETED' : 'PENDING'}</span>
                                     </div>
