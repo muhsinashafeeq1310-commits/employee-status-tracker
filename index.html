@@ -21,11 +21,16 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .status-card {
+        .status-card-interactive {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
-        .status-card:active {
-            transform: scale(0.95);
+        .status-card-interactive:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+        .status-card-interactive:active {
+            transform: scale(0.96);
         }
         .loader {
             border: 2px solid rgba(255,255,255,0.1);
@@ -68,16 +73,19 @@
     <div id="mainScreen" class="hidden w-full max-w-3xl space-y-8 animate-in fade-in duration-700">
         <header class="flex justify-between items-end pb-2 border-b border-white/5">
             <div>
-                <h2 class="text-3xl font-bold tracking-tight">Onboarding Status</h2>
-                <p id="currentUserRole" class="text-xs text-emerald-400 font-semibold mt-1 uppercase tracking-widest"></p>
+                <h2 class="text-3xl font-bold tracking-tight">Onboarding Dashboard</h2>
+                <div class="flex items-center gap-2 mt-1">
+                    <span id="roleBadge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-bold uppercase tracking-widest"></span>
+                    <p id="currentUserRole" class="text-[11px] text-white/40 font-medium"></p>
+                </div>
             </div>
             <button id="logoutBtn" class="text-[10px] uppercase tracking-widest bg-white/5 border border-white/10 px-4 py-2 rounded-full hover:bg-white/10 transition-colors">Sign Out</button>
         </header>
 
-        <!-- Navigation -->
-        <nav class="flex gap-3 p-1.5 glass rounded-2xl">
-            <button id="tabEmployees" class="flex-1 py-3 rounded-xl transition-all font-semibold text-sm">Dashboard</button>
-            <button id="tabAdd" class="flex-1 py-3 rounded-xl transition-all font-semibold text-sm">Add New Employee</button>
+        <!-- Navigation (Hidden for Updaters) -->
+        <nav id="mainNav" class="flex gap-3 p-1.5 glass rounded-2xl">
+            <button id="tabEmployees" class="flex-1 py-3 rounded-xl transition-all font-bold text-sm bg-emerald-600 shadow-lg text-white">Dashboard</button>
+            <button id="tabAdd" class="flex-1 py-3 rounded-xl transition-all font-semibold text-sm text-white/40 hover:text-white">Add New Employee</button>
         </nav>
 
         <!-- List View -->
@@ -85,7 +93,7 @@
             <!-- Cards will appear here -->
         </div>
 
-        <!-- Add Form -->
+        <!-- Add Form (Only for Creators) -->
         <div id="addView" class="hidden glass p-8 rounded-[2rem] space-y-6">
             <h3 class="text-xl font-bold">New Employee Profile</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -155,9 +163,9 @@
         loginBtn.addEventListener('click', async () => {
           const email = document.getElementById('emailInput').value.trim();
           const password = document.getElementById('passwordInput').value.trim();
-          if (!email || !password) return showToast('Check your credentials');
+          if (!email || !password) return showToast('Enter Credentials');
 
-          loginBtn.textContent = 'Authenticating...';
+          loginBtn.textContent = 'Verifying...';
           const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
           if (error) {
             showToast('Access Denied');
@@ -168,18 +176,31 @@
           const role = await fetchUserRole(data.user.id);
           if (!role) {
             await supabaseClient.auth.signOut();
-            showToast('Role mismatch');
+            showToast('Permission Error');
             return;
           }
       
           currentUser = { id: data.user.id, email: data.user.email, role };
+          
+          // Setup UI based on Role
           document.getElementById('loginScreen').classList.add('hidden');
           document.getElementById('mainScreen').classList.remove('hidden');
           document.body.classList.remove('items-center', 'justify-center');
           document.body.classList.add('pt-12', 'flex', 'flex-col', 'items-center');
-          document.getElementById('currentUserRole').textContent = `${role} Access: ${data.user.email}`;
           
-          if (role !== 'creator') document.getElementById('tabAdd').classList.add('hidden');
+          document.getElementById('roleBadge').textContent = role;
+          document.getElementById('currentUserRole').textContent = data.user.email;
+          
+          const mainNav = document.getElementById('mainNav');
+          const tabAdd = document.getElementById('tabAdd');
+          
+          if (role === 'updater') {
+            // UPDATER: Hide the entire Navigation bar (since they only have one tab)
+            mainNav.classList.add('hidden');
+          } else {
+            // CREATOR: Show Navigation bar
+            mainNav.classList.remove('hidden');
+          }
           
           fetchEmployees();
         });
@@ -205,6 +226,8 @@
         tabAdd.addEventListener('click', () => activateTab(false));
       
         document.getElementById('saveEmployeeBtn').addEventListener('click', async () => {
+          if (currentUser?.role !== 'creator') return;
+          
           const btn = document.getElementById('saveEmployeeBtn');
           const payload = {
             name: document.getElementById('newName').value.trim(),
@@ -214,17 +237,17 @@
             email: document.getElementById('newEmail').value.trim(),
             qiwa_status: 'pending', gosi_status: 'pending', mudad_status: 'pending'
           };
-          if (!payload.name || !payload.identification_number) return showToast('Full Name & ID are required');
-          btn.disabled = true; btn.textContent = 'Creating...';
+          if (!payload.name || !payload.identification_number) return showToast('Name & ID Required');
+          btn.disabled = true; btn.textContent = 'Saving...';
           const { error } = await supabaseClient.from('employees').insert(payload);
           if (error) showToast('Database Error');
-          else { fetchEmployees(); showToast('Profile Created'); activateTab(true); }
+          else { fetchEmployees(); showToast('Created Successfully'); activateTab(true); }
           btn.disabled = false; btn.textContent = 'Create Employee Entry';
         });
       
         function renderEmployees() {
           const view = document.getElementById('employeesView');
-          view.innerHTML = employees.length ? '' : '<div class="glass p-12 text-center rounded-3xl text-white/20">No active files</div>';
+          view.innerHTML = employees.length ? '' : '<div class="glass p-12 text-center rounded-3xl text-white/20">System ready. No files found.</div>';
           
           employees.forEach(emp => {
             const card = document.createElement('div');
@@ -247,17 +270,23 @@
                 ${['qiwa', 'gosi', 'mudad'].map(key => {
                   const done = emp[key] === 'done';
                   const isUpdater = currentUser?.role === 'updater';
+                  
+                  // Conditional styling based on role
+                  const cardClass = isUpdater ? 'status-card-interactive' : '';
+                  const roleHint = isUpdater ? '<span class="text-[7px] text-emerald-400/40 mt-1 uppercase tracking-tighter">Click to toggle</span>' : '';
+
                   return `
                     <div id="tile-${emp.id}-${key}" data-id="${emp.id}" data-key="${key}" 
-                         class="status-card flex items-center justify-between p-4 rounded-2xl border ${done ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white/5 border-white/5'} ${isUpdater ? 'cursor-pointer hover:bg-white/10' : ''}">
+                         class="${cardClass} flex items-center justify-between p-4 rounded-2xl border ${done ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white/5 border-white/5'}">
                         <div class="flex flex-col">
-                            <span class="text-[9px] uppercase font-black tracking-tighter text-white/40 mb-1">${key} File</span>
-                            <span class="text-xs font-bold ${done ? 'text-emerald-400' : 'text-zinc-500'}">${done ? 'COMPLETED' : 'PENDING'}</span>
+                            <span class="text-[9px] uppercase font-black tracking-tighter text-white/40 mb-1">${key}</span>
+                            <span class="text-xs font-bold ${done ? 'text-emerald-400' : 'text-zinc-500'}">${done ? 'DONE' : 'PENDING'}</span>
+                            ${roleHint}
                         </div>
                         <div class="flex items-center justify-center w-8 h-8 rounded-full ${done ? 'bg-emerald-500 text-white' : 'bg-white/5 text-white/10'}">
                             ${done ? '✓' : '○'}
                         </div>
-                        <div id="loader-${emp.id}-${key}" class="hidden absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center">
+                        <div id="loader-${emp.id}-${key}" class="hidden absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center">
                             <div class="loader"></div>
                         </div>
                     </div>`;
@@ -266,14 +295,18 @@
             view.appendChild(card);
           });
       
+          // ONLY attach click listeners if the role is UPDATER
           if (currentUser?.role === 'updater') {
-              document.querySelectorAll('.status-card').forEach(tile => {
+              document.querySelectorAll('.status-card-interactive').forEach(tile => {
                 tile.onclick = () => handleUpdateStatus(tile.dataset.id, tile.dataset.key);
               });
           }
         }
       
         async function handleUpdateStatus(empId, key) {
+          // Double-check role in the function for extra safety
+          if (currentUser?.role !== 'updater') return;
+
           const emp = employees.find(e => e.id == empId);
           const newStatus = emp[key] === 'done' ? 'pending' : 'done';
           const loader = document.getElementById(`loader-${empId}-${key}`);
@@ -288,10 +321,10 @@
           loader.classList.add('hidden');
 
           if (error) {
-            showToast('Update Failed');
+            showToast('Sync Error: ' + error.message);
           } else {
             emp[key] = newStatus;
-            showToast(`${key.toUpperCase()} Status Updated`);
+            showToast(`${key.toUpperCase()} marked as ${newStatus}`);
             renderEmployees();
           }
         }
