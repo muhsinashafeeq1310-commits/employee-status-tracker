@@ -1,352 +1,438 @@
-<script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-  
-    // ==== Supabase client ====
-    const SUPABASE_URL = 'https://ftkwyywgoutsvdcdvyja.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU';
-  
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  
-    // ==== Auth + app state ====
-    let currentUser = null; // { id, email, role }
-    let employees = [];     // local cache of employees
-  
-    // --- Utility: toast ---
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      const msg = document.getElementById('toastMsg');
-      msg.textContent = message;
-      toast.classList.remove('opacity-0');
-      toast.classList.add('opacity-100');
-      setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0');
-      }, 2000);
-    }
-  
-    // === Fetch user role from user_roles ===
-    async function fetchUserRole(userId) {
-      const { data, error } = await supabaseClient
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
-  
-      if (error) {
-        console.error(error);
-        showToast('No role found for this user');
-        return null;
-      }
-  
-      return data.role;
-    }
-  
-    // === Fetch employees from Supabase ===
-    async function fetchEmployees() {
-      const { data, error } = await supabaseClient
-        .from('employees')
-        .select('*')
-        .order('created_at', { ascending: false });
-  
-      if (error) {
-        console.error(error);
-        showToast('Error loading employees');
-        return;
-      }
-  
-      employees = data.map(row => ({
-        id: row.id,
-        name: row.name,
-        nationalId: row.identification_number,
-        mobile: row.mobile,
-        iban: row.iban,
-        email: row.email,
-        qiwa: row.qiwa_status,
-        gosi: row.gosi_status,
-        mudad: row.mudad_status
-      }));
-  
-      renderEmployees();
-    }
-  
-    // === Login / logout ===
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-  
-    loginBtn.addEventListener('click', async () => {
-      const email = document.getElementById('emailInput').value.trim();
-      const password = document.getElementById('passwordInput').value.trim();
-  
-      if (!email || !password) {
-        showToast('Email and password required');
-        return;
-      }
-  
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
-  
-      if (error) {
-        console.error(error);
-        showToast('Login failed');
-        return;
-      }
-  
-      const user = data.user;
-      const role = await fetchUserRole(user.id);
-      if (!role) {
-        await supabaseClient.auth.signOut();
-        return;
-      }
-  
-      currentUser = { id: user.id, email: user.email, role };
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('mainScreen').classList.remove('hidden');
-      document.getElementById('currentUserRole').textContent =
-        `${user.email} – ${role === 'creator' ? 'Can add employees' : 'Can update statuses'}`;
-  
-      // Configure Add tab visibility for updater
-      const tabAdd = document.getElementById('tabAdd');
-      if (role === 'creator') {
-        tabAdd.classList.remove('opacity-40', 'pointer-events-none');
-      } else {
-        tabAdd.classList.add('opacity-40', 'pointer-events-none');
-        activateTab(true);
-      }
-  
-      fetchEmployees();
-    });
-  
-    logoutBtn.addEventListener('click', async () => {
-      await supabaseClient.auth.signOut();
-      currentUser = null;
-      document.getElementById('emailInput').value = '';
-      document.getElementById('passwordInput').value = '';
-      document.getElementById('mainScreen').classList.add('hidden');
-      document.getElementById('loginScreen').classList.remove('hidden');
-    });
-  
-    // === Tabs ===
-    const tabEmployees = document.getElementById('tabEmployees');
-    const tabAdd = document.getElementById('tabAdd');
-    const employeesView = document.getElementById('employeesView');
-    const addView = document.getElementById('addView');
-  
-    function activateTab(isEmployees) {
-      if (isEmployees) {
-        tabEmployees.classList.add('bg-emeraldGreen', 'text-white', 'shadow-lg');
-        tabEmployees.classList.remove('bg-black/40', 'border', 'border-white/10');
-        tabAdd.classList.add('bg-black/40', 'border', 'border-white/10');
-        tabAdd.classList.remove('bg-emeraldGreen', 'text-white', 'shadow-lg');
-        employeesView.classList.remove('hidden');
-        addView.classList.add('hidden');
-      } else {
-        tabAdd.classList.add('bg-emeraldGreen', 'text-white', 'shadow-lg');
-        tabAdd.classList.remove('bg-black/40', 'border', 'border-white/10');
-        tabEmployees.classList.add('bg-black/40', 'border', 'border-white/10');
-        tabEmployees.classList.remove('bg-emeraldGreen', 'text-white', 'shadow-lg');
-        employeesView.classList.add('hidden');
-        addView.classList.remove('hidden');
-      }
-    }
-  
-    function switchToEmployees() { activateTab(true); }
-    function switchToAdd() { activateTab(false); }
-  
-    tabEmployees.addEventListener('click', switchToEmployees);
-    tabAdd.addEventListener('click', () => {
-      if (currentUser?.role !== 'creator') return;
-      switchToAdd();
-    });
-  
-    activateTab(true); // default
-  
-    // === Add employee ===
-    const saveEmployeeBtn = document.getElementById('saveEmployeeBtn');
-  
-    saveEmployeeBtn.addEventListener('click', async () => {
-      if (currentUser?.role !== 'creator') {
-        showToast('Only creator can add employees');
-        return;
-      }
-  
-      const name = document.getElementById('newName').value.trim();
-      const nationalId = document.getElementById('newId').value.trim();
-      const mobile = document.getElementById('newMobile').value.trim();
-      const iban = document.getElementById('newIban').value.trim();
-      const email = document.getElementById('newEmail').value.trim();
-  
-      if (!name || !nationalId || !iban) {
-        showToast('Name, ID and IBAN are required');
-        return;
-      }
-  
-      const newEmpRow = {
-        name,
-        identification_number: nationalId,
-        mobile,
-        iban,
-        email,
-        qiwa_status: 'pending',
-        gosi_status: 'pending',
-        mudad_status: 'pending'
-      };
-  
-      const { data, error } = await supabaseClient
-        .from('employees')
-        .insert(newEmpRow)
-        .select()
-        .single();
-  
-      if (error) {
-        console.error(error);
-        showToast('Error adding employee');
-        return;
-      }
-  
-      employees.unshift({
-        id: data.id,
-        name: data.name,
-        nationalId: data.identification_number,
-        mobile: data.mobile,
-        iban: data.iban,
-        email: data.email,
-        qiwa: data.qiwa_status,
-        gosi: data.gosi_status,
-        mudad: data.mudad_status
-      });
-  
-      renderEmployees();
-      showToast('Employee added');
-  
-      document.getElementById('newName').value = '';
-      document.getElementById('newId').value = '';
-      document.getElementById('newMobile').value = '';
-      document.getElementById('newIban').value = '';
-      document.getElementById('newEmail').value = '';
-  
-      switchToEmployees();
-    });
-  
-    // === Render employees ===
-    function renderEmployees() {
-      employeesView.innerHTML = '';
-  
-      if (employees.length === 0) {
-        employeesView.innerHTML =
-          '<p class="text-xs text-slate-300 text-center py-8">No employees yet. Use "Add employee" to create one.</p>';
-        return;
-      }
-  
-      employees.forEach(emp => {
-        const card = document.createElement('div');
-        card.className =
-          'bg-gradient-to-b from-emeraldDark to-emeraldGreen rounded-3xl border border-white/10 shadow-xl px-4 py-3 space-y-2';
-  
-        const nameRow = document.createElement('div');
-        nameRow.className = 'flex items-start justify-between gap-2';
-  
-        nameRow.innerHTML = `
-          <div>
-            <p class="text-sm font-semibold">${emp.name}</p>
-            <p class="text-[11px] text-slate-200 mt-0.5">ID: ${emp.nationalId || '-'}</p>
-            <p class="text-[11px] text-slate-200">Mobile: ${emp.mobile || '-'}</p>
-            <p class="text-[11px] text-slate-200 truncate">IBAN: ${emp.iban || '-'}</p>
-          </div>
-        `;
-  
-        card.appendChild(nameRow);
-  
-        const statuses = document.createElement('div');
-        statuses.className = 'grid grid-cols-3 gap-2 mt-2';
-  
-        ['qiwa', 'gosi', 'mudad'].forEach(key => {
-          const value = emp[key];
-          const isDone = value === 'done';
-          const label = key.toUpperCase();
-  
-          const badge = document.createElement('div');
-          badge.className =
-            'flex flex-col items-center justify-between bg-black/30 rounded-2xl border border-white/10 px-2 py-2 text-[10px] text-center';
-  
-          const statusPill = `
-            <span class="px-2 py-0.5 rounded-full text-[10px] ${isDone ? 'bg-emeraldGreen/90' : 'bg-slate-600/70'} text-white">
-              ${isDone ? 'Done' : 'Pending'}
-            </span>
-          `;
-  
-          let actionBtn = '';
-          if (currentUser?.role === 'updater') {
-            actionBtn = `
-              <button data-emp="${emp.id}" data-key="${key}"
-                class="mt-1 px-2 py-0.5 rounded-full border border-white/20 text-[10px] bg-black/30 hover:bg-black/50">
-                ${isDone ? 'Mark pending' : 'Mark done'}
-              </button>
-            `;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eman Bakery – Employee Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f172a; /* Dark background from screenshot */
+            color: white;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .emerald-gradient {
+            background: linear-gradient(180deg, #064e3b 0%, #065f46 100%);
+        }
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="w-full max-w-md emerald-gradient p-8 rounded-[2.5rem] shadow-2xl border border-white/10">
+        <div class="text-center mb-8">
+            <p class="text-[10px] tracking-[0.3em] text-emerald-200 uppercase mb-1">E M A N</p>
+            <h1 class="text-3xl font-bold mb-1">Eman Bakery</h1>
+            <p class="text-sm text-emerald-100/70">Bank account onboarding status</p>
+        </div>
+
+        <div class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-emerald-100 mb-2">Email</label>
+                <input type="email" id="emailInput" placeholder="shafeeq1dxb@gmail.com" 
+                    class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-emerald-100 mb-2">Password</label>
+                <input type="password" id="passwordInput" placeholder="••••••••••••••" 
+                    class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+            </div>
+
+            <button id="loginBtn" class="w-full bg-emerald-900/40 border border-white/10 hover:bg-emerald-800/60 py-4 rounded-2xl font-semibold text-lg transition-all active:scale-[0.98]">
+                Sign in
+            </button>
+
+            <div class="text-center space-y-1">
+                <p class="text-[10px] text-emerald-100/50">Login With Your User Name and Password.</p>
+                <p class="text-[10px] text-emerald-100/50">www.emanbakeries.com</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Screen (Hidden by default) -->
+    <div id="mainScreen" class="hidden w-full max-w-2xl space-y-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold">Employee Tracker</h2>
+                <p id="currentUserRole" class="text-xs text-slate-400"></p>
+            </div>
+            <button id="logoutBtn" class="text-xs bg-red-900/30 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-900/50">Logout</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 p-1 bg-black/20 rounded-2xl border border-white/5">
+            <button id="tabEmployees" class="flex-1 py-3 rounded-xl transition-all font-medium">Employees</button>
+            <button id="tabAdd" class="flex-1 py-3 rounded-xl transition-all font-medium">Add Employee</button>
+        </div>
+
+        <!-- Views -->
+        <div id="employeesView" class="space-y-4">
+            <!-- Employee cards injected here -->
+        </div>
+
+        <div id="addView" class="hidden glass-panel p-6 rounded-3xl space-y-4">
+            <input id="newName" type="text" placeholder="Full Name" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3">
+            <input id="newId" type="text" placeholder="National ID" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3">
+            <input id="newMobile" type="text" placeholder="Mobile Number" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3">
+            <input id="newEmail" type="email" placeholder="Email Address" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3">
+            <input id="newIban" type="text" placeholder="IBAN" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3">
+            <button id="saveEmployeeBtn" class="w-full bg-emerald-600 py-4 rounded-xl font-bold">Save Employee</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-300 pointer-events-none">
+        <div class="bg-slate-800 border border-white/10 px-6 py-3 rounded-full shadow-2xl">
+            <p id="toastMsg" class="text-sm"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+      
+        // ==== Supabase client ====
+        // IMPORTANT: We use 'supabaseClient' instead of 'supabase' to avoid global name conflicts
+        const SUPABASE_URL = 'https://ftkwyywgoutsvdcdvyja.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU';
+      
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      
+        // ==== Auth + app state ====
+        let currentUser = null; 
+        let employees = [];     
+      
+        // --- Utility: toast ---
+        function showToast(message) {
+          const toast = document.getElementById('toast');
+          const msg = document.getElementById('toastMsg');
+          msg.textContent = message;
+          toast.classList.remove('opacity-0');
+          toast.classList.add('opacity-100');
+          setTimeout(() => {
+            toast.classList.remove('opacity-100');
+            toast.classList.add('opacity-0');
+          }, 2500);
+        }
+      
+        // === Fetch user role from user_roles ===
+        async function fetchUserRole(userId) {
+          const { data, error } = await supabaseClient
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', userId)
+            .single();
+      
+          if (error) {
+            console.error(error);
+            showToast('No role found for this user');
+            return null;
           }
-  
-          badge.innerHTML = `
-            <span class="uppercase tracking-wide text-slate-200 mb-1">${label}</span>
-            ${statusPill}
-            ${actionBtn}
-          `;
-  
-          statuses.appendChild(badge);
+          return data.role;
+        }
+      
+        // === Fetch employees from Supabase ===
+        async function fetchEmployees() {
+          const { data, error } = await supabaseClient
+            .from('employees')
+            .select('*')
+            .order('created_at', { ascending: false });
+      
+          if (error) {
+            console.error(error);
+            showToast('Error loading employees');
+            return;
+          }
+      
+          employees = data.map(row => ({
+            id: row.id,
+            name: row.name,
+            nationalId: row.identification_number,
+            mobile: row.mobile,
+            iban: row.iban,
+            email: row.email,
+            qiwa: row.qiwa_status,
+            gosi: row.gosi_status,
+            mudad: row.mudad_status
+          }));
+      
+          renderEmployees();
+        }
+      
+        // === Login / logout ===
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+      
+        loginBtn.addEventListener('click', async () => {
+          const email = document.getElementById('emailInput').value.trim();
+          const password = document.getElementById('passwordInput').value.trim();
+      
+          if (!email || !password) {
+            showToast('Email and password required');
+            return;
+          }
+
+          loginBtn.textContent = 'Signing in...';
+          loginBtn.disabled = true;
+      
+          const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+      
+          if (error) {
+            console.error(error);
+            showToast('Login failed: ' + error.message);
+            loginBtn.textContent = 'Sign in';
+            loginBtn.disabled = false;
+            return;
+          }
+      
+          const user = data.user;
+          const role = await fetchUserRole(user.id);
+          
+          if (!role) {
+            await supabaseClient.auth.signOut();
+            loginBtn.textContent = 'Sign in';
+            loginBtn.disabled = false;
+            return;
+          }
+      
+          currentUser = { id: user.id, email: user.email, role };
+          document.getElementById('loginScreen').classList.add('hidden');
+          document.getElementById('mainScreen').classList.remove('hidden');
+          document.body.classList.remove('items-center'); // Move app to top
+          document.body.classList.add('pt-12');
+
+          document.getElementById('currentUserRole').textContent =
+            `${user.email} – ${role === 'creator' ? 'Can add employees' : 'Can update statuses'}`;
+      
+          const tabAdd = document.getElementById('tabAdd');
+          if (role === 'creator') {
+            tabAdd.classList.remove('opacity-40', 'pointer-events-none');
+          } else {
+            tabAdd.classList.add('opacity-40', 'pointer-events-none');
+            activateTab(true);
+          }
+      
+          fetchEmployees();
         });
-  
-        card.appendChild(statuses);
-        employeesView.appendChild(card);
-      });
-  
-      // Attach listeners for status buttons
-      document.querySelectorAll('[data-emp]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const empId = Number(btn.getAttribute('data-emp'));
-          const key = btn.getAttribute('data-key');
-          handleStatusChange(empId, key);
+      
+        logoutBtn.addEventListener('click', async () => {
+          await supabaseClient.auth.signOut();
+          currentUser = null;
+          document.getElementById('emailInput').value = '';
+          document.getElementById('passwordInput').value = '';
+          document.getElementById('mainScreen').classList.add('hidden');
+          document.getElementById('loginScreen').classList.remove('hidden');
+          document.body.classList.add('items-center');
+          document.body.classList.remove('pt-12');
+          loginBtn.textContent = 'Sign in';
+          loginBtn.disabled = false;
         });
-      });
-    }
-  
-    // === Update status with confirmation ===
-    async function handleStatusChange(empId, key) {
-      if (currentUser?.role !== 'updater') {
-        showToast('Only updater can change statuses');
-        return;
-      }
-  
-      const emp = employees.find(e => e.id === empId);
-      if (!emp) return;
-  
-      const current = emp[key];
-      const target = current === 'done' ? 'pending' : 'done';
-  
-      const confirmed = window.confirm(
-        `Are you sure you want to change ${key.toUpperCase()} status for ${emp.name} from "${current}" to "${target}"?`
-      );
-      if (!confirmed) return;
-  
-      const columnMap = {
-        qiwa: 'qiwa_status',
-        gosi: 'gosi_status',
-        mudad: 'mudad_status'
-      };
-  
-      const { error } = await supabaseClient
-        .from('employees')
-        .update({ [columnMap[key]]: target })
-        .eq('id', empId);
-  
-      if (error) {
-        console.error(error);
-        showToast('Error updating status');
-        return;
-      }
-  
-      emp[key] = target;
-      renderEmployees();
-      showToast(`${key.toUpperCase()} updated`);
-    }
-  </script>
-  
+      
+        // === Tabs ===
+        const tabEmployees = document.getElementById('tabEmployees');
+        const tabAdd = document.getElementById('tabAdd');
+        const employeesView = document.getElementById('employeesView');
+        const addView = document.getElementById('addView');
+      
+        function activateTab(isEmployees) {
+          if (isEmployees) {
+            tabEmployees.className = "flex-1 py-3 rounded-xl transition-all font-medium bg-emerald-600 text-white shadow-lg";
+            tabAdd.className = "flex-1 py-3 rounded-xl transition-all font-medium text-slate-400 hover:text-white";
+            employeesView.classList.remove('hidden');
+            addView.classList.add('hidden');
+          } else {
+            tabAdd.className = "flex-1 py-3 rounded-xl transition-all font-medium bg-emerald-600 text-white shadow-lg";
+            tabEmployees.className = "flex-1 py-3 rounded-xl transition-all font-medium text-slate-400 hover:text-white";
+            employeesView.classList.add('hidden');
+            addView.classList.remove('hidden');
+          }
+        }
+      
+        tabEmployees.addEventListener('click', () => activateTab(true));
+        tabAdd.addEventListener('click', () => {
+          if (currentUser?.role !== 'creator') return;
+          activateTab(false);
+        });
+      
+        activateTab(true); // default
+      
+        // === Add employee ===
+        const saveEmployeeBtn = document.getElementById('saveEmployeeBtn');
+      
+        saveEmployeeBtn.addEventListener('click', async () => {
+          if (currentUser?.role !== 'creator') {
+            showToast('Only creator can add employees');
+            return;
+          }
+      
+          const name = document.getElementById('newName').value.trim();
+          const nationalId = document.getElementById('newId').value.trim();
+          const mobile = document.getElementById('newMobile').value.trim();
+          const iban = document.getElementById('newIban').value.trim();
+          const email = document.getElementById('newEmail').value.trim();
+      
+          if (!name || !nationalId || !iban) {
+            showToast('Name, ID and IBAN are required');
+            return;
+          }
+
+          saveEmployeeBtn.disabled = true;
+          saveEmployeeBtn.textContent = 'Saving...';
+      
+          const newEmpRow = {
+            name,
+            identification_number: nationalId,
+            mobile,
+            iban,
+            email,
+            qiwa_status: 'pending',
+            gosi_status: 'pending',
+            mudad_status: 'pending'
+          };
+      
+          const { data, error } = await supabaseClient
+            .from('employees')
+            .insert(newEmpRow)
+            .select()
+            .single();
+      
+          if (error) {
+            console.error(error);
+            showToast('Error adding employee');
+            saveEmployeeBtn.disabled = false;
+            saveEmployeeBtn.textContent = 'Save Employee';
+            return;
+          }
+      
+          employees.unshift({
+            id: data.id,
+            name: data.name,
+            nationalId: data.identification_number,
+            mobile: data.mobile,
+            iban: data.iban,
+            email: data.email,
+            qiwa: data.qiwa_status,
+            gosi: data.gosi_status,
+            mudad: data.mudad_status
+          });
+      
+          renderEmployees();
+          showToast('Employee added');
+      
+          document.getElementById('newName').value = '';
+          document.getElementById('newId').value = '';
+          document.getElementById('newMobile').value = '';
+          document.getElementById('newIban').value = '';
+          document.getElementById('newEmail').value = '';
+      
+          saveEmployeeBtn.disabled = false;
+          saveEmployeeBtn.textContent = 'Save Employee';
+          activateTab(true);
+        });
+      
+        // === Render employees ===
+        function renderEmployees() {
+          employeesView.innerHTML = '';
+      
+          if (employees.length === 0) {
+            employeesView.innerHTML =
+              '<p class="text-xs text-slate-500 text-center py-12">No employees found. Use "Add Employee" to create one.</p>';
+            return;
+          }
+      
+          employees.forEach(emp => {
+            const card = document.createElement('div');
+            card.className = 'emerald-gradient rounded-3xl border border-white/10 shadow-xl px-5 py-4 space-y-4';
+      
+            card.innerHTML = `
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-lg font-bold">${emp.name}</p>
+                  <p class="text-[11px] text-emerald-100/60 mt-0.5 uppercase tracking-wider">ID: ${emp.nationalId || '-'}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-[11px] text-emerald-100/60">${emp.mobile || '-'}</p>
+                  <p class="text-[10px] text-emerald-100/40 italic truncate max-w-[150px]">${emp.iban || '-'}</p>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-3 gap-3">
+                ${['qiwa', 'gosi', 'mudad'].map(key => {
+                  const val = emp[key];
+                  const isDone = val === 'done';
+                  const canUpdate = currentUser?.role === 'updater';
+                  
+                  return `
+                    <div class="bg-black/20 rounded-2xl border border-white/5 p-3 flex flex-col items-center gap-2">
+                        <span class="text-[9px] uppercase tracking-widest text-emerald-100/50">${key}</span>
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold ${isDone ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300'}">
+                            ${isDone ? 'DONE' : 'PENDING'}
+                        </span>
+                        ${canUpdate ? `
+                            <button data-emp="${emp.id}" data-key="${key}" class="mt-1 text-[9px] underline text-emerald-200/50 hover:text-white">
+                                Mark ${isDone ? 'Pending' : 'Done'}
+                            </button>
+                        ` : ''}
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `;
+      
+            employeesView.appendChild(card);
+          });
+      
+          // Re-attach listeners for status buttons
+          document.querySelectorAll('[data-emp]').forEach(btn => {
+            btn.onclick = () => {
+              const empId = Number(btn.getAttribute('data-emp'));
+              const key = btn.getAttribute('data-key');
+              handleStatusChange(empId, key);
+            };
+          });
+        }
+      
+        // === Update status ===
+        async function handleStatusChange(empId, key) {
+          if (currentUser?.role !== 'updater') {
+            showToast('Only updater can change statuses');
+            return;
+          }
+      
+          const emp = employees.find(e => e.id === empId);
+          if (!emp) return;
+      
+          const current = emp[key];
+          const target = current === 'done' ? 'pending' : 'done';
+      
+          const columnMap = {
+            qiwa: 'qiwa_status',
+            gosi: 'gosi_status',
+            mudad: 'mudad_status'
+          };
+      
+          const { error } = await supabaseClient
+            .from('employees')
+            .update({ [columnMap[key]]: target })
+            .eq('id', empId);
+      
+          if (error) {
+            console.error(error);
+            showToast('Error updating status');
+            return;
+          }
+      
+          emp[key] = target;
+          renderEmployees();
+          showToast(`${key.toUpperCase()} marked as ${target}`);
+        }
+      </script>
+</body>
+</html>
