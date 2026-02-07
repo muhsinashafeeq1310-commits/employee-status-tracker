@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-color: #0f172a; /* Dark background from screenshot */
+            background-color: #0f172a;
             color: white;
             font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <!-- Main App Screen (Hidden by default) -->
+    <!-- Main App Screen -->
     <div id="mainScreen" class="hidden w-full max-w-2xl space-y-6">
         <div class="flex justify-between items-center">
             <div>
@@ -64,16 +64,12 @@
             <button id="logoutBtn" class="text-xs bg-red-900/30 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-900/50">Logout</button>
         </div>
 
-        <!-- Tabs -->
         <div class="flex gap-2 p-1 bg-black/20 rounded-2xl border border-white/5">
             <button id="tabEmployees" class="flex-1 py-3 rounded-xl transition-all font-medium">Employees</button>
             <button id="tabAdd" class="flex-1 py-3 rounded-xl transition-all font-medium">Add Employee</button>
         </div>
 
-        <!-- Views -->
-        <div id="employeesView" class="space-y-4">
-            <!-- Employee cards injected here -->
-        </div>
+        <div id="employeesView" class="space-y-4"></div>
 
         <div id="addView" class="hidden glass-panel p-6 rounded-3xl space-y-4">
             <input id="newName" type="text" placeholder="Full Name" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3">
@@ -85,29 +81,26 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-300 pointer-events-none">
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-300 pointer-events-none z-50">
         <div class="bg-slate-800 border border-white/10 px-6 py-3 rounded-full shadow-2xl">
-            <p id="toastMsg" class="text-sm"></p>
+            <p id="toastMsg" class="text-sm text-center"></p>
         </div>
     </div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
       
-        // ==== Supabase client ====
-        // IMPORTANT: We use 'supabaseClient' instead of 'supabase' to avoid global name conflicts
         const SUPABASE_URL = 'https://ftkwyywgoutsvdcdvyja.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU';
       
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       
-        // ==== Auth + app state ====
         let currentUser = null; 
         let employees = [];     
       
-        // --- Utility: toast ---
         function showToast(message) {
+          console.log("Toast:", message);
           const toast = document.getElementById('toast');
           const msg = document.getElementById('toastMsg');
           msg.textContent = message;
@@ -116,26 +109,31 @@
           setTimeout(() => {
             toast.classList.remove('opacity-100');
             toast.classList.add('opacity-0');
-          }, 2500);
+          }, 6000);
         }
       
-        // === Fetch user role from user_roles ===
         async function fetchUserRole(userId) {
+          console.log("Searching for role for user ID:", userId);
+          
           const { data, error } = await supabaseClient
             .from('user_roles')
             .select('role')
             .eq('user_id', userId)
-            .single();
+            .maybeSingle();
       
           if (error) {
-            console.error(error);
-            showToast('No role found for this user');
+            showToast('Supabase Error: ' + error.message);
             return null;
           }
+
+          if (!data) {
+            showToast('Error: UID ' + userId.substring(0,5) + '... not found in user_roles table. Check RLS settings.');
+            return null;
+          }
+
           return data.role;
         }
       
-        // === Fetch employees from Supabase ===
         async function fetchEmployees() {
           const { data, error } = await supabaseClient
             .from('employees')
@@ -143,11 +141,9 @@
             .order('created_at', { ascending: false });
       
           if (error) {
-            console.error(error);
-            showToast('Error loading employees');
+            showToast('Employees Error: ' + error.message);
             return;
           }
-      
           employees = data.map(row => ({
             id: row.id,
             name: row.name,
@@ -159,14 +155,10 @@
             gosi: row.gosi_status,
             mudad: row.mudad_status
           }));
-      
           renderEmployees();
         }
       
-        // === Login / logout ===
         const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-      
         loginBtn.addEventListener('click', async () => {
           const email = document.getElementById('emailInput').value.trim();
           const password = document.getElementById('passwordInput').value.trim();
@@ -176,24 +168,19 @@
             return;
           }
 
-          loginBtn.textContent = 'Signing in...';
+          loginBtn.textContent = 'Checking...';
           loginBtn.disabled = true;
       
-          const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-          });
+          const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       
           if (error) {
-            console.error(error);
-            showToast('Login failed: ' + error.message);
+            showToast('Login Failed: ' + error.message);
             loginBtn.textContent = 'Sign in';
             loginBtn.disabled = false;
             return;
           }
       
-          const user = data.user;
-          const role = await fetchUserRole(user.id);
+          const role = await fetchUserRole(data.user.id);
           
           if (!role) {
             await supabaseClient.auth.signOut();
@@ -202,237 +189,93 @@
             return;
           }
       
-          currentUser = { id: user.id, email: user.email, role };
+          currentUser = { id: data.user.id, email: data.user.email, role };
           document.getElementById('loginScreen').classList.add('hidden');
           document.getElementById('mainScreen').classList.remove('hidden');
-          document.body.classList.remove('items-center'); // Move app to top
-          document.body.classList.add('pt-12');
+          document.body.classList.remove('items-center', 'justify-center');
+          document.body.classList.add('pt-12', 'flex', 'flex-col', 'items-center');
 
-          document.getElementById('currentUserRole').textContent =
-            `${user.email} – ${role === 'creator' ? 'Can add employees' : 'Can update statuses'}`;
-      
-          const tabAdd = document.getElementById('tabAdd');
-          if (role === 'creator') {
-            tabAdd.classList.remove('opacity-40', 'pointer-events-none');
-          } else {
-            tabAdd.classList.add('opacity-40', 'pointer-events-none');
+          document.getElementById('currentUserRole').textContent = `${data.user.email} (${role})`;
+          
+          if (role !== 'creator') {
+            document.getElementById('tabAdd').classList.add('opacity-40', 'pointer-events-none');
             activateTab(true);
           }
-      
           fetchEmployees();
         });
       
-        logoutBtn.addEventListener('click', async () => {
-          await supabaseClient.auth.signOut();
-          currentUser = null;
-          document.getElementById('emailInput').value = '';
-          document.getElementById('passwordInput').value = '';
-          document.getElementById('mainScreen').classList.add('hidden');
-          document.getElementById('loginScreen').classList.remove('hidden');
-          document.body.classList.add('items-center');
-          document.body.classList.remove('pt-12');
-          loginBtn.textContent = 'Sign in';
-          loginBtn.disabled = false;
-        });
+        document.getElementById('logoutBtn').addEventListener('click', () => location.reload());
       
-        // === Tabs ===
         const tabEmployees = document.getElementById('tabEmployees');
         const tabAdd = document.getElementById('tabAdd');
-        const employeesView = document.getElementById('employeesView');
-        const addView = document.getElementById('addView');
-      
         function activateTab(isEmployees) {
           if (isEmployees) {
             tabEmployees.className = "flex-1 py-3 rounded-xl transition-all font-medium bg-emerald-600 text-white shadow-lg";
             tabAdd.className = "flex-1 py-3 rounded-xl transition-all font-medium text-slate-400 hover:text-white";
-            employeesView.classList.remove('hidden');
-            addView.classList.add('hidden');
+            document.getElementById('employeesView').classList.remove('hidden');
+            document.getElementById('addView').classList.add('hidden');
           } else {
             tabAdd.className = "flex-1 py-3 rounded-xl transition-all font-medium bg-emerald-600 text-white shadow-lg";
             tabEmployees.className = "flex-1 py-3 rounded-xl transition-all font-medium text-slate-400 hover:text-white";
-            employeesView.classList.add('hidden');
-            addView.classList.remove('hidden');
+            document.getElementById('employeesView').classList.add('hidden');
+            document.getElementById('addView').classList.remove('hidden');
           }
         }
       
         tabEmployees.addEventListener('click', () => activateTab(true));
-        tabAdd.addEventListener('click', () => {
-          if (currentUser?.role !== 'creator') return;
-          activateTab(false);
-        });
+        tabAdd.addEventListener('click', () => currentUser?.role === 'creator' && activateTab(false));
       
-        activateTab(true); // default
-      
-        // === Add employee ===
-        const saveEmployeeBtn = document.getElementById('saveEmployeeBtn');
-      
-        saveEmployeeBtn.addEventListener('click', async () => {
-          if (currentUser?.role !== 'creator') {
-            showToast('Only creator can add employees');
-            return;
-          }
-      
-          const name = document.getElementById('newName').value.trim();
-          const nationalId = document.getElementById('newId').value.trim();
-          const mobile = document.getElementById('newMobile').value.trim();
-          const iban = document.getElementById('newIban').value.trim();
-          const email = document.getElementById('newEmail').value.trim();
-      
-          if (!name || !nationalId || !iban) {
-            showToast('Name, ID and IBAN are required');
-            return;
-          }
-
-          saveEmployeeBtn.disabled = true;
-          saveEmployeeBtn.textContent = 'Saving...';
-      
-          const newEmpRow = {
-            name,
-            identification_number: nationalId,
-            mobile,
-            iban,
-            email,
-            qiwa_status: 'pending',
-            gosi_status: 'pending',
-            mudad_status: 'pending'
+        document.getElementById('saveEmployeeBtn').addEventListener('click', async () => {
+          const btn = document.getElementById('saveEmployeeBtn');
+          const payload = {
+            name: document.getElementById('newName').value.trim(),
+            identification_number: document.getElementById('newId').value.trim(),
+            mobile: document.getElementById('newMobile').value.trim(),
+            iban: document.getElementById('newIban').value.trim(),
+            email: document.getElementById('newEmail').value.trim(),
+            qiwa_status: 'pending', gosi_status: 'pending', mudad_status: 'pending'
           };
-      
-          const { data, error } = await supabaseClient
-            .from('employees')
-            .insert(newEmpRow)
-            .select()
-            .single();
-      
-          if (error) {
-            console.error(error);
-            showToast('Error adding employee');
-            saveEmployeeBtn.disabled = false;
-            saveEmployeeBtn.textContent = 'Save Employee';
-            return;
-          }
-      
-          employees.unshift({
-            id: data.id,
-            name: data.name,
-            nationalId: data.identification_number,
-            mobile: data.mobile,
-            iban: data.iban,
-            email: data.email,
-            qiwa: data.qiwa_status,
-            gosi: data.gosi_status,
-            mudad: data.mudad_status
-          });
-      
-          renderEmployees();
-          showToast('Employee added');
-      
-          document.getElementById('newName').value = '';
-          document.getElementById('newId').value = '';
-          document.getElementById('newMobile').value = '';
-          document.getElementById('newIban').value = '';
-          document.getElementById('newEmail').value = '';
-      
-          saveEmployeeBtn.disabled = false;
-          saveEmployeeBtn.textContent = 'Save Employee';
-          activateTab(true);
+          if (!payload.name || !payload.identification_number) return showToast('Name and ID required');
+          
+          btn.disabled = true; btn.textContent = 'Saving...';
+          const { error } = await supabaseClient.from('employees').insert(payload);
+          if (error) showToast(error.message);
+          else { fetchEmployees(); showToast('Added!'); activateTab(true); }
+          btn.disabled = false; btn.textContent = 'Save Employee';
         });
       
-        // === Render employees ===
         function renderEmployees() {
-          employeesView.innerHTML = '';
-      
-          if (employees.length === 0) {
-            employeesView.innerHTML =
-              '<p class="text-xs text-slate-500 text-center py-12">No employees found. Use "Add Employee" to create one.</p>';
-            return;
-          }
-      
+          const view = document.getElementById('employeesView');
+          view.innerHTML = employees.length ? '' : '<p class="text-xs text-slate-500 text-center py-12">No records found.</p>';
           employees.forEach(emp => {
             const card = document.createElement('div');
-            card.className = 'emerald-gradient rounded-3xl border border-white/10 shadow-xl px-5 py-4 space-y-4';
-      
+            card.className = 'emerald-gradient rounded-3xl border border-white/10 shadow-xl px-5 py-4 space-y-4 w-full max-w-xl';
             card.innerHTML = `
               <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-lg font-bold">${emp.name}</p>
-                  <p class="text-[11px] text-emerald-100/60 mt-0.5 uppercase tracking-wider">ID: ${emp.nationalId || '-'}</p>
-                </div>
-                <div class="text-right">
-                  <p class="text-[11px] text-emerald-100/60">${emp.mobile || '-'}</p>
-                  <p class="text-[10px] text-emerald-100/40 italic truncate max-w-[150px]">${emp.iban || '-'}</p>
-                </div>
+                <div><p class="text-lg font-bold">${emp.name}</p><p class="text-[11px] text-emerald-100/60 uppercase">ID: ${emp.nationalId}</p></div>
+                <div class="text-right text-[11px] text-emerald-100/60"><p>${emp.mobile || '-'}</p></div>
               </div>
-              
               <div class="grid grid-cols-3 gap-3">
                 ${['qiwa', 'gosi', 'mudad'].map(key => {
-                  const val = emp[key];
-                  const isDone = val === 'done';
-                  const canUpdate = currentUser?.role === 'updater';
-                  
-                  return `
-                    <div class="bg-black/20 rounded-2xl border border-white/5 p-3 flex flex-col items-center gap-2">
-                        <span class="text-[9px] uppercase tracking-widest text-emerald-100/50">${key}</span>
-                        <span class="px-3 py-1 rounded-full text-[10px] font-bold ${isDone ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300'}">
-                            ${isDone ? 'DONE' : 'PENDING'}
-                        </span>
-                        ${canUpdate ? `
-                            <button data-emp="${emp.id}" data-key="${key}" class="mt-1 text-[9px] underline text-emerald-200/50 hover:text-white">
-                                Mark ${isDone ? 'Pending' : 'Done'}
-                            </button>
-                        ` : ''}
-                    </div>
-                  `;
+                  const done = emp[key] === 'done';
+                  return `<div class="bg-black/20 rounded-2xl p-3 flex flex-col items-center gap-2">
+                    <span class="text-[9px] uppercase text-emerald-100/50">${key}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${done ? 'bg-emerald-500' : 'bg-slate-700'}">${done ? 'DONE' : 'PENDING'}</span>
+                    ${currentUser?.role === 'updater' ? `<button data-emp="${emp.id}" data-key="${key}" class="text-[9px] underline text-emerald-200/50">Toggle</button>` : ''}
+                  </div>`;
                 }).join('')}
-              </div>
-            `;
-      
-            employeesView.appendChild(card);
+              </div>`;
+            view.appendChild(card);
           });
-      
-          // Re-attach listeners for status buttons
-          document.querySelectorAll('[data-emp]').forEach(btn => {
-            btn.onclick = () => {
-              const empId = Number(btn.getAttribute('data-emp'));
-              const key = btn.getAttribute('data-key');
-              handleStatusChange(empId, key);
-            };
-          });
+          document.querySelectorAll('[data-emp]').forEach(btn => btn.onclick = () => updateStatus(Number(btn.dataset.emp), btn.dataset.key));
         }
       
-        // === Update status ===
-        async function handleStatusChange(empId, key) {
-          if (currentUser?.role !== 'updater') {
-            showToast('Only updater can change statuses');
-            return;
-          }
-      
-          const emp = employees.find(e => e.id === empId);
-          if (!emp) return;
-      
-          const current = emp[key];
-          const target = current === 'done' ? 'pending' : 'done';
-      
-          const columnMap = {
-            qiwa: 'qiwa_status',
-            gosi: 'gosi_status',
-            mudad: 'mudad_status'
-          };
-      
-          const { error } = await supabaseClient
-            .from('employees')
-            .update({ [columnMap[key]]: target })
-            .eq('id', empId);
-      
-          if (error) {
-            console.error(error);
-            showToast('Error updating status');
-            return;
-          }
-      
-          emp[key] = target;
-          renderEmployees();
-          showToast(`${key.toUpperCase()} marked as ${target}`);
+        async function updateStatus(id, key) {
+          const emp = employees.find(e => e.id === id);
+          const target = emp[key] === 'done' ? 'pending' : 'done';
+          const { error } = await supabaseClient.from('employees').update({ [key + '_status']: target }).eq('id', id);
+          if (!error) { emp[key] = target; renderEmployees(); }
         }
-      </script>
+    </script>
 </body>
 </html>
