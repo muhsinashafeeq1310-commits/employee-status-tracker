@@ -4,25 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Eman Bakery Tracker</title>
+    
+    <!-- iOS Native App Config -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Eman Bakery">
+    <meta name="theme-color" content="#020617">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         :root { --app-height: 100%; }
-        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; height: var(--app-height); -webkit-tap-highlight-color: transparent; }
-        .app-container { width: 100%; max-width: 640px; min-height: 100vh; display: flex; flex-direction: column; margin: 0 auto; }
+        
+        /* Prevent elastic scrolling/bouncing on iOS */
+        html { position: fixed; height: 100%; overflow: hidden; width: 100%; }
+        
+        body { 
+            background-color: #020617; 
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            height: var(--app-height); 
+            width: 100%;
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; 
+            -webkit-tap-highlight-color: transparent;
+            /* Extra padding for the notch in standalone mode */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .app-container { width: 100%; max-width: 640px; min-height: 100%; display: flex; flex-direction: column; margin: 0 auto; }
         .emerald-gradient { background: linear-gradient(145deg, #064e3b 0%, #065f46 100%); }
         .glass { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .tile-pending { background: rgba(71, 85, 105, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); }
         .tile-done { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255, 255, 255, 0.08); background: #020617; }
-        @media (min-width: 768px) { .tab-bar { position: static; border-radius: 1rem; background: transparent; } }
+        
+        /* Tab Bar styling */
+        .tab-bar { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            z-index: 50; 
+            padding-bottom: max(10px, env(safe-area-inset-bottom)); 
+            border-top: 1px solid rgba(255, 255, 255, 0.08); 
+            background: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        @media (min-width: 768px) { .tab-bar { position: static; border-radius: 1rem; background: transparent; padding-bottom: 0; } }
+        
         .loader { border: 2px solid rgba(255,255,255,0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 14px; height: 14px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .notification-dot { position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid #020617; }
-        .notif-panel { position: fixed; top: 70px; right: 10px; width: 280px; max-height: 400px; z-index: 100; overflow-y: auto; display: none; }
+        .notif-panel { position: fixed; top: calc(60px + env(safe-area-inset-top)); right: 10px; width: 280px; max-height: 400px; z-index: 100; overflow-y: auto; display: none; }
         
         /* Full screen spinner */
         #globalLoader { position: fixed; inset: 0; background: #020617; z-index: 200; display: none; align-items: center; justify-content: center; }
+        
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body>
@@ -37,7 +77,7 @@
 
     <div class="app-container">
         <!-- Login -->
-        <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-6">
+        <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-6 min-h-[100vh]">
             <div class="w-full max-w-sm emerald-gradient p-10 rounded-[3rem] shadow-2xl border border-white/10">
                 <div class="text-center mb-10">
                     <p class="text-[10px] tracking-[0.4em] text-emerald-300/60 uppercase mb-2">E M A N</p>
@@ -54,7 +94,8 @@
 
         <!-- Dashboard -->
         <div id="mainScreen" class="hidden flex-1 flex flex-col p-4 space-y-4">
-            <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-xl pt-4 pb-2 flex justify-between items-center border-b border-white/5">
+            <!-- Header with safe area padding for notch -->
+            <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-xl pt-2 pb-2 flex justify-between items-center border-b border-white/5">
                 <div>
                     <h2 class="text-xl font-black tracking-tight">Eman Bakery</h2>
                     <p id="currentUserRole" class="text-[9px] text-white/30 font-bold uppercase tracking-widest"></p>
@@ -78,24 +119,25 @@
                 </div>
             </div>
 
-            <nav id="mainNav" class="tab-bar glass md:mt-2">
+            <div id="employeesView" class="flex-1 space-y-4 pb-32 min-h-[50vh]">
+                <!-- Empty State -->
+            </div>
+
+            <!-- Tab Bar -->
+            <nav id="mainNav" class="tab-bar">
                 <div class="flex justify-around p-2">
-                    <button id="tabEmployees" class="flex-1 py-3 rounded-xl flex flex-col items-center gap-1">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        <span class="text-[8px] font-black uppercase">Report</span>
+                    <button id="tabEmployees" class="flex-1 py-2 rounded-xl flex flex-col items-center gap-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        <span class="text-[9px] font-black uppercase">Report</span>
                     </button>
-                    <button id="tabAdd" class="flex-1 py-3 rounded-xl flex flex-col items-center gap-1">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
-                        <span class="text-[8px] font-black uppercase">Add Entry</span>
+                    <button id="tabAdd" class="flex-1 py-2 rounded-xl flex flex-col items-center gap-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                        <span class="text-[9px] font-black uppercase">Add Entry</span>
                     </button>
                 </div>
             </nav>
 
-            <div id="employeesView" class="flex-1 space-y-4 pb-24 min-h-[50vh]">
-                <!-- Empty State will be injected here if no data -->
-            </div>
-
-            <div id="addView" class="hidden glass p-6 rounded-[2.5rem] space-y-4 mb-24 animate-in slide-in-from-bottom-4 duration-500">
+            <div id="addView" class="hidden glass p-6 rounded-[2.5rem] space-y-4 mb-32 animate-in slide-in-from-bottom-4 duration-500">
                 <h3 class="text-lg font-black text-emerald-400">Add Employee</h3>
                 
                 <div class="space-y-4">
@@ -300,14 +342,14 @@
         const tabAdd = document.getElementById('tabAdd');
         function activateTab(isEmployees) {
             if (isEmployees) {
-                tabEmployees.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg";
-                tabAdd.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 text-white/40";
+                tabEmployees.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg transition-all";
+                tabAdd.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 text-white/40 transition-all";
                 document.getElementById('employeesView').classList.remove('hidden');
                 document.getElementById('addView').classList.add('hidden');
                 fetchEmployees(); // Refresh on tab switch
             } else {
-                tabAdd.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg";
-                tabEmployees.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 text-white/40";
+                tabAdd.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg transition-all";
+                tabEmployees.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 text-white/40 transition-all";
                 document.getElementById('employeesView').classList.add('hidden');
                 document.getElementById('addView').classList.remove('hidden');
             }
