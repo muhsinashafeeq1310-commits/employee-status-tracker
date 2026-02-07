@@ -9,18 +9,19 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Eman Bakery">
-    <meta name="theme-color" content="#020617">
+    <meta name="theme-color" content="#F2F2F2">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         :root { --app-height: 100%; }
         
         html { position: fixed; height: 100%; overflow: hidden; width: 100%; }
         
         body { 
-            background-color: #020617; 
-            color: #f8fafc; 
+            /* VELVET SMOKE GRADIENT */
+            background: linear-gradient(180deg, #F2F2F2 0%, #ADA996 100%);
+            color: #1e293b; /* Dark Slate Text */
             font-family: 'Inter', sans-serif; 
             height: var(--app-height); 
             width: 100%;
@@ -32,10 +33,26 @@
         }
 
         .app-container { width: 100%; max-width: 640px; min-height: 100%; display: flex; flex-direction: column; margin: 0 auto; }
-        .emerald-gradient { background: linear-gradient(145deg, #064e3b 0%, #065f46 100%); }
-        .glass { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .tile-pending { background: rgba(71, 85, 105, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .tile-done { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.2); }
+        
+        /* Light Glass Effect */
+        .glass { 
+            background: rgba(255, 255, 255, 0.65); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.8); 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Status Tiles */
+        .tile-pending { 
+            background: rgba(255, 255, 255, 0.5); 
+            border: 1px solid rgba(0, 0, 0, 0.05); 
+        }
+        .tile-done { 
+            background: #fff; 
+            border: 1px solid #10b981; 
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+        }
         
         .tab-bar { 
             position: fixed; 
@@ -44,69 +61,79 @@
             right: 0; 
             z-index: 50; 
             padding-bottom: max(10px, env(safe-area-inset-bottom)); 
-            border-top: 1px solid rgba(255, 255, 255, 0.08); 
-            background: rgba(2, 6, 23, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.5); 
+            background: rgba(242, 242, 242, 0.9);
             backdrop-filter: blur(10px);
         }
-        @media (min-width: 768px) { .tab-bar { position: static; border-radius: 1rem; background: transparent; padding-bottom: 0; } }
+        @media (min-width: 768px) { .tab-bar { position: static; border-radius: 1rem; background: rgba(255,255,255,0.5); padding-bottom: 0; } }
         
-        .loader { border: 2px solid rgba(255,255,255,0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 14px; height: 14px; animation: spin 0.8s linear infinite; }
+        .loader { border: 2px solid rgba(0,0,0,0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 14px; height: 14px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .notification-dot { position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid #020617; }
+        .notification-dot { position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid #fff; }
         .notif-panel { position: fixed; top: calc(60px + env(safe-area-inset-top)); right: 10px; width: 280px; max-height: 400px; z-index: 100; overflow-y: auto; display: none; }
-        #globalLoader { position: fixed; inset: 0; background: #020617; z-index: 200; display: none; align-items: center; justify-content: center; }
+        #globalLoader { position: fixed; inset: 0; background: #F2F2F2; z-index: 200; display: none; align-items: center; justify-content: center; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        /* Button Styling for Velvet Theme */
+        .btn-primary {
+            background-color: #1f2937; /* Dark Charcoal */
+            color: white;
+        }
+        .btn-active:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
     <div id="globalLoader">
         <div class="flex flex-col items-center gap-4">
-            <div class="loader" style="width: 40px; height: 40px; border-width: 4px;"></div>
-            <p class="text-xs uppercase tracking-widest text-emerald-500 font-bold">Loading Data...</p>
+            <div class="loader" style="width: 40px; height: 40px; border-width: 4px; border-color: #cbd5e1; border-top-color: #1f2937;"></div>
+            <p class="text-xs uppercase tracking-widest text-slate-500 font-bold">Loading...</p>
         </div>
     </div>
 
     <div class="app-container">
         <!-- Login -->
         <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-6 min-h-[100vh]">
-            <div class="w-full max-w-sm emerald-gradient p-10 rounded-[3rem] shadow-2xl border border-white/10">
+            <div class="w-full max-w-sm glass p-10 rounded-[2.5rem] shadow-xl">
                 <div class="text-center mb-10">
-                    <p class="text-[10px] tracking-[0.4em] text-emerald-300/60 uppercase mb-2">E M A N</p>
-                    <h1 class="text-4xl font-extrabold mb-2 tracking-tight">Eman Bakery</h1>
-                    <p class="text-sm text-emerald-100/60">Employee Portal</p>
+                    <p class="text-[10px] tracking-[0.4em] text-slate-400 uppercase mb-2 font-bold">E M A N</p>
+                    <h1 class="text-4xl font-black mb-2 tracking-tight text-slate-800">Eman Bakery</h1>
+                    <p class="text-sm text-slate-500">Employee Portal</p>
                 </div>
                 <div class="space-y-4">
-                    <input type="email" id="emailInput" placeholder="Email" class="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-1 ring-emerald-500/50">
-                    <input type="password" id="passwordInput" placeholder="Password" class="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-1 ring-emerald-500/50">
-                    <button id="loginBtn" class="w-full bg-white text-emerald-900 py-4 rounded-2xl font-bold text-lg active:scale-95 transition-all">Sign in</button>
+                    <input type="email" id="emailInput" placeholder="Email" class="w-full bg-white/60 border border-slate-200 rounded-2xl px-5 py-4 text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 placeholder:text-slate-400 font-medium">
+                    <input type="password" id="passwordInput" placeholder="Password" class="w-full bg-white/60 border border-slate-200 rounded-2xl px-5 py-4 text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 placeholder:text-slate-400 font-medium">
+                    <button id="loginBtn" class="w-full btn-primary py-4 rounded-2xl font-bold text-lg shadow-lg mt-4 btn-active transition-all">Sign in</button>
                 </div>
             </div>
         </div>
 
         <!-- Dashboard -->
         <div id="mainScreen" class="hidden flex-1 flex flex-col p-4 space-y-4">
-            <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-xl pt-2 pb-2 flex justify-between items-center border-b border-white/5">
+            <header class="sticky top-0 z-40 pt-2 pb-2 flex justify-between items-center">
+                <!-- Added backdrop-blur manually via inline style for header to blend with gradient -->
+                <div style="background: rgba(242,242,242,0.8); backdrop-filter: blur(10px); position: absolute; inset: 0; z-index: -1; margin: 0 -1rem; mask-image: linear-gradient(to bottom, black 80%, transparent 100%);"></div>
+                
                 <div>
-                    <h2 class="text-xl font-black tracking-tight">Eman Bakery</h2>
-                    <p id="currentUserRole" class="text-[9px] text-white/30 font-bold uppercase tracking-widest"></p>
+                    <h2 class="text-xl font-black tracking-tight text-slate-800">Eman Bakery</h2>
+                    <p id="currentUserRole" class="text-[10px] text-slate-400 font-bold uppercase tracking-widest"></p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button id="notifBell" class="relative p-2 rounded-full bg-white/5 border border-white/10 active:scale-90 transition-all">
-                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <button id="notifBell" class="relative p-2 rounded-full bg-white/40 border border-white/60 active:scale-90 transition-all shadow-sm">
+                        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                         <div id="bellDot" class="notification-dot hidden"></div>
                     </button>
-                    <button id="logoutBtn" class="text-[9px] font-black uppercase tracking-widest bg-red-500/10 text-red-400 border border-red-500/20 px-4 py-2 rounded-full active:scale-90 transition-all">Exit</button>
+                    <button id="logoutBtn" class="text-[9px] font-black uppercase tracking-widest bg-red-50 text-red-500 border border-red-100 px-4 py-2 rounded-full active:scale-90 transition-all shadow-sm">Exit</button>
                 </div>
             </header>
 
-            <div id="notifPanel" class="notif-panel glass rounded-3xl p-4 shadow-2xl animate-in slide-in-from-top-2 duration-300">
+            <div id="notifPanel" class="notif-panel glass rounded-3xl p-4 shadow-2xl animate-in slide-in-from-top-2 duration-300 bg-white/80">
                 <div class="flex justify-between items-center mb-3">
-                    <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Recent Activity</span>
-                    <button id="closeNotif" class="text-white/40 text-xs">Close</button>
+                    <span class="text-[10px] font-black text-slate-800 uppercase tracking-widest">Recent Activity</span>
+                    <button id="closeNotif" class="text-slate-400 text-xs font-bold">Close</button>
                 </div>
                 <div id="notifList" class="space-y-2">
-                    <p class="text-[10px] text-white/20 text-center py-4">No recent updates</p>
+                    <p class="text-[10px] text-slate-400 text-center py-4">No recent updates</p>
                 </div>
             </div>
 
@@ -129,43 +156,43 @@
             </nav>
 
             <div id="addView" class="hidden glass p-6 rounded-[2.5rem] space-y-4 mb-32 animate-in slide-in-from-bottom-4 duration-500">
-                <h3 class="text-lg font-black text-emerald-400">Add Employee</h3>
+                <h3 class="text-lg font-black text-slate-800">Add Employee</h3>
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="text-[9px] font-black text-white/40 uppercase ml-2">Quick Select Name</label>
-                        <select id="nameDropdown" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm outline-none focus:ring-1 ring-emerald-500/50">
+                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2">Quick Select Name</label>
+                        <select id="nameDropdown" class="w-full bg-white/50 border border-slate-200 rounded-2xl px-4 py-4 text-sm outline-none focus:ring-1 focus:ring-slate-400 text-slate-800 font-medium">
                             <option value="">-- Choose Employee --</option>
                         </select>
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <input id="newId" type="text" placeholder="ID Number" class="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-4 text-sm text-white/60" readonly>
-                        <input id="newMobile" type="text" placeholder="Mobile Number (Manual)" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm">
-                        <input id="newEmail" type="email" placeholder="Email (Manual)" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm">
-                        <input id="newIban" type="text" placeholder="IBAN (Manual)" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm">
+                        <input id="newId" type="text" placeholder="ID Number" class="w-full bg-slate-100/50 border border-slate-200 rounded-2xl px-4 py-4 text-sm text-slate-500 font-medium" readonly>
+                        <input id="newMobile" type="text" placeholder="Mobile Number (Manual)" class="w-full bg-white/50 border border-slate-200 rounded-2xl px-4 py-4 text-sm text-slate-800 font-medium">
+                        <input id="newEmail" type="email" placeholder="Email (Manual)" class="w-full bg-white/50 border border-slate-200 rounded-2xl px-4 py-4 text-sm text-slate-800 font-medium">
+                        <input id="newIban" type="text" placeholder="IBAN (Manual)" class="w-full bg-white/50 border border-slate-200 rounded-2xl px-4 py-4 text-sm text-slate-800 font-medium">
                     </div>
                 </div>
                 
-                <button id="saveEmployeeBtn" class="w-full bg-emerald-600 py-4 rounded-2xl font-black text-sm shadow-lg active:scale-95 transition-all">Save Profile</button>
+                <button id="saveEmployeeBtn" class="w-full btn-primary py-4 rounded-2xl font-black text-sm shadow-lg btn-active transition-all">Save Profile</button>
             </div>
         </div>
     </div>
 
     <!-- Confirm Modal -->
     <div id="confirmModal" class="fixed inset-0 modal-overlay z-[110] flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
-        <div class="bg-slate-900 w-full max-w-sm p-8 rounded-t-[3rem] sm:rounded-[3rem] border-t border-white/10 transform translate-y-full sm:translate-y-0 transition-all duration-300" id="modalContent">
-            <h3 class="text-xl font-black mb-1" id="modalTitle">Confirm</h3>
-            <p class="text-xs text-white/40 mb-8" id="modalText"></p>
+        <div class="bg-white w-full max-w-sm p-8 rounded-t-[3rem] sm:rounded-[3rem] shadow-2xl transform translate-y-full sm:translate-y-0 transition-all duration-300" id="modalContent">
+            <h3 class="text-xl font-black mb-1 text-slate-800" id="modalTitle">Confirm</h3>
+            <p class="text-xs text-slate-500 mb-8 font-medium" id="modalText"></p>
             <div class="flex gap-3">
-                <button id="modalCancel" class="flex-1 py-4 rounded-2xl bg-white/5 font-bold text-xs uppercase tracking-widest">Cancel</button>
-                <button id="modalConfirm" class="flex-1 py-4 rounded-2xl bg-emerald-600 font-bold text-xs uppercase tracking-widest shadow-lg">Confirm</button>
+                <button id="modalCancel" class="flex-1 py-4 rounded-2xl bg-slate-100 font-bold text-xs uppercase tracking-widest text-slate-600">Cancel</button>
+                <button id="modalConfirm" class="flex-1 py-4 rounded-2xl btn-primary font-bold text-xs uppercase tracking-widest shadow-lg">Confirm</button>
             </div>
         </div>
     </div>
 
     <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 opacity-0 transition-all duration-300 pointer-events-none z-[120]">
-        <div class="bg-emerald-500 text-white font-black px-6 py-3 rounded-full shadow-2xl text-[10px] uppercase tracking-widest">
+        <div class="bg-slate-800 text-white font-black px-6 py-3 rounded-full shadow-2xl text-[10px] uppercase tracking-widest">
             <span id="toastMsg"></span>
         </div>
     </div>
@@ -240,9 +267,7 @@
                     action_type: action,
                     message: msg
                 });
-            } catch (err) {
-                console.warn("Logging failed, likely table missing:", err);
-            }
+            } catch (err) { console.warn("Log failed"); }
         }
 
         async function fetchLogs() {
@@ -252,22 +277,20 @@
                     logs = data;
                     renderLogs();
                 }
-            } catch (err) {
-                console.warn("Logs disabled or missing table");
-            }
+            } catch (err) { }
         }
 
         function renderLogs() {
             const list = document.getElementById('notifList');
             if (logs.length === 0) {
-                list.innerHTML = '<p class="text-[10px] text-white/20 text-center py-4">No recent updates</p>';
+                list.innerHTML = '<p class="text-[10px] text-slate-400 text-center py-4">No recent updates</p>';
                 return;
             }
             list.innerHTML = logs.map(l => `
-                <div class="p-3 bg-white/5 rounded-xl border border-white/5">
-                    <p class="text-[10px] font-bold text-emerald-400">${(l.user_email || 'User').split('@')[0].toUpperCase()} - ${l.action_type}</p>
-                    <p class="text-[9px] text-white/60">${l.message}</p>
-                    <p class="text-[7px] text-white/20 mt-1">${new Date(l.created_at).toLocaleTimeString()}</p>
+                <div class="p-3 bg-white/50 rounded-xl border border-slate-100">
+                    <p class="text-[10px] font-bold text-slate-800">${(l.user_email || 'User').split('@')[0].toUpperCase()} - ${l.action_type}</p>
+                    <p class="text-[9px] text-slate-500">${l.message}</p>
+                    <p class="text-[7px] text-slate-400 mt-1">${new Date(l.created_at).toLocaleTimeString()}</p>
                 </div>
             `).join('');
             if (logs.length > 0) document.getElementById('bellDot').classList.remove('hidden');
@@ -281,7 +304,7 @@
                     renderLogs();
                     showToast(`New update from ${payload.new.user_email.split('@')[0]}`);
                 }).subscribe();
-        } catch (e) { console.log('Realtime inactive'); }
+        } catch (e) { }
 
         async function fetchEmployees() {
             const loader = document.getElementById('globalLoader');
@@ -292,7 +315,7 @@
             loader.style.display = 'none'; 
             
             if (error) {
-                showToast('Sync Error: ' + error.message);
+                showToast('Sync Error');
                 employees = [];
             } else {
                 employees = data || [];
@@ -344,14 +367,14 @@
             }
 
             if (isEmployees) {
-                tabEmployees.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg transition-all";
-                tabAdd.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-white/40 transition-all";
+                tabEmployees.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 btn-primary shadow-lg transition-all";
+                tabAdd.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-slate-400 transition-all";
                 document.getElementById('employeesView').classList.remove('hidden');
                 document.getElementById('addView').classList.add('hidden');
                 fetchEmployees(); 
             } else {
-                tabAdd.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg transition-all";
-                tabEmployees.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-white/40 transition-all";
+                tabAdd.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 btn-primary shadow-lg transition-all";
+                tabEmployees.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-slate-400 transition-all";
                 document.getElementById('employeesView').classList.add('hidden');
                 document.getElementById('addView').classList.remove('hidden');
             }
@@ -397,20 +420,20 @@
             if (employees.length === 0) {
                 view.innerHTML = `
                     <div class="glass p-10 text-center rounded-[2.5rem] mt-10">
-                        <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <span class="text-2xl">📂</span>
                         </div>
-                        <p class="text-sm font-bold text-white/60">No Files Found</p>
-                        <p class="text-[10px] text-white/30 mt-2">Use 'Add Entry' to create one</p>
+                        <p class="text-sm font-bold text-slate-500">No Files Found</p>
+                        <p class="text-[10px] text-slate-400 mt-2">Use 'Add Entry' to create one</p>
                     </div>`;
                 return;
             }
 
             view.innerHTML = employees.map(emp => `
-                <div class="glass rounded-[2rem] p-5 space-y-4 border-l-4 border-emerald-500 shadow-xl">
+                <div class="glass rounded-[2rem] p-5 space-y-4 shadow-lg border-l-4 border-slate-700">
                     <div>
-                        <h4 class="text-base font-extrabold tracking-tight">${emp.name}</h4>
-                        <p class="text-[8px] uppercase font-black text-white/40 tracking-widest">ID: ${emp.identification_number} • ${emp.mobile || 'No Contact'}</p>
+                        <h4 class="text-base font-extrabold tracking-tight text-slate-800">${emp.name}</h4>
+                        <p class="text-[8px] uppercase font-black text-slate-400 tracking-widest mt-1">ID: ${emp.identification_number} • ${emp.mobile || 'No Contact'}</p>
                     </div>
                     <div class="grid grid-cols-1 gap-2.5">
                         ${['qiwa', 'gosi', 'mudad'].map(key => {
@@ -418,13 +441,14 @@
                             const isUpdater = currentUser?.role === 'updater';
                             return `
                                 <div data-id="${emp.id}" data-key="${key}" 
-                                     class="${isUpdater ? 'cursor-pointer active:scale-95' : ''} ${done ? 'tile-done' : 'tile-pending'} border flex items-center justify-between p-3.5 rounded-2xl relative transition-all">
+                                     class="${isUpdater ? 'cursor-pointer active:scale-95' : ''} ${done ? 'tile-done' : 'tile-pending'} flex items-center justify-between p-3.5 rounded-2xl relative transition-all">
                                     <div class="flex flex-col">
-                                        <span class="text-[7px] uppercase font-black text-white/30">${key}</span>
-                                        <span class="text-[10px] font-black ${done ? 'text-emerald-400' : 'text-slate-500'}">${done ? 'COMPLETED' : 'PENDING'}</span>
+                                        <!-- NOTICEABLE TITLES: BIGGER AND DARKER -->
+                                        <span class="text-xs font-black uppercase text-slate-700 tracking-tight">${key} FILE</span>
+                                        <span class="text-[10px] font-bold ${done ? 'text-emerald-600' : 'text-slate-400'}">${done ? 'COMPLETED' : 'PENDING'}</span>
                                     </div>
-                                    <div class="w-7 h-7 rounded-full flex items-center justify-center ${done ? 'bg-emerald-500 text-white' : 'bg-white/5 text-white/10'} font-bold text-xs">${done ? '✓' : '○'}</div>
-                                    <div id="loader-${emp.id}-${key}" class="hidden absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center"><div class="loader"></div></div>
+                                    <div class="w-7 h-7 rounded-full flex items-center justify-center ${done ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-200 text-slate-400'} font-bold text-xs">${done ? '✓' : '○'}</div>
+                                    <div id="loader-${emp.id}-${key}" class="hidden absolute inset-0 bg-white/80 rounded-2xl flex items-center justify-center"><div class="loader"></div></div>
                                 </div>`;
                         }).join('')}
                     </div>
