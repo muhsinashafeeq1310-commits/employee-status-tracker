@@ -60,7 +60,7 @@
 
           <p class="text-[11px] text-slate-300 text-center leading-snug mt-1">
             Login With Your User Name and Password.<br />
-            www.emanbakeries.com <span class="font-medium"></span> .
+            <a href="https://www.emanbakeries.com" class="underline">www.emanbakeries.com</a>
           </p>
         </div>
       </div>
@@ -151,10 +151,10 @@
   </div>
 
   <script>
-    // ==== Supabase client (FILL THESE TWO LINES) ====
+    // ==== Supabase client ====
     const SUPABASE_URL = 'https://ftkwyywgoutsvdcdvyja.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ==== Auth + app state ====
     let currentUser = null; // { id, email, role }
@@ -175,7 +175,7 @@
 
     // === Fetch user role from user_roles ===
     async function fetchUserRole(userId) {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
@@ -192,7 +192,7 @@
 
     // === Fetch employees from Supabase ===
     async function fetchEmployees() {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('employees')
         .select('*')
         .order('created_at', { ascending: false });
@@ -231,7 +231,7 @@
         return;
       }
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password
       });
@@ -245,7 +245,7 @@
       const user = data.user;
       const role = await fetchUserRole(user.id);
       if (!role) {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         return;
       }
 
@@ -268,7 +268,7 @@
     });
 
     logoutBtn.addEventListener('click', async () => {
-      await supabase.auth.signOut();
+      await supabaseClient.auth.signOut();
       currentUser = null;
       document.getElementById('emailInput').value = '';
       document.getElementById('passwordInput').value = '';
@@ -342,7 +342,7 @@
         mudad_status: 'pending'
       };
 
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('employees')
         .insert(newEmpRow)
         .select()
@@ -482,7 +482,7 @@
         mudad: 'mudad_status'
       };
 
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('employees')
         .update({ [columnMap[key]]: target })
         .eq('id', empId);
