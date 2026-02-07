@@ -3,187 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Eman Bakery – Employee Tracker</title>
+    <title>Eman Bakery Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
-        :root {
-            --app-height: 100%;
-        }
-
-        body {
-            background-color: #020617;
-            color: #f8fafc;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-            height: var(--app-height);
-        }
-
-        /* Native App Feel: Full Screen on Mobile, Centered on Desktop */
-        .app-container {
-            width: 100%;
-            max-width: 640px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            margin: 0 auto;
-        }
-
-        .emerald-gradient {
-            background: linear-gradient(145deg, #064e3b 0%, #065f46 100%);
-        }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        /* Tab Bar: Bottom on Mobile, Top on Desktop */
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            padding-bottom: env(safe-area-inset-bottom);
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        @media (min-width: 768px) {
-            .tab-bar {
-                position: static;
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                padding-bottom: 0;
-                border-radius: 1rem;
-            }
-        }
-
-        .status-card-interactive {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .status-card-interactive:active {
-            transform: scale(0.96);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .loader {
-            border: 2px solid rgba(255,255,255,0.1);
-            border-top: 2px solid #10b981;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 0.8s linear infinite;
-        }
+        :root { --app-height: 100%; }
+        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; height: var(--app-height); -webkit-tap-highlight-color: transparent; }
+        .app-container { width: 100%; max-width: 640px; min-height: 100vh; display: flex; flex-direction: column; margin: 0 auto; }
+        .emerald-gradient { background: linear-gradient(145deg, #064e3b 0%, #065f46 100%); }
+        .glass { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .tile-pending { background: rgba(71, 85, 105, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .tile-done { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255, 255, 255, 0.08); }
+        @media (min-width: 768px) { .tab-bar { position: static; border-radius: 1rem; } }
+        .loader { border: 2px solid rgba(255,255,255,0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 14px; height: 14px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .modal-overlay {
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-
-        /* Smooth scroll for the list */
-        #employeesView {
-            padding-bottom: calc(100px + env(safe-area-inset-bottom));
-        }
+        .notification-dot { position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid #020617; }
+        .notif-panel { position: fixed; top: 70px; right: 10px; width: 280px; max-height: 400px; z-index: 100; overflow-y: auto; display: none; }
     </style>
 </head>
 <body>
 
-    <!-- App Wrapper -->
     <div class="app-container">
-
-        <!-- Login Screen -->
-        <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-6 sm:p-10">
-            <div class="w-full max-w-sm emerald-gradient p-10 rounded-[3rem] shadow-2xl border border-white/10 animate-in fade-in zoom-in duration-500">
+        <!-- Login -->
+        <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-6">
+            <div class="w-full max-w-sm emerald-gradient p-10 rounded-[3rem] shadow-2xl border border-white/10">
                 <div class="text-center mb-10">
                     <p class="text-[10px] tracking-[0.4em] text-emerald-300/60 uppercase mb-2">E M A N</p>
                     <h1 class="text-4xl font-extrabold mb-2 tracking-tight">Eman Bakery</h1>
-                    <p class="text-sm text-emerald-100/60">Onboarding Portal</p>
+                    <p class="text-sm text-emerald-100/60">Employee Portal</p>
                 </div>
-
                 <div class="space-y-4">
-                    <input type="email" id="emailInput" placeholder="Email" 
-                        class="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 placeholder:text-white/20">
-                    
-                    <input type="password" id="passwordInput" placeholder="Password" 
-                        class="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 placeholder:text-white/20">
-
-                    <button id="loginBtn" class="w-full bg-white text-emerald-900 py-4 rounded-2xl font-bold text-lg hover:bg-emerald-50 transition-all active:scale-[0.98] shadow-xl mt-4">
-                        Sign in
-                    </button>
+                    <input type="email" id="emailInput" placeholder="Email" class="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-1 ring-emerald-500/50">
+                    <input type="password" id="passwordInput" placeholder="Password" class="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-1 ring-emerald-500/50">
+                    <button id="loginBtn" class="w-full bg-white text-emerald-900 py-4 rounded-2xl font-bold text-lg active:scale-95 transition-all">Sign in</button>
                 </div>
             </div>
         </div>
 
-        <!-- Main Dashboard -->
-        <div id="mainScreen" class="hidden flex-1 flex flex-col p-4 sm:p-8 space-y-6">
-            
-            <!-- Sticky Header -->
-            <header class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-lg pt-4 pb-2 -mx-4 px-4 flex justify-between items-center border-b border-white/5">
+        <!-- Dashboard -->
+        <div id="mainScreen" class="hidden flex-1 flex flex-col p-4 space-y-4">
+            <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-xl pt-4 pb-2 flex justify-between items-center border-b border-white/5">
                 <div>
-                    <h2 class="text-xl font-extrabold tracking-tight">Onboarding</h2>
-                    <div class="flex items-center gap-2">
-                        <span id="roleBadge" class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[8px] font-black uppercase tracking-widest"></span>
-                        <p id="currentUserRole" class="text-[10px] text-white/40 font-medium truncate max-w-[120px]"></p>
-                    </div>
+                    <h2 class="text-xl font-black tracking-tight">Eman Bakery</h2>
+                    <p id="currentUserRole" class="text-[9px] text-white/30 font-bold uppercase tracking-widest"></p>
                 </div>
-                <button id="logoutBtn" class="text-[9px] font-bold uppercase tracking-widest bg-white/5 border border-white/10 px-4 py-2 rounded-full active:bg-red-500/20 transition-all">Logout</button>
+                <div class="flex items-center gap-3">
+                    <!-- Notification Bell -->
+                    <button id="notifBell" class="relative p-2 rounded-full bg-white/5 border border-white/10 active:scale-90 transition-all">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <div id="bellDot" class="notification-dot hidden"></div>
+                    </button>
+                    <button id="logoutBtn" class="text-[9px] font-black uppercase tracking-widest bg-red-500/10 text-red-400 border border-red-500/20 px-4 py-2 rounded-full active:scale-90 transition-all">Exit</button>
+                </div>
             </header>
 
-            <!-- Navigation: Tab Bar for Mobile -->
-            <nav id="mainNav" class="tab-bar glass md:mt-4">
-                <div class="flex items-center justify-around md:gap-4 p-2 md:p-1.5">
-                    <button id="tabEmployees" class="flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
-                        <span class="text-[10px] md:text-sm font-bold uppercase md:capitalize">Dashboard</span>
+            <!-- Notifications Panel -->
+            <div id="notifPanel" class="notif-panel glass rounded-3xl p-4 shadow-2xl animate-in slide-in-from-top-2 duration-300">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Recent Activity</span>
+                    <button id="closeNotif" class="text-white/40 text-xs">Close</button>
+                </div>
+                <div id="notifList" class="space-y-2">
+                    <p class="text-[10px] text-white/20 text-center py-4">No recent updates</p>
+                </div>
+            </div>
+
+            <nav id="mainNav" class="tab-bar glass md:mt-2">
+                <div class="flex justify-around p-2">
+                    <button id="tabEmployees" class="flex-1 py-3 rounded-xl flex flex-col items-center gap-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        <span class="text-[8px] font-black uppercase">Report</span>
                     </button>
-                    <button id="tabAdd" class="flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        <span class="text-[10px] md:text-sm font-bold uppercase md:capitalize">Add Entry</span>
+                    <button id="tabAdd" class="flex-1 py-3 rounded-xl flex flex-col items-center gap-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                        <span class="text-[8px] font-black uppercase">Add Entry</span>
                     </button>
                 </div>
             </nav>
 
-            <!-- Content Area -->
-            <div id="employeesView" class="flex-1 space-y-4">
-                <!-- Cards injected here -->
-            </div>
+            <div id="employeesView" class="flex-1 space-y-4 pb-24"></div>
 
-            <!-- Add Form -->
-            <div id="addView" class="hidden glass p-6 rounded-[2rem] space-y-5 mb-24">
-                <h3 class="text-lg font-bold">New Employee Profile</h3>
-                <div class="space-y-3">
-                    <input id="newName" type="text" placeholder="Full Name" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 outline-none focus:ring-1 ring-emerald-500">
-                    <input id="newId" type="text" placeholder="National ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 outline-none focus:ring-1 ring-emerald-500">
-                    <input id="newMobile" type="text" placeholder="Mobile Number" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 outline-none focus:ring-1 ring-emerald-500">
-                    <input id="newEmail" type="email" placeholder="Email Address" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 outline-none focus:ring-1 ring-emerald-500">
-                    <input id="newIban" type="text" placeholder="IBAN" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 outline-none focus:ring-1 ring-emerald-500">
+            <!-- Add Form with Dropdown -->
+            <div id="addView" class="hidden glass p-6 rounded-[2.5rem] space-y-4 mb-24 animate-in slide-in-from-bottom-4 duration-500">
+                <h3 class="text-lg font-black text-emerald-400">Add Employee</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[9px] font-black text-white/40 uppercase ml-2">Quick Select Name</label>
+                        <select id="nameDropdown" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm outline-none focus:ring-1 ring-emerald-500/50">
+                            <option value="">-- Choose Employee --</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3">
+                        <input id="newId" type="text" placeholder="ID Number" class="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-4 text-sm" readonly>
+                        <input id="newMobile" type="text" placeholder="Mobile Number (Manual)" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm">
+                        <input id="newEmail" type="email" placeholder="Email (Manual)" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm">
+                        <input id="newIban" type="text" placeholder="IBAN (Manual)" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm">
+                    </div>
                 </div>
-                <button id="saveEmployeeBtn" class="w-full bg-emerald-600 py-4 rounded-2xl font-bold shadow-lg shadow-emerald-900/40 active:scale-[0.98] transition-transform">Save Profile</button>
+                
+                <button id="saveEmployeeBtn" class="w-full bg-emerald-600 py-4 rounded-2xl font-black text-sm shadow-lg active:scale-95 transition-all">Save Profile</button>
             </div>
         </div>
     </div>
 
     <!-- Confirm Modal -->
-    <div id="confirmModal" class="fixed inset-0 modal-overlay z-[100] flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-slate-900 border border-white/10 w-full max-w-sm p-8 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300" id="modalContent">
-            <h3 class="text-xl font-bold mb-2" id="modalTitle">Confirm</h3>
-            <p class="text-sm text-white/60 mb-8" id="modalText"></p>
+    <div id="confirmModal" class="fixed inset-0 modal-overlay z-[110] flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-slate-900 w-full max-w-sm p-8 rounded-t-[3rem] sm:rounded-[3rem] border-t border-white/10 transform translate-y-full sm:translate-y-0 transition-all duration-300" id="modalContent">
+            <h3 class="text-xl font-black mb-1" id="modalTitle">Confirm</h3>
+            <p class="text-xs text-white/40 mb-8" id="modalText"></p>
             <div class="flex gap-3">
-                <button id="modalCancel" class="flex-1 py-4 rounded-2xl bg-white/5 font-bold">Cancel</button>
-                <button id="modalConfirm" class="flex-1 py-4 rounded-2xl bg-emerald-600 font-bold shadow-lg shadow-emerald-900/40">Confirm</button>
+                <button id="modalCancel" class="flex-1 py-4 rounded-2xl bg-white/5 font-bold text-xs uppercase tracking-widest">Cancel</button>
+                <button id="modalConfirm" class="flex-1 py-4 rounded-2xl bg-emerald-600 font-bold text-xs uppercase tracking-widest shadow-lg">Confirm</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 opacity-0 transition-all duration-300 pointer-events-none z-[60]">
-        <div class="bg-emerald-500 text-white font-bold px-6 py-3 rounded-full shadow-2xl text-xs whitespace-nowrap">
+    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 opacity-0 transition-all duration-300 pointer-events-none z-[120]">
+        <div class="bg-emerald-500 text-white font-black px-6 py-3 rounded-full shadow-2xl text-[10px] uppercase tracking-widest">
             <span id="toastMsg"></span>
         </div>
     </div>
@@ -195,14 +134,51 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU';
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       
-        let currentUser = null; 
-        let employees = [];     
+        // Pre-populated data
+        const PRE_EMPLOYEES = [
+            { name: "Sidhik Kuruttukavil Kochu Muhammed", id: "2289943199" },
+            { name: "Abdul Jabbar Mannakuzhi Maithen", id: "2329326967" },
+            { name: "Anvar Husain Mohammed Anchukandan", id: "2345158345" },
+            { name: "Mohamed Safwan M Sally", id: "2347675510" },
+            { name: "Muhammed Rafi Aliparambil", id: "2354265015" },
+            { name: "Sulfi Puthiyedathu Basheer", id: "2376846297" },
+            { name: "Sabeeb Manat Hassan Kutty", id: "2455539706" },
+            { name: "Al Ameen Kadukkunnan", id: "2485790295" },
+            { name: "Ansif Ali Kuruttukavil Alikunju", id: "2501924977" },
+            { name: "Md Akter Hosen", id: "2515498364" },
+            { name: "Mobarok Hossen", id: "2552187540" }
+        ];
 
-        // Fix mobile height issues
+        let currentUser = null; 
+        let employees = [];
+        let logs = [];
+
+        // UI Setup
+        const nameDropdown = document.getElementById('nameDropdown');
+        PRE_EMPLOYEES.forEach(e => {
+            const opt = document.createElement('option');
+            opt.value = e.name;
+            opt.textContent = e.name;
+            nameDropdown.appendChild(opt);
+        });
+
+        nameDropdown.onchange = (e) => {
+            const selected = PRE_EMPLOYEES.find(emp => emp.name === e.target.value);
+            document.getElementById('newId').value = selected ? selected.id : "";
+        };
+
         const setAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
         window.addEventListener('resize', setAppHeight);
         setAppHeight();
-      
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = message;
+            toast.classList.remove('opacity-0', '-translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => { toast.classList.add('opacity-0', '-translate-y-4'); toast.classList.remove('opacity-100', 'translate-y-0'); }, 3000);
+        }
+
         function askConfirmation(title, text, onConfirm) {
             const modal = document.getElementById('confirmModal');
             const content = document.getElementById('modalContent');
@@ -212,154 +188,175 @@
             content.classList.remove('translate-y-full', 'sm:scale-95');
             document.getElementById('modalConfirm').onclick = () => { onConfirm(); close(); };
             document.getElementById('modalCancel').onclick = close;
-            function close() { 
-                modal.classList.add('opacity-0', 'pointer-events-none'); 
-                content.classList.add('translate-y-full', 'sm:scale-95'); 
+            function close() { modal.classList.add('opacity-0', 'pointer-events-none'); content.classList.add('translate-y-full', 'sm:scale-95'); }
+        }
+
+        async function logActivity(action, msg) {
+            await supabaseClient.from('activity_logs').insert({
+                user_email: currentUser.email,
+                action_type: action,
+                message: msg
+            });
+        }
+
+        async function fetchLogs() {
+            const { data } = await supabaseClient.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(10);
+            if (data) {
+                logs = data;
+                renderLogs();
             }
         }
 
-        function showToast(message) {
-          const toast = document.getElementById('toast');
-          document.getElementById('toastMsg').textContent = message;
-          toast.classList.remove('opacity-0', '-translate-y-4');
-          toast.classList.add('opacity-100', 'translate-y-0');
-          setTimeout(() => { toast.classList.add('opacity-0', '-translate-y-4'); toast.classList.remove('opacity-100', 'translate-y-0'); }, 3000);
+        function renderLogs() {
+            const list = document.getElementById('notifList');
+            list.innerHTML = logs.map(l => `
+                <div class="p-3 bg-white/5 rounded-xl border border-white/5">
+                    <p class="text-[10px] font-bold text-emerald-400">${l.user_email.split('@')[0].toUpperCase()} - ${l.action_type}</p>
+                    <p class="text-[9px] text-white/60">${l.message}</p>
+                    <p class="text-[7px] text-white/20 mt-1">${new Date(l.created_at).toLocaleTimeString()}</p>
+                </div>
+            `).join('');
+            
+            // Show red dot if there's new stuff since last view (simplified)
+            if (logs.length > 0) document.getElementById('bellDot').classList.remove('hidden');
         }
-      
-        async function fetchUserRole(userId) {
-          const { data, error } = await supabaseClient.from('user_roles').select('role').eq('user_id', userId).maybeSingle();
-          return data?.role;
-        }
-      
+
+        // Real-time listener for logs
+        const logChannel = supabaseClient.channel('activity_logs')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
+                logs.unshift(payload.new);
+                if (logs.length > 10) logs.pop();
+                renderLogs();
+                showToast(`New update from ${payload.new.user_email.split('@')[0]}`);
+            }).subscribe();
+
         async function fetchEmployees() {
-          const { data, error } = await supabaseClient.from('employees').select('*').order('created_at', { ascending: false });
-          if (error) return;
-          employees = data.map(row => ({
-            id: row.id, name: row.name, nationalId: row.identification_number, mobile: row.mobile,
-            iban: row.iban, email: row.email, qiwa: row.qiwa_status, gosi: row.gosi_status, mudad: row.mudad_status
-          }));
-          renderEmployees();
+            const { data } = await supabaseClient.from('employees').select('*').order('created_at', { ascending: false });
+            employees = data || [];
+            renderEmployees();
         }
-      
+
         const loginBtn = document.getElementById('loginBtn');
-        loginBtn.addEventListener('click', async () => {
-          const email = document.getElementById('emailInput').value.trim();
-          const password = document.getElementById('passwordInput').value.trim();
-          if (!email || !password) return showToast('Check credentials');
-          loginBtn.textContent = 'Signing in...';
-          const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-          if (error) { showToast('Login Failed'); loginBtn.textContent = 'Sign in'; return; }
-          const role = await fetchUserRole(data.user.id);
-          if (!role) { await supabaseClient.auth.signOut(); showToast('Role Error'); return; }
-          currentUser = { id: data.user.id, email: data.user.email, role };
-          document.getElementById('loginScreen').classList.add('hidden');
-          document.getElementById('mainScreen').classList.remove('hidden');
-          document.getElementById('roleBadge').textContent = role;
-          document.getElementById('currentUserRole').textContent = data.user.email;
-          if (role === 'updater') document.getElementById('tabAdd').classList.add('hidden');
-          fetchEmployees();
-        });
-      
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            askConfirmation('Logout', 'Are you sure you want to sign out?', () => {
-                supabaseClient.auth.signOut().then(() => location.reload());
-            });
-        });
-      
+        loginBtn.onclick = async () => {
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+            loginBtn.textContent = 'Auth...';
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) { showToast('Error'); loginBtn.textContent = 'Sign in'; return; }
+            const roleData = await supabaseClient.from('user_roles').select('role').eq('user_id', data.user.id).maybeSingle();
+            if (!roleData.data) { await supabaseClient.auth.signOut(); showToast('Role Missing'); return; }
+            currentUser = { id: data.user.id, email: data.user.email, role: roleData.data.role };
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.remove('hidden');
+            document.getElementById('roleBadge').textContent = currentUser.role;
+            document.getElementById('currentUserRole').textContent = currentUser.email;
+            if (currentUser.role === 'updater') document.getElementById('tabAdd').classList.add('hidden');
+            fetchEmployees();
+            fetchLogs();
+        };
+
+        document.getElementById('logoutBtn').onclick = () => askConfirmation('Exit', 'Sign out of Eman Bakery?', () => location.reload());
+        document.getElementById('notifBell').onclick = () => {
+            const p = document.getElementById('notifPanel');
+            p.style.display = p.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('bellDot').classList.add('hidden');
+        };
+        document.getElementById('closeNotif').onclick = () => document.getElementById('notifPanel').style.display = 'none';
+
         const tabEmployees = document.getElementById('tabEmployees');
         const tabAdd = document.getElementById('tabAdd');
         function activateTab(isEmployees) {
-          if (isEmployees) {
-            tabEmployees.className = "flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all bg-emerald-600 text-white shadow-lg";
-            tabAdd.className = "flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all text-white/40";
-            document.getElementById('employeesView').classList.remove('hidden');
-            document.getElementById('addView').classList.add('hidden');
-          } else {
-            tabAdd.className = "flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all bg-emerald-600 text-white shadow-lg";
-            tabEmployees.className = "flex flex-col md:flex-row items-center justify-center gap-1 flex-1 py-3 md:py-3 rounded-xl transition-all text-white/40";
-            document.getElementById('employeesView').classList.add('hidden');
-            document.getElementById('addView').classList.remove('hidden');
-          }
+            if (isEmployees) {
+                tabEmployees.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg";
+                tabAdd.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 text-white/40";
+                document.getElementById('employeesView').classList.remove('hidden');
+                document.getElementById('addView').classList.add('hidden');
+            } else {
+                tabAdd.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg";
+                tabEmployees.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 text-white/40";
+                document.getElementById('employeesView').classList.add('hidden');
+                document.getElementById('addView').classList.remove('hidden');
+            }
         }
-        tabEmployees.addEventListener('click', () => activateTab(true));
-        tabAdd.addEventListener('click', () => activateTab(false));
+        tabEmployees.onclick = () => activateTab(true);
+        tabAdd.onclick = () => activateTab(false);
         activateTab(true);
 
-        document.getElementById('saveEmployeeBtn').addEventListener('click', async () => {
-          const btn = document.getElementById('saveEmployeeBtn');
-          const payload = {
-            name: document.getElementById('newName').value.trim(),
-            identification_number: document.getElementById('newId').value.trim(),
-            mobile: document.getElementById('newMobile').value.trim(),
-            iban: document.getElementById('newIban').value.trim(),
-            email: document.getElementById('newEmail').value.trim(),
-            qiwa_status: 'pending', gosi_status: 'pending', mudad_status: 'pending'
-          };
-          if (!payload.name || !payload.identification_number) return showToast('Name & ID Required');
-          btn.disabled = true; btn.textContent = 'Saving...';
-          const { error } = await supabaseClient.from('employees').insert(payload);
-          if (error) showToast('Error');
-          else { fetchEmployees(); showToast('Created!'); activateTab(true); }
-          btn.disabled = false; btn.textContent = 'Save Profile';
-        });
-      
+        document.getElementById('saveEmployeeBtn').onclick = async () => {
+            const name = nameDropdown.value;
+            const idNo = document.getElementById('newId').value;
+            const mob = document.getElementById('newMobile').value;
+            const em = document.getElementById('newEmail').value;
+            const ib = document.getElementById('newIban').value;
+            if (!name || !idNo) return showToast('Pick an Employee');
+            
+            const btn = document.getElementById('saveEmployeeBtn');
+            btn.disabled = true; btn.textContent = 'Saving...';
+            const { error } = await supabaseClient.from('employees').insert({
+                name, identification_number: idNo, mobile: mob, iban: ib, email: em,
+                qiwa_status: 'pending', gosi_status: 'pending', mudad_status: 'pending'
+            });
+            if (!error) {
+                await logActivity('ADDED', `New profile: ${name}`);
+                fetchEmployees(); 
+                showToast('Success');
+                activateTab(true);
+                // Reset
+                nameDropdown.value = ""; document.getElementById('newId').value = "";
+            }
+            btn.disabled = false; btn.textContent = 'Save Profile';
+        };
+
         function renderEmployees() {
-          const view = document.getElementById('employeesView');
-          view.innerHTML = employees.length ? '' : '<div class="glass p-12 text-center rounded-3xl text-white/20">No active files</div>';
-          employees.forEach(emp => {
-            const card = document.createElement('div');
-            card.className = 'glass rounded-[2rem] p-5 space-y-4 border-l-4 border-emerald-500 shadow-xl';
-            card.innerHTML = `
-              <div class="flex justify-between items-start">
-                <div>
-                  <h4 class="text-base font-extrabold tracking-tight">${emp.name}</h4>
-                  <p class="text-[9px] uppercase tracking-widest text-white/40 font-bold mt-0.5">ID: ${emp.nationalId} • ${emp.mobile || 'No Mobile'}</p>
+            const view = document.getElementById('employeesView');
+            view.innerHTML = employees.map(emp => `
+                <div class="glass rounded-[2rem] p-5 space-y-4 border-l-4 border-emerald-500 shadow-xl">
+                    <div>
+                        <h4 class="text-base font-extrabold tracking-tight">${emp.name}</h4>
+                        <p class="text-[8px] uppercase font-black text-white/40 tracking-widest">ID: ${emp.identification_number} • ${emp.mobile || 'No Contact'}</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        ${['qiwa', 'gosi', 'mudad'].map(key => {
+                            const done = emp[key + '_status'] === 'done';
+                            const isUpdater = currentUser?.role === 'updater';
+                            return `
+                                <div data-id="${emp.id}" data-key="${key}" 
+                                     class="${isUpdater ? 'cursor-pointer active:scale-95' : ''} ${done ? 'tile-done' : 'tile-pending'} border flex items-center justify-between p-3.5 rounded-2xl relative transition-all">
+                                    <div class="flex flex-col">
+                                        <span class="text-[7px] uppercase font-black text-white/30">${key}</span>
+                                        <span class="text-[10px] font-black ${done ? 'text-emerald-400' : 'text-slate-500'}">${done ? 'COMPLETED' : 'PENDING'}</span>
+                                    </div>
+                                    <div class="w-7 h-7 rounded-full flex items-center justify-center ${done ? 'bg-emerald-500 text-white' : 'bg-white/5 text-white/10'} font-bold text-xs">${done ? '✓' : '○'}</div>
+                                    <div id="loader-${emp.id}-${key}" class="hidden absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center"><div class="loader"></div></div>
+                                </div>`;
+                        }).join('')}
+                    </div>
                 </div>
-                <div class="text-[8px] text-white/20 italic truncate max-w-[100px]">${emp.iban || ''}</div>
-              </div>
-              <div class="grid grid-cols-1 gap-2.5">
-                ${['qiwa', 'gosi', 'mudad'].map(key => {
-                  const done = emp[key] === 'done';
-                  const isUpdater = currentUser?.role === 'updater';
-                  return `
-                    <div data-id="${emp.id}" data-key="${key}" 
-                         class="${isUpdater ? 'status-card-interactive cursor-pointer' : ''} ${done ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-white/5 border-white/5'} border flex items-center justify-between p-3.5 rounded-2xl relative">
-                        <div class="flex flex-col">
-                            <span class="text-[8px] uppercase font-black tracking-tighter text-white/30">${key} file</span>
-                            <span class="text-xs font-bold ${done ? 'text-emerald-400' : 'text-slate-500'}">${done ? 'Completed' : 'Pending'}</span>
-                        </div>
-                        <div class="flex items-center justify-center w-7 h-7 rounded-full ${done ? 'bg-emerald-500 text-white' : 'bg-white/5 text-white/10'}">
-                            ${done ? '✓' : '○'}
-                        </div>
-                        <div id="loader-${emp.id}-${key}" class="hidden absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center"><div class="loader"></div></div>
-                    </div>`;
-                }).join('')}
-              </div>`;
-            view.appendChild(card);
-          });
-          if (currentUser?.role === 'updater') {
-              document.querySelectorAll('.status-card-interactive').forEach(tile => {
-                tile.onclick = () => {
-                    const id = tile.dataset.id;
-                    const key = tile.dataset.key;
-                    const emp = employees.find(e => e.id == id);
-                    const action = emp[key] === 'done' ? 'PENDING' : 'COMPLETED';
-                    askConfirmation('Update File', `Set ${key.toUpperCase()} for ${emp.name} to ${action}?`, () => handleUpdateStatus(id, key));
-                };
-              });
-          }
-        }
-      
-        async function handleUpdateStatus(empId, key) {
-          const emp = employees.find(e => e.id == empId);
-          const newStatus = emp[key] === 'done' ? 'pending' : 'done';
-          const loader = document.getElementById(`loader-${empId}-${key}`);
-          loader.classList.remove('hidden');
-          const { error } = await supabaseClient.from('employees').update({ [key + '_status']: newStatus }).eq('id', empId);
-          loader.classList.add('hidden');
-          if (error) showToast('Sync Error');
-          else { emp[key] = newStatus; showToast('Updated'); renderEmployees(); }
+            `).join('');
+
+            if (currentUser?.role === 'updater') {
+                document.querySelectorAll('[data-id]').forEach(tile => {
+                    tile.onclick = () => {
+                        const id = tile.dataset.id;
+                        const key = tile.dataset.key;
+                        const emp = employees.find(e => e.id == id);
+                        const current = emp[key + '_status'];
+                        const next = current === 'done' ? 'pending' : 'done';
+                        askConfirmation('Update Status', `Set ${key.toUpperCase()} for ${emp.name} to ${next.toUpperCase()}?`, async () => {
+                            const loader = document.getElementById(`loader-${id}-${key}`);
+                            loader.classList.remove('hidden');
+                            const { error } = await supabaseClient.from('employees').update({ [key + '_status']: next }).eq('id', id);
+                            if (!error) {
+                                await logActivity('UPDATED', `${key.toUpperCase()} for ${emp.name} -> ${next}`);
+                                fetchEmployees();
+                            }
+                            loader.classList.add('hidden');
+                        });
+                    };
+                });
+            }
         }
     </script>
 </body>
 </html>
+
