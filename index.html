@@ -14,15 +14,26 @@
         .glass { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .tile-pending { background: rgba(71, 85, 105, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); }
         .tile-done { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255, 255, 255, 0.08); }
-        @media (min-width: 768px) { .tab-bar { position: static; border-radius: 1rem; } }
+        .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255, 255, 255, 0.08); background: #020617; }
+        @media (min-width: 768px) { .tab-bar { position: static; border-radius: 1rem; background: transparent; } }
         .loader { border: 2px solid rgba(255,255,255,0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 14px; height: 14px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .notification-dot { position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid #020617; }
         .notif-panel { position: fixed; top: 70px; right: 10px; width: 280px; max-height: 400px; z-index: 100; overflow-y: auto; display: none; }
+        
+        /* Full screen spinner */
+        #globalLoader { position: fixed; inset: 0; background: #020617; z-index: 200; display: none; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
+
+    <!-- Loading Screen -->
+    <div id="globalLoader">
+        <div class="flex flex-col items-center gap-4">
+            <div class="loader" style="width: 40px; height: 40px; border-width: 4px;"></div>
+            <p class="text-xs uppercase tracking-widest text-emerald-500 font-bold">Loading Data...</p>
+        </div>
+    </div>
 
     <div class="app-container">
         <!-- Login -->
@@ -49,7 +60,6 @@
                     <p id="currentUserRole" class="text-[9px] text-white/30 font-bold uppercase tracking-widest"></p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <!-- Notification Bell -->
                     <button id="notifBell" class="relative p-2 rounded-full bg-white/5 border border-white/10 active:scale-90 transition-all">
                         <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                         <div id="bellDot" class="notification-dot hidden"></div>
@@ -58,7 +68,6 @@
                 </div>
             </header>
 
-            <!-- Notifications Panel -->
             <div id="notifPanel" class="notif-panel glass rounded-3xl p-4 shadow-2xl animate-in slide-in-from-top-2 duration-300">
                 <div class="flex justify-between items-center mb-3">
                     <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Recent Activity</span>
@@ -82,9 +91,10 @@
                 </div>
             </nav>
 
-            <div id="employeesView" class="flex-1 space-y-4 pb-24"></div>
+            <div id="employeesView" class="flex-1 space-y-4 pb-24 min-h-[50vh]">
+                <!-- Empty State will be injected here if no data -->
+            </div>
 
-            <!-- Add Form with Dropdown -->
             <div id="addView" class="hidden glass p-6 rounded-[2.5rem] space-y-4 mb-24 animate-in slide-in-from-bottom-4 duration-500">
                 <h3 class="text-lg font-black text-emerald-400">Add Employee</h3>
                 
@@ -97,7 +107,7 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <input id="newId" type="text" placeholder="ID Number" class="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-4 text-sm" readonly>
+                        <input id="newId" type="text" placeholder="ID Number" class="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-4 text-sm text-white/60" readonly>
                         <input id="newMobile" type="text" placeholder="Mobile Number (Manual)" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm">
                         <input id="newEmail" type="email" placeholder="Email (Manual)" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm">
                         <input id="newIban" type="text" placeholder="IBAN (Manual)" class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-sm">
@@ -134,7 +144,6 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU';
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       
-        // Pre-populated data
         const PRE_EMPLOYEES = [
             { name: "Sidhik Kuruttukavil Kochu Muhammed", id: "2289943199" },
             { name: "Abdul Jabbar Mannakuzhi Maithen", id: "2329326967" },
@@ -192,47 +201,70 @@
         }
 
         async function logActivity(action, msg) {
-            await supabaseClient.from('activity_logs').insert({
-                user_email: currentUser.email,
-                action_type: action,
-                message: msg
-            });
+            try {
+                await supabaseClient.from('activity_logs').insert({
+                    user_email: currentUser.email,
+                    action_type: action,
+                    message: msg
+                });
+            } catch (err) {
+                console.warn("Logging failed, likely table missing:", err);
+            }
         }
 
         async function fetchLogs() {
-            const { data } = await supabaseClient.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(10);
-            if (data) {
-                logs = data;
-                renderLogs();
+            try {
+                const { data, error } = await supabaseClient.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(10);
+                if (!error && data) {
+                    logs = data;
+                    renderLogs();
+                }
+            } catch (err) {
+                console.warn("Logs disabled or missing table");
             }
         }
 
         function renderLogs() {
             const list = document.getElementById('notifList');
+            if (logs.length === 0) {
+                list.innerHTML = '<p class="text-[10px] text-white/20 text-center py-4">No recent updates</p>';
+                return;
+            }
             list.innerHTML = logs.map(l => `
                 <div class="p-3 bg-white/5 rounded-xl border border-white/5">
-                    <p class="text-[10px] font-bold text-emerald-400">${l.user_email.split('@')[0].toUpperCase()} - ${l.action_type}</p>
+                    <p class="text-[10px] font-bold text-emerald-400">${(l.user_email || 'User').split('@')[0].toUpperCase()} - ${l.action_type}</p>
                     <p class="text-[9px] text-white/60">${l.message}</p>
                     <p class="text-[7px] text-white/20 mt-1">${new Date(l.created_at).toLocaleTimeString()}</p>
                 </div>
             `).join('');
-            
-            // Show red dot if there's new stuff since last view (simplified)
             if (logs.length > 0) document.getElementById('bellDot').classList.remove('hidden');
         }
 
-        // Real-time listener for logs
-        const logChannel = supabaseClient.channel('activity_logs')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
-                logs.unshift(payload.new);
-                if (logs.length > 10) logs.pop();
-                renderLogs();
-                showToast(`New update from ${payload.new.user_email.split('@')[0]}`);
-            }).subscribe();
+        // Real-time
+        try {
+            const logChannel = supabaseClient.channel('activity_logs')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
+                    logs.unshift(payload.new);
+                    if (logs.length > 10) logs.pop();
+                    renderLogs();
+                    showToast(`New update from ${payload.new.user_email.split('@')[0]}`);
+                }).subscribe();
+        } catch (e) { console.log('Realtime inactive'); }
 
         async function fetchEmployees() {
-            const { data } = await supabaseClient.from('employees').select('*').order('created_at', { ascending: false });
-            employees = data || [];
+            const loader = document.getElementById('globalLoader');
+            loader.style.display = 'flex'; // Show spinner
+            
+            const { data, error } = await supabaseClient.from('employees').select('*').order('created_at', { ascending: false });
+            
+            loader.style.display = 'none'; // Hide spinner
+            
+            if (error) {
+                showToast('Sync Error: ' + error.message);
+                employees = [];
+            } else {
+                employees = data || [];
+            }
             renderEmployees();
         }
 
@@ -248,9 +280,10 @@
             currentUser = { id: data.user.id, email: data.user.email, role: roleData.data.role };
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainScreen').classList.remove('hidden');
-            document.getElementById('roleBadge').textContent = currentUser.role;
             document.getElementById('currentUserRole').textContent = currentUser.email;
             if (currentUser.role === 'updater') document.getElementById('tabAdd').classList.add('hidden');
+            
+            // Fetch concurrently
             fetchEmployees();
             fetchLogs();
         };
@@ -271,6 +304,7 @@
                 tabAdd.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 text-white/40";
                 document.getElementById('employeesView').classList.remove('hidden');
                 document.getElementById('addView').classList.add('hidden');
+                fetchEmployees(); // Refresh on tab switch
             } else {
                 tabAdd.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg";
                 tabEmployees.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 text-white/40";
@@ -301,14 +335,27 @@
                 fetchEmployees(); 
                 showToast('Success');
                 activateTab(true);
-                // Reset
                 nameDropdown.value = ""; document.getElementById('newId').value = "";
+            } else {
+                showToast(error.message);
             }
             btn.disabled = false; btn.textContent = 'Save Profile';
         };
 
         function renderEmployees() {
             const view = document.getElementById('employeesView');
+            if (employees.length === 0) {
+                view.innerHTML = `
+                    <div class="glass p-10 text-center rounded-[2.5rem] mt-10">
+                        <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">📂</span>
+                        </div>
+                        <p class="text-sm font-bold text-white/60">No Files Found</p>
+                        <p class="text-[10px] text-white/30 mt-2">Use 'Add Entry' to create one</p>
+                    </div>`;
+                return;
+            }
+
             view.innerHTML = employees.map(emp => `
                 <div class="glass rounded-[2rem] p-5 space-y-4 border-l-4 border-emerald-500 shadow-xl">
                     <div>
@@ -359,4 +406,5 @@
     </script>
 </body>
 </html>
+
 
