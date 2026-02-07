@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- ANTI-CACHE HEADERS (Forces iPhone to check for updates) -->
+    <!-- ANTI-CACHE HEADERS -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -15,7 +15,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Eman Bakery">
-    <meta name="theme-color" content="#F2F2F2">
+    <meta name="theme-color" content="#ADA996">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -25,8 +25,8 @@
         html { position: fixed; height: 100%; overflow: hidden; width: 100%; }
         
         body { 
-            /* VELVET SMOKE GRADIENT */
-            background: linear-gradient(180deg, #F2F2F2 0%, #ADA996 100%);
+            /* VELVET SMOKE GRADIENT: #ADA996 -> #F2F2F2 */
+            background: linear-gradient(180deg, #ADA996 0%, #F2F2F2 100%);
             color: #1e293b; 
             font-family: 'Inter', sans-serif; 
             height: var(--app-height); 
@@ -38,24 +38,25 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        .app-container { width: 100%; max-width: 640px; min-height: 100%; display: flex; flex-direction: column; margin: 0 auto; }
+        .app-container { width: 100%; max-width: 1024px; min-height: 100%; display: flex; flex-direction: column; margin: 0 auto; }
         
+        /* Glass Cards */
         .glass { 
-            background: rgba(255, 255, 255, 0.65); 
+            background: rgba(255, 255, 255, 0.75); 
             backdrop-filter: blur(20px); 
             -webkit-backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.8); 
+            border: 1px solid rgba(255, 255, 255, 0.9); 
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         }
 
-        .tile-pending { background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(0, 0, 0, 0.05); }
+        .tile-pending { background: #e2e8f0; border: 1px solid #cbd5e1; }
         .tile-done { background: #fff; border: 1px solid #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); }
         
         .tab-bar { 
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; 
             padding-bottom: max(10px, env(safe-area-inset-bottom)); 
             border-top: 1px solid rgba(255, 255, 255, 0.5); 
-            background: rgba(242, 242, 242, 0.9);
+            background: rgba(242, 242, 242, 0.95);
             backdrop-filter: blur(10px);
         }
         @media (min-width: 768px) { .tab-bar { position: static; border-radius: 1rem; background: rgba(255,255,255,0.5); padding-bottom: 0; } }
@@ -69,6 +70,12 @@
 
         .btn-primary { background-color: #1f2937; color: white; }
         .btn-active:active { transform: scale(0.98); }
+
+        /* Modal Transitions */
+        .modal-enter { opacity: 0; transform: scale(0.95); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 300ms, transform 300ms; }
+        .modal-exit { opacity: 1; transform: scale(1); }
+        .modal-exit-active { opacity: 0; transform: scale(0.95); transition: opacity 300ms, transform 300ms; }
     </style>
 </head>
 <body>
@@ -85,16 +92,15 @@
         <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-6 min-h-[100vh]">
             <div class="w-full max-w-sm glass p-10 rounded-[2.5rem] shadow-xl">
                 <div class="text-center mb-10">
-                    <p class="text-[10px] tracking-[0.4em] text-slate-400 uppercase mb-2 font-bold">E M A N</p>
+                    <p class="text-[10px] tracking-[0.4em] text-slate-500 uppercase mb-2 font-bold">E M A N</p>
                     <h1 class="text-4xl font-black mb-2 tracking-tight text-slate-800">Eman Bakery</h1>
-                    <p class="text-sm text-slate-500">Employee Portal v2.0</p>
+                    <p class="text-sm text-slate-600">Employee Portal</p>
                 </div>
                 <div class="space-y-4">
-                    <input type="email" id="emailInput" placeholder="Email" class="w-full bg-white/60 border border-slate-200 rounded-2xl px-5 py-4 text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 placeholder:text-slate-400 font-medium">
-                    <input type="password" id="passwordInput" placeholder="Password" class="w-full bg-white/60 border border-slate-200 rounded-2xl px-5 py-4 text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 placeholder:text-slate-400 font-medium">
+                    <input type="email" id="emailInput" placeholder="Email" class="w-full bg-white/50 border border-slate-300 rounded-2xl px-5 py-4 text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 placeholder:text-slate-500 font-medium">
+                    <input type="password" id="passwordInput" placeholder="Password" class="w-full bg-white/50 border border-slate-300 rounded-2xl px-5 py-4 text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 placeholder:text-slate-500 font-medium">
                     <button id="loginBtn" class="w-full btn-primary py-4 rounded-2xl font-bold text-lg shadow-lg mt-4 btn-active transition-all">Sign in</button>
-                    <!-- Refresh Button on Login Screen -->
-                     <button onclick="window.location.reload(true)" class="w-full py-2 text-xs text-slate-400 uppercase font-bold tracking-widest hover:text-slate-600">
+                    <button onclick="window.location.reload(true)" class="w-full py-2 text-xs text-slate-500 uppercase font-bold tracking-widest hover:text-slate-800">
                         ↻ Check for Updates
                     </button>
                 </div>
@@ -104,38 +110,35 @@
         <!-- Dashboard -->
         <div id="mainScreen" class="hidden flex-1 flex flex-col p-4 space-y-4">
             <header class="sticky top-0 z-40 pt-2 pb-2 flex justify-between items-center">
-                <div style="background: rgba(242,242,242,0.8); backdrop-filter: blur(10px); position: absolute; inset: 0; z-index: -1; margin: 0 -1rem; mask-image: linear-gradient(to bottom, black 80%, transparent 100%);"></div>
+                <div style="background: rgba(173, 169, 150, 0.8); backdrop-filter: blur(10px); position: absolute; inset: 0; z-index: -1; margin: 0 -1rem; mask-image: linear-gradient(to bottom, black 80%, transparent 100%);"></div>
                 
                 <div>
-                    <h2 class="text-xl font-black tracking-tight text-slate-800">Eman Bakery</h2>
-                    <p id="currentUserRole" class="text-[10px] text-slate-400 font-bold uppercase tracking-widest"></p>
+                    <h2 class="text-xl font-black tracking-tight text-slate-900">Eman Bakery</h2>
+                    <p id="currentUserRole" class="text-[10px] text-slate-600 font-bold uppercase tracking-widest"></p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <!-- Update Button -->
-                    <button onclick="window.location.reload(true)" class="p-2 rounded-full bg-slate-200/50 border border-white/60 active:scale-90 transition-all text-slate-500">
+                    <button onclick="window.location.reload(true)" class="p-2 rounded-full bg-white/40 border border-white/60 active:scale-90 transition-all text-slate-700">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                     </button>
-                    
                     <button id="notifBell" class="relative p-2 rounded-full bg-white/40 border border-white/60 active:scale-90 transition-all shadow-sm">
-                        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                         <div id="bellDot" class="notification-dot hidden"></div>
                     </button>
-                    <button id="logoutBtn" class="text-[9px] font-black uppercase tracking-widest bg-red-50 text-red-500 border border-red-100 px-4 py-2 rounded-full active:scale-90 transition-all shadow-sm">Exit</button>
+                    <button id="logoutBtn" class="text-[9px] font-black uppercase tracking-widest bg-white/50 text-red-600 border border-red-200 px-4 py-2 rounded-full active:scale-90 transition-all shadow-sm">Exit</button>
                 </div>
             </header>
 
-            <div id="notifPanel" class="notif-panel glass rounded-3xl p-4 shadow-2xl animate-in slide-in-from-top-2 duration-300 bg-white/80">
+            <div id="notifPanel" class="notif-panel glass rounded-3xl p-4 shadow-2xl animate-in slide-in-from-top-2 duration-300 bg-white/90">
                 <div class="flex justify-between items-center mb-3">
                     <span class="text-[10px] font-black text-slate-800 uppercase tracking-widest">Recent Activity</span>
-                    <button id="closeNotif" class="text-slate-400 text-xs font-bold">Close</button>
+                    <button id="closeNotif" class="text-slate-500 text-xs font-bold">Close</button>
                 </div>
-                <div id="notifList" class="space-y-2">
-                    <p class="text-[10px] text-slate-400 text-center py-4">No recent updates</p>
-                </div>
+                <div id="notifList" class="space-y-2"></div>
             </div>
 
-            <div id="employeesView" class="flex-1 space-y-4 pb-32 min-h-[50vh]">
-                <!-- Empty State -->
+            <!-- EMPLOYEES GRID (3 Columns on Desktop, 1 on Mobile) -->
+            <div id="employeesView" class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 pb-32 content-start">
+                <!-- Cards injected here -->
             </div>
 
             <nav id="mainNav" class="tab-bar">
@@ -156,17 +159,17 @@
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2">Quick Select Name</label>
-                        <select id="nameDropdown" class="w-full bg-white/50 border border-slate-200 rounded-2xl px-4 py-4 text-sm outline-none focus:ring-1 focus:ring-slate-400 text-slate-800 font-medium">
+                        <label class="text-[9px] font-black text-slate-500 uppercase ml-2">Quick Select</label>
+                        <select id="nameDropdown" class="w-full bg-white/50 border border-slate-300 rounded-2xl px-4 py-4 text-sm outline-none focus:ring-1 focus:ring-slate-500 text-slate-800 font-medium">
                             <option value="">-- Choose Employee --</option>
                         </select>
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <input id="newId" type="text" placeholder="ID Number" class="w-full bg-slate-100/50 border border-slate-200 rounded-2xl px-4 py-4 text-sm text-slate-500 font-medium" readonly>
-                        <input id="newMobile" type="text" placeholder="Mobile Number (Manual)" class="w-full bg-white/50 border border-slate-200 rounded-2xl px-4 py-4 text-sm text-slate-800 font-medium">
-                        <input id="newEmail" type="email" placeholder="Email (Manual)" class="w-full bg-white/50 border border-slate-200 rounded-2xl px-4 py-4 text-sm text-slate-800 font-medium">
-                        <input id="newIban" type="text" placeholder="IBAN (Manual)" class="w-full bg-white/50 border border-slate-200 rounded-2xl px-4 py-4 text-sm text-slate-800 font-medium">
+                        <input id="newId" type="text" placeholder="ID Number" class="w-full bg-slate-100 border border-slate-300 rounded-2xl px-4 py-4 text-sm text-slate-500 font-medium" readonly>
+                        <input id="newMobile" type="text" placeholder="Mobile Number" class="w-full bg-white/50 border border-slate-300 rounded-2xl px-4 py-4 text-sm text-slate-800 font-medium">
+                        <input id="newEmail" type="email" placeholder="Email" class="w-full bg-white/50 border border-slate-300 rounded-2xl px-4 py-4 text-sm text-slate-800 font-medium">
+                        <input id="newIban" type="text" placeholder="IBAN" class="w-full bg-white/50 border border-slate-300 rounded-2xl px-4 py-4 text-sm text-slate-800 font-medium">
                     </div>
                 </div>
                 
@@ -175,9 +178,29 @@
         </div>
     </div>
 
+    <!-- DETAIL MODAL -->
+    <div id="detailModal" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDetailModal()"></div>
+        
+        <!-- Content -->
+        <div id="detailContent" class="bg-[#F2F2F2] w-full max-w-lg p-6 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl transform translate-y-full sm:translate-y-10 sm:scale-95 transition-transform duration-300 pointer-events-auto max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-center mb-6">
+                <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+            </div>
+            
+            <div id="modalBody" class="space-y-6">
+                <!-- Dynamic Content Injected Here -->
+            </div>
+
+            <button onclick="closeDetailModal()" class="w-full mt-8 py-4 bg-slate-200 text-slate-600 font-bold rounded-2xl uppercase tracking-widest text-xs">Close</button>
+        </div>
+    </div>
+
     <!-- Confirm Modal -->
-    <div id="confirmModal" class="fixed inset-0 modal-overlay z-[110] flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
-        <div class="bg-white w-full max-w-sm p-8 rounded-t-[3rem] sm:rounded-[3rem] shadow-2xl transform translate-y-full sm:translate-y-0 transition-all duration-300" id="modalContent">
+    <div id="confirmModal" class="fixed inset-0 z-[110] flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div class="bg-white w-full max-w-sm p-8 rounded-t-[3rem] sm:rounded-[3rem] shadow-2xl transform translate-y-full sm:translate-y-0 transition-all duration-300 relative" id="modalContent">
             <h3 class="text-xl font-black mb-1 text-slate-800" id="modalTitle">Confirm</h3>
             <p class="text-xs text-slate-500 mb-8 font-medium" id="modalText"></p>
             <div class="flex gap-3">
@@ -200,24 +223,50 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU';
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       
+        // FULL DATA LIST from your image
         const PRE_EMPLOYEES = [
-            { name: "Sidhik Kuruttukavil Kochu Muhammed", id: "2289943199" },
-            { name: "Abdul Jabbar Mannakuzhi Maithen", id: "2329326967" },
-            { name: "Anvar Husain Mohammed Anchukandan", id: "2345158345" },
-            { name: "Mohamed Safwan M Sally", id: "2347675510" },
-            { name: "Muhammed Rafi Aliparambil", id: "2354265015" },
-            { name: "Sulfi Puthiyedathu Basheer", id: "2376846297" },
-            { name: "Sabeeb Manat Hassan Kutty", id: "2455539706" },
-            { name: "Al Ameen Kadukkunnan", id: "2485790295" },
-            { name: "Ansif Ali Kuruttukavil Alikunju", id: "2501924977" },
-            { name: "Md Akter Hosen", id: "2515498364" },
-            { name: "Mobarok Hossen", id: "2552187540" }
+            { name: "NAHEEMUDHEEN PARATHODI", id: "2235923253", iban: "SA6345000000852160290001", email: "naheemptd@emanbakeries.com" },
+            { name: "SHAMSUDHEEN MANATTU", id: "2307985529", iban: "SA54658796543500000023340110001", email: "shamsumanat9890@gmail.com" },
+            { name: "IBRAHIM BADUSHAN THOTTATHIKUDIYI", id: "2331355376", iban: "SA1745000000262432735001", email: "badushai803@gmail.com" },
+            { name: "ALFAS ASLAM", id: "2503874980", iban: "SA40407512424500000023340524001", email: "alfasaslu7@gmail.com" },
+            { name: "MUHAMMED SHALI VAZHAYIL", id: "2455820023", iban: "SA614500000023340532001", email: "salivazhayil@gmail.com" },
+            { name: "SHERIN KOCHUKONICKAL AZEEZ", id: "2354488948", iban: "SA814500000023340714001", email: "kasherin384@gmail.com" },
+            { name: "SHIJAS KAREEM PALLIMUKIL", id: "2256400710", iban: "SA034500000023340722001", email: "pkshijas556@gmail.com" },
+            { name: "SINEESH PATHUKUDI MUHAMMED", id: "2440029813", iban: "SA224500000023340730001", email: "akkuansal72@gmail.com" },
+            { name: "MUHAMMED PARAKKUNNATHU EBRAHIM", id: "2377814138", iban: "SA894500000023340748001", email: "foumalmammu@gmail.com" },
+            { name: "ASINSHA ASAINAR VELLIRIPPIL", id: "2478222298", iban: "SA204500000023341449001", email: "asinshaasi@gmail.com" },
+            { name: "CHEVU NISSAR MUTTATHUCHALIL MOIDU", id: "2309399752", iban: "SA734500000023341456001", email: "fasilchevunizarnizar@gmail.com" },
+            { name: "SUMANDAS SUKHANDU BIKASH", id: "2205956697", iban: "SA024500000023342488001", email: "sumonchaudary0012@gmail.com" },
+            { name: "SHABEER ALI PANAKKATHODEN", id: "2481393557", iban: "SA804500000023341316001", email: "shabirp313@gmail.com" },
+            { name: "AHAMMED KABEER VANKALATH", id: "2311162198", iban: "SA024500000023341324001", email: "ahammadkhabeer@gmail.com" },
+            { name: "MUHSIN KURUTTUKAVIL MUSTHAFA", id: "2501103358", iban: "SA444500000023341357001", email: "muhsinkrtkvl17@gmail.com" },
+            { name: "ASHKAR ENJAKUDIYIL ALI", id: "2501925479", iban: "SA794500000023341530001", email: "ashkarali1232@gmail.com" },
+            { name: "ASHRAF MOONNAN KANDATHIL KOMU", id: "2311479220", iban: "SA714500000023341399001", email: "asharafbapu4@gmail.com" },
+            { name: "ABDUSSAMAD PANDALAN", id: "2308915301", iban: "SA214500000023341720001", email: "samadthelakkad@gmail.com" },
+            { name: "MUSTHAFA PATHAYAPURAKKAL", id: "2322180403", iban: "SA124500000023341415001", email: "m95042906@gmail.com" },
+            { name: "ARIF KOORIMANNIL POOVATHIKKAL", id: "2453005585", iban: "SA6345000000262434046001", email: "sinansilu382@gmail.com" },
+            { name: "RIYAS KILIVAYIL ALAVIKUTTY KILIVAYIL", id: "2303530915", iban: "SA6745000000221675051001", email: "riyasvga786786@gmail.com" },
+            { name: "MANSOORALI MANSOORALI PUTHAN", id: "2405299500", iban: "SA054500000023341555001", email: "mansooreman4@gmail.com" },
+            { name: "KONTHALAM THELLIKKUNNEL ABDUL AZEES", id: "2366253124", iban: "SA124500000023341803001", email: "konthalamazees3806@gmail.com" },
+            { name: "RIFAS KANJIRAKKATTU KUDIYIL BASHEER", id: "2501103424", iban: "SA0445000000221672819001", email: "rifaskbasheer@gmail.com" },
+            { name: "AGHIL ALIYAKKOTT GANGADHARAN", id: "2439707783", iban: "SA9345000000221672785001", email: "vishnuaghil67@gmail.com" },
+            { name: "ABDUL AZEEZ AYIMPADI", id: "2289306652", iban: "SA104500000023341746001", email: "azeeseman123@gmail.com" },
+            { name: "SHAMSUDHEEN KURUTTUKAVIL SAINUDHEEN", id: "2511077311", iban: "SA824500000023341761001", email: "shamslabba786@gmail.com" },
+            { name: "JISHNU RAVEENDRAN", id: "2485790337", iban: "SA5345000000221673197001", email: "jishnur8089@gmail.com" },
+            { name: "ANSAL RASAK", id: "2477053272", iban: "SA6445000000221673171001", email: "ansalrasak408@gmail.com" },
+            { name: "SABEER KADOOKUNNAN KUNHIMOHAMED", id: "2308393285", iban: "SA214500000023342108001", email: "shifashifinkk@gmail.com" },
+            { name: "KABEER POOVATHUM CHOTTIL MUHAMMED", id: "2245613761", iban: "SA094500000023342348001", email: "safvankabeer007@gmail.com" },
+            { name: "EBRAHIM LATHEEF KAVANA PARAMBIL", id: "2309489785", iban: "SA134500000023342462001", email: "latheef20k5@gmail.com" },
+            { name: "ABDUL MANAF KURUTTAKAVIL MUSTHAFA", id: "2301750994", iban: "SA494500000023343197001", email: "manafmusthafa3@gmail.com" },
+            { name: "NEJMUDHEEN SAKHIB", id: "2481486153", iban: "SA444500000023344849001", email: "nejmudheensakhib786@gmail.com" },
+            { name: "ABDUL MUNIR VAZHAYIL", id: "2289427870", iban: "SA284500000023343908001", email: "muneervazhayil78@gmail.com" }
         ];
 
         let currentUser = null; 
         let employees = [];
         let logs = [];
 
+        // UI Setup
         const nameDropdown = document.getElementById('nameDropdown');
         PRE_EMPLOYEES.forEach(e => {
             const opt = document.createElement('option');
@@ -228,7 +277,14 @@
 
         nameDropdown.onchange = (e) => {
             const selected = PRE_EMPLOYEES.find(emp => emp.name === e.target.value);
-            document.getElementById('newId').value = selected ? selected.id : "";
+            if (selected) {
+                document.getElementById('newId').value = selected.id || "";
+                document.getElementById('newMobile').value = "";
+                document.getElementById('newEmail').value = selected.email || "";
+                document.getElementById('newIban').value = selected.iban || "";
+            } else {
+                ['newId', 'newMobile', 'newEmail', 'newIban'].forEach(id => document.getElementById(id).value = '');
+            }
         };
 
         const setAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
@@ -243,44 +299,120 @@
             setTimeout(() => { toast.classList.add('opacity-0', '-translate-y-4'); toast.classList.remove('opacity-100', 'translate-y-0'); }, 3000);
         }
 
+        window.closeDetailModal = function() {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailContent');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.add('translate-y-full', 'sm:translate-y-10', 'sm:scale-95');
+        }
+
+        window.openDetailModal = function(empId) {
+            const emp = employees.find(e => e.id == empId);
+            if (!emp) return;
+
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailContent');
+            const body = document.getElementById('modalBody');
+
+            body.innerHTML = `
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 leading-tight">${emp.name}</h2>
+                    <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">ID: ${emp.identification_number}</p>
+                </div>
+
+                <div class="space-y-4">
+                    ${renderDetailRow('Mobile', emp.mobile || 'N/A')}
+                    ${renderDetailRow('Email', emp.email || 'N/A')}
+                    ${renderDetailRow('IBAN', emp.iban || 'N/A')}
+                </div>
+
+                <div class="grid grid-cols-1 gap-3 pt-4">
+                    <p class="text-[10px] font-black uppercase text-slate-400 mb-1">Status Files</p>
+                    ${['qiwa', 'gosi', 'mudad'].map(key => renderStatusTile(emp, key)).join('')}
+                </div>
+            `;
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('translate-y-full', 'sm:translate-y-10', 'sm:scale-95');
+        }
+
+        function renderDetailRow(label, value) {
+            return `
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center group">
+                    <div class="overflow-hidden">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">${label}</p>
+                        <p class="text-sm font-bold text-slate-700 truncate pr-2">${value}</p>
+                    </div>
+                    <button onclick="copyToClipboard('${value}')" class="p-2 bg-slate-50 text-slate-400 rounded-lg hover:bg-slate-200 hover:text-slate-600 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderStatusTile(emp, key) {
+            const done = emp[key + '_status'] === 'done';
+            const isUpdater = currentUser?.role === 'updater';
+            return `
+                <div onclick="${isUpdater ? `toggleStatus('${emp.id}', '${key}')` : ''}"
+                     class="${isUpdater ? 'cursor-pointer active:scale-95' : ''} ${done ? 'tile-done' : 'tile-pending'} flex items-center justify-between p-4 rounded-2xl relative transition-all">
+                    <div class="flex flex-col">
+                        <span class="text-xs font-black uppercase text-slate-800 tracking-tight">${key} FILE</span>
+                        <span class="text-[10px] font-bold ${done ? 'text-emerald-600' : 'text-slate-400'}">${done ? 'COMPLETED' : 'PENDING'}</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center ${done ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-200 text-slate-400'} font-bold text-sm">
+                        ${done ? '✓' : '○'}
+                    </div>
+                </div>
+            `;
+        }
+
+        window.copyToClipboard = function(text) {
+            if (text === 'N/A') return;
+            navigator.clipboard.writeText(text);
+            showToast('Copied to clipboard');
+        }
+
+        window.toggleStatus = function(id, key) {
+            const emp = employees.find(e => e.id == id);
+            const current = emp[key + '_status'];
+            const next = current === 'done' ? 'pending' : 'done';
+            askConfirmation('Update Status', `Set ${key.toUpperCase()} for ${emp.name} to ${next.toUpperCase()}?`, async () => {
+                const { error } = await supabaseClient.from('employees').update({ [key + '_status']: next }).eq('id', id);
+                if (!error) {
+                    await logActivity('UPDATED', `${key.toUpperCase()} for ${emp.name} -> ${next}`);
+                    await fetchEmployees(); // Refresh data
+                    openDetailModal(id); // Re-render modal with new status
+                }
+            });
+        }
+
         function askConfirmation(title, text, onConfirm) {
             const modal = document.getElementById('confirmModal');
             const content = document.getElementById('modalContent');
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalText').textContent = text;
             modal.classList.remove('opacity-0', 'pointer-events-none');
-            content.classList.remove('translate-y-full', 'sm:scale-95');
+            content.classList.remove('translate-y-full', 'sm:translate-y-0');
             document.getElementById('modalConfirm').onclick = () => { onConfirm(); close(); };
             document.getElementById('modalCancel').onclick = close;
-            function close() { modal.classList.add('opacity-0', 'pointer-events-none'); content.classList.add('translate-y-full', 'sm:scale-95'); }
+            function close() { modal.classList.add('opacity-0', 'pointer-events-none'); content.classList.add('translate-y-full', 'sm:translate-y-0'); }
         }
 
         async function logActivity(action, msg) {
-            try {
-                await supabaseClient.from('activity_logs').insert({
-                    user_email: currentUser.email,
-                    action_type: action,
-                    message: msg
-                });
-            } catch (err) { console.warn("Log failed"); }
+            try { await supabaseClient.from('activity_logs').insert({ user_email: currentUser.email, action_type: action, message: msg }); } catch (err) { }
         }
 
         async function fetchLogs() {
             try {
                 const { data, error } = await supabaseClient.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(10);
-                if (!error && data) {
-                    logs = data;
-                    renderLogs();
-                }
+                if (!error && data) { logs = data; renderLogs(); }
             } catch (err) { }
         }
 
         function renderLogs() {
             const list = document.getElementById('notifList');
-            if (logs.length === 0) {
-                list.innerHTML = '<p class="text-[10px] text-slate-400 text-center py-4">No recent updates</p>';
-                return;
-            }
+            if (logs.length === 0) { list.innerHTML = '<p class="text-[10px] text-slate-400 text-center py-4">No recent updates</p>'; return; }
             list.innerHTML = logs.map(l => `
                 <div class="p-3 bg-white/50 rounded-xl border border-slate-100">
                     <p class="text-[10px] font-bold text-slate-800">${(l.user_email || 'User').split('@')[0].toUpperCase()} - ${l.action_type}</p>
@@ -292,29 +424,17 @@
         }
 
         try {
-            const logChannel = supabaseClient.channel('activity_logs')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
-                    logs.unshift(payload.new);
-                    if (logs.length > 10) logs.pop();
-                    renderLogs();
-                    showToast(`New update from ${payload.new.user_email.split('@')[0]}`);
-                }).subscribe();
+            supabaseClient.channel('activity_logs').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
+                logs.unshift(payload.new); if (logs.length > 10) logs.pop(); renderLogs(); showToast(`New update from ${payload.new.user_email.split('@')[0]}`);
+            }).subscribe();
         } catch (e) { }
 
         async function fetchEmployees() {
             const loader = document.getElementById('globalLoader');
             loader.style.display = 'flex'; 
-            
             const { data, error } = await supabaseClient.from('employees').select('*').order('created_at', { ascending: false });
-            
             loader.style.display = 'none'; 
-            
-            if (error) {
-                showToast('Sync Error');
-                employees = [];
-            } else {
-                employees = data || [];
-            }
+            if (error) { showToast('Sync Error'); employees = []; } else { employees = data || []; }
             renderEmployees();
         }
 
@@ -329,11 +449,7 @@
             if (!roleData.data) { await supabaseClient.auth.signOut(); showToast('Role Missing'); return; }
             currentUser = { id: data.user.id, email: data.user.email, role: roleData.data.role };
             
-            if (currentUser.role === 'updater') {
-                document.getElementById('tabAdd').style.display = 'none'; 
-            } else {
-                document.getElementById('tabAdd').style.display = 'flex';
-            }
+            if (currentUser.role === 'updater') document.getElementById('tabAdd').style.display = 'none'; else document.getElementById('tabAdd').style.display = 'flex';
 
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainScreen').classList.remove('hidden');
@@ -344,32 +460,23 @@
         };
 
         document.getElementById('logoutBtn').onclick = () => askConfirmation('Exit', 'Sign out of Eman Bakery?', () => location.reload(true));
-        
-        document.getElementById('notifBell').onclick = () => {
-            const p = document.getElementById('notifPanel');
-            p.style.display = p.style.display === 'block' ? 'none' : 'block';
-            document.getElementById('bellDot').classList.add('hidden');
-        };
+        document.getElementById('notifBell').onclick = () => { document.getElementById('notifPanel').style.display = 'block'; document.getElementById('bellDot').classList.add('hidden'); };
         document.getElementById('closeNotif').onclick = () => document.getElementById('notifPanel').style.display = 'none';
 
         const tabEmployees = document.getElementById('tabEmployees');
         const tabAdd = document.getElementById('tabAdd');
         function activateTab(isEmployees) {
-            if (!isEmployees && currentUser?.role === 'updater') {
-                showToast('Restricted Access');
-                return;
-            }
-
+            if (!isEmployees && currentUser?.role === 'updater') { showToast('Restricted Access'); return; }
             if (isEmployees) {
                 tabEmployees.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 btn-primary shadow-lg transition-all";
                 tabAdd.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-slate-400 transition-all";
-                document.getElementById('employeesView').classList.remove('hidden');
+                document.getElementById('employeesView').classList.remove('hidden'); document.getElementById('employeesView').classList.add('grid');
                 document.getElementById('addView').classList.add('hidden');
                 fetchEmployees(); 
             } else {
                 tabAdd.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 btn-primary shadow-lg transition-all";
                 tabEmployees.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-slate-400 transition-all";
-                document.getElementById('employeesView').classList.add('hidden');
+                document.getElementById('employeesView').classList.add('hidden'); document.getElementById('employeesView').classList.remove('grid');
                 document.getElementById('addView').classList.remove('hidden');
             }
         }
@@ -378,11 +485,7 @@
         activateTab(true);
 
         document.getElementById('saveEmployeeBtn').onclick = async () => {
-            if (currentUser?.role !== 'creator') {
-                showToast('Unauthorized');
-                return;
-            }
-
+            if (currentUser?.role !== 'creator') { showToast('Unauthorized'); return; }
             const name = nameDropdown.value;
             const idNo = document.getElementById('newId').value;
             const mob = document.getElementById('newMobile').value;
@@ -398,79 +501,28 @@
             });
             if (!error) {
                 await logActivity('ADDED', `New profile: ${name}`);
-                fetchEmployees(); 
-                showToast('Success');
-                activateTab(true);
+                fetchEmployees(); showToast('Success'); activateTab(true);
                 nameDropdown.value = ""; document.getElementById('newId').value = "";
-            } else {
-                showToast(error.message);
-            }
+            } else { showToast(error.message); }
             btn.disabled = false; btn.textContent = 'Save Profile';
         };
 
         function renderEmployees() {
             const view = document.getElementById('employeesView');
             if (employees.length === 0) {
-                view.innerHTML = `
-                    <div class="glass p-10 text-center rounded-[2.5rem] mt-10">
-                        <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span class="text-2xl">📂</span>
-                        </div>
-                        <p class="text-sm font-bold text-slate-500">No Files Found</p>
-                        <p class="text-[10px] text-slate-400 mt-2">Use 'Add Entry' to create one</p>
-                    </div>`;
+                view.innerHTML = `<div class="glass p-10 text-center rounded-[2.5rem] mt-10 col-span-3"><div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4"><span class="text-2xl">📂</span></div><p class="text-sm font-bold text-slate-500">No Files Found</p></div>`;
                 return;
             }
 
             view.innerHTML = employees.map(emp => `
-                <div class="glass rounded-[2rem] p-5 space-y-4 shadow-lg border-l-4 border-slate-700">
+                <div onclick="openDetailModal(${emp.id})" class="glass rounded-[1.5rem] p-5 shadow-lg border-l-4 border-slate-700 cursor-pointer active:scale-95 transition-all">
                     <div>
-                        <h4 class="text-base font-extrabold tracking-tight text-slate-800">${emp.name}</h4>
-                        <p class="text-[8px] uppercase font-black text-slate-400 tracking-widest mt-1">ID: ${emp.identification_number} • ${emp.mobile || 'No Contact'}</p>
-                    </div>
-                    <div class="grid grid-cols-1 gap-2.5">
-                        ${['qiwa', 'gosi', 'mudad'].map(key => {
-                            const done = emp[key + '_status'] === 'done';
-                            const isUpdater = currentUser?.role === 'updater';
-                            return `
-                                <div data-id="${emp.id}" data-key="${key}" 
-                                     class="${isUpdater ? 'cursor-pointer active:scale-95' : ''} ${done ? 'tile-done' : 'tile-pending'} flex items-center justify-between p-3.5 rounded-2xl relative transition-all">
-                                    <div class="flex flex-col">
-                                        <span class="text-xs font-black uppercase text-slate-700 tracking-tight">${key} FILE</span>
-                                        <span class="text-[10px] font-bold ${done ? 'text-emerald-600' : 'text-slate-400'}">${done ? 'COMPLETED' : 'PENDING'}</span>
-                                    </div>
-                                    <div class="w-7 h-7 rounded-full flex items-center justify-center ${done ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-200 text-slate-400'} font-bold text-xs">${done ? '✓' : '○'}</div>
-                                    <div id="loader-${emp.id}-${key}" class="hidden absolute inset-0 bg-white/80 rounded-2xl flex items-center justify-center"><div class="loader"></div></div>
-                                </div>`;
-                        }).join('')}
+                        <h4 class="text-base font-extrabold tracking-tight text-slate-800 truncate">${emp.name}</h4>
+                        <p class="text-[9px] uppercase font-black text-slate-400 tracking-widest mt-1">ID: ${emp.identification_number}</p>
                     </div>
                 </div>
             `).join('');
-
-            if (currentUser?.role === 'updater') {
-                document.querySelectorAll('[data-id]').forEach(tile => {
-                    tile.onclick = () => {
-                        const id = tile.dataset.id;
-                        const key = tile.dataset.key;
-                        const emp = employees.find(e => e.id == id);
-                        const current = emp[key + '_status'];
-                        const next = current === 'done' ? 'pending' : 'done';
-                        askConfirmation('Update Status', `Set ${key.toUpperCase()} for ${emp.name} to ${next.toUpperCase()}?`, async () => {
-                            const loader = document.getElementById(`loader-${id}-${key}`);
-                            loader.classList.remove('hidden');
-                            const { error } = await supabaseClient.from('employees').update({ [key + '_status']: next }).eq('id', id);
-                            if (!error) {
-                                await logActivity('UPDATED', `${key.toUpperCase()} for ${emp.name} -> ${next}`);
-                                fetchEmployees();
-                            }
-                            loader.classList.add('hidden');
-                        });
-                    };
-                });
-            }
         }
     </script>
 </body>
 </html>
-
-
