@@ -16,7 +16,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         :root { --app-height: 100%; }
         
-        /* Prevent elastic scrolling/bouncing on iOS */
         html { position: fixed; height: 100%; overflow: hidden; width: 100%; }
         
         body { 
@@ -28,7 +27,6 @@
             overflow-y: auto; 
             -webkit-overflow-scrolling: touch; 
             -webkit-tap-highlight-color: transparent;
-            /* Extra padding for the notch in standalone mode */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
@@ -39,7 +37,6 @@
         .tile-pending { background: rgba(71, 85, 105, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); }
         .tile-done { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.2); }
         
-        /* Tab Bar styling */
         .tab-bar { 
             position: fixed; 
             bottom: 0; 
@@ -57,17 +54,12 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .notification-dot { position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid #020617; }
         .notif-panel { position: fixed; top: calc(60px + env(safe-area-inset-top)); right: 10px; width: 280px; max-height: 400px; z-index: 100; overflow-y: auto; display: none; }
-        
-        /* Full screen spinner */
         #globalLoader { position: fixed; inset: 0; background: #020617; z-index: 200; display: none; align-items: center; justify-content: center; }
-        
-        /* Hide scrollbar for clean look */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body>
 
-    <!-- Loading Screen -->
     <div id="globalLoader">
         <div class="flex flex-col items-center gap-4">
             <div class="loader" style="width: 40px; height: 40px; border-width: 4px;"></div>
@@ -94,7 +86,6 @@
 
         <!-- Dashboard -->
         <div id="mainScreen" class="hidden flex-1 flex flex-col p-4 space-y-4">
-            <!-- Header with safe area padding for notch -->
             <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-xl pt-2 pb-2 flex justify-between items-center border-b border-white/5">
                 <div>
                     <h2 class="text-xl font-black tracking-tight">Eman Bakery</h2>
@@ -282,7 +273,6 @@
             if (logs.length > 0) document.getElementById('bellDot').classList.remove('hidden');
         }
 
-        // Real-time
         try {
             const logChannel = supabaseClient.channel('activity_logs')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
@@ -295,11 +285,11 @@
 
         async function fetchEmployees() {
             const loader = document.getElementById('globalLoader');
-            loader.style.display = 'flex'; // Show spinner
+            loader.style.display = 'flex'; 
             
             const { data, error } = await supabaseClient.from('employees').select('*').order('created_at', { ascending: false });
             
-            loader.style.display = 'none'; // Hide spinner
+            loader.style.display = 'none'; 
             
             if (error) {
                 showToast('Sync Error: ' + error.message);
@@ -320,12 +310,18 @@
             const roleData = await supabaseClient.from('user_roles').select('role').eq('user_id', data.user.id).maybeSingle();
             if (!roleData.data) { await supabaseClient.auth.signOut(); showToast('Role Missing'); return; }
             currentUser = { id: data.user.id, email: data.user.email, role: roleData.data.role };
+            
+            // LOCK 1: Visual Hide immediately
+            if (currentUser.role === 'updater') {
+                document.getElementById('tabAdd').style.display = 'none'; 
+            } else {
+                document.getElementById('tabAdd').style.display = 'flex';
+            }
+
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainScreen').classList.remove('hidden');
             document.getElementById('currentUserRole').textContent = currentUser.email;
-            if (currentUser.role === 'updater') document.getElementById('tabAdd').classList.add('hidden');
             
-            // Fetch concurrently
             fetchEmployees();
             fetchLogs();
         };
@@ -341,15 +337,21 @@
         const tabEmployees = document.getElementById('tabEmployees');
         const tabAdd = document.getElementById('tabAdd');
         function activateTab(isEmployees) {
+            // LOCK 2: Logic Guard
+            if (!isEmployees && currentUser?.role === 'updater') {
+                showToast('Restricted Access');
+                return;
+            }
+
             if (isEmployees) {
-                tabEmployees.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg transition-all";
-                tabAdd.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 text-white/40 transition-all";
+                tabEmployees.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg transition-all";
+                tabAdd.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-white/40 transition-all";
                 document.getElementById('employeesView').classList.remove('hidden');
                 document.getElementById('addView').classList.add('hidden');
-                fetchEmployees(); // Refresh on tab switch
+                fetchEmployees(); 
             } else {
-                tabAdd.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg transition-all";
-                tabEmployees.className = "flex-1 py-3 rounded-xl flex flex-col items-center gap-1 text-white/40 transition-all";
+                tabAdd.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 bg-emerald-600 text-white shadow-lg transition-all";
+                tabEmployees.className = "flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-white/40 transition-all";
                 document.getElementById('employeesView').classList.add('hidden');
                 document.getElementById('addView').classList.remove('hidden');
             }
@@ -359,6 +361,12 @@
         activateTab(true);
 
         document.getElementById('saveEmployeeBtn').onclick = async () => {
+            // LOCK 3: Database Guard
+            if (currentUser?.role !== 'creator') {
+                showToast('Unauthorized');
+                return;
+            }
+
             const name = nameDropdown.value;
             const idNo = document.getElementById('newId').value;
             const mob = document.getElementById('newMobile').value;
