@@ -24,7 +24,7 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
   <!-- Tailwind Config -->
-  <script id="tailwind-config">
+  <script>
     tailwind.config = {
       darkMode: "class",
       theme: {
@@ -57,7 +57,6 @@
       font-family: "Plus Jakarta Sans", sans-serif;
     }
 
-    /* Glassmorphism utilities for login */
     .glass-panel {
       background: rgba(34, 21, 16, 0.75);
       backdrop-filter: blur(12px);
@@ -85,7 +84,6 @@
       scrollbar-width: none;
     }
 
-    /* Toast */
     #toast {
       transition: opacity 0.25s ease;
     }
@@ -109,11 +107,10 @@
       ></div>
     </div>
 
-    <!-- Content -->
+    <!-- Login content -->
     <div
       class="relative z-20 flex-1 flex flex-col justify-center items-center w-full max-w-md"
     >
-      <!-- Logo -->
       <div class="mb-8 text-center">
         <div
           class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 backdrop-blur-md mb-4 border border-primary/30 shadow-[0_0_15px_rgba(238,91,43,0.3)]"
@@ -134,7 +131,6 @@
         </p>
       </div>
 
-      <!-- Glass Card Login Form -->
       <div
         class="w-full glass-panel rounded-2xl p-6 shadow-2xl relative overflow-hidden group"
       >
@@ -149,7 +145,6 @@
         </p>
 
         <form class="space-y-4" onsubmit="event.preventDefault();">
-          <!-- Email -->
           <div class="relative group/input">
             <div
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
@@ -169,7 +164,6 @@
             />
           </div>
 
-          <!-- Password -->
           <div class="relative group/input">
             <div
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
@@ -198,15 +192,14 @@
             </button>
           </div>
 
-          <!-- Forgot -->
           <div class="flex justify-end pt-1">
             <span
               class="text-primary text-xs font-semibold hover:text-primary/80 transition-colors cursor-default"
-              >Forgot Password?</span
             >
+              Forgot Password?
+            </span>
           </div>
 
-          <!-- Sign In Button -->
           <button
             id="loginBtn"
             type="button"
@@ -221,7 +214,6 @@
           </button>
         </form>
 
-        <!-- Face ID divider -->
         <div class="relative flex py-5 items-center">
           <div class="flex-grow border-t border-white/10"></div>
           <span class="flex-shrink-0 mx-4 text-white/30 text-xs"
@@ -246,7 +238,6 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="relative z-20 flex flex-col items-center gap-4 mt-6">
       <button
         type="button"
@@ -267,17 +258,16 @@
     </div>
   </div>
 
-  <!-- MAIN APP (DASHBOARD + ADD EMPLOYEE) -->
+  <!-- MAIN APP -->
   <div
     id="mainScreen"
     class="hidden h-full flex flex-col bg-background-light dark:bg-background-dark"
   >
     <!-- Top Bar -->
     <div
-      class="flex items-center justify-between px-5 pt-12 pb-4 sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm"
+      class="flex items-center justify-between px-5 pt-8 pb-4 sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm"
     >
       <div class="flex items-center gap-3">
-        <!-- Avatar -->
         <div class="relative">
           <div
             class="h-10 w-10 rounded-full bg-cover bg-center border-2 border-primary/30"
@@ -312,9 +302,8 @@
       </button>
     </div>
 
-    <!-- Scrollable Content -->
+    <!-- Content -->
     <main class="flex-1 overflow-y-auto hide-scrollbar pb-24">
-      <!-- Context Selector -->
       <div class="px-5 mb-6">
         <div class="relative">
           <select
@@ -338,27 +327,23 @@
           <span class="material-symbols-outlined text-primary">group</span>
           Employee Onboarding
         </h2>
-        <div id="employeesView" class="flex flex-col gap-3">
-          <!-- Cards rendered by JS -->
-        </div>
+        <div id="employeesView" class="flex flex-col gap-3"></div>
       </div>
 
-      <!-- Spacer -->
       <div class="h-6"></div>
     </main>
 
-    <!-- ADD EMPLOYEE (New Entry style) -->
+    <!-- ADD EMPLOYEE VIEW -->
     <div
       id="addView"
       class="hidden bg-background-light dark:bg-background-dark min-h-[70vh] flex flex-col"
     >
-      <!-- Header -->
       <header
         class="sticky top-0 z-20 flex items-center justify-between px-4 py-3 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5"
       >
         <button
           type="button"
-          onclick="document.getElementById('tabEmployees').click()"
+          id="backToEmployeesBtn"
           class="flex items-center justify-center p-2 -ml-2 text-slate-500 dark:text-gray-400 hover:text-primary transition-colors rounded-full hover:bg-black/5 dark:hover:bg-white/5"
         >
           <span class="material-symbols-outlined text-[24px]">arrow_back</span>
@@ -369,7 +354,6 @@
         <span class="w-8 h-8"></span>
       </header>
 
-      <!-- Content -->
       <main class="flex-1 px-4 py-6 space-y-6 pb-24">
         <section class="space-y-3">
           <label
@@ -453,7 +437,6 @@
         </section>
       </main>
 
-      <!-- Fixed Footer Actions -->
       <div
         class="fixed bottom-0 left-0 right-0 p-4 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 z-30"
       >
@@ -488,14 +471,15 @@
           <span class="text-[10px] font-bold">Employees</span>
         </button>
         <button
+          id="tabAdd"
           type="button"
           class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors group"
         >
           <span
             class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform"
-            >calendar_month</span
+            >person_add</span
           >
-          <span class="text-[10px] font-medium">Schedule</span>
+          <span class="text-[10px] font-medium">Add Employee</span>
         </button>
 
         <div class="relative -top-6">
@@ -545,7 +529,7 @@
     </div>
   </div>
 
-  <!-- APP LOGIC + SUPABASE (unchanged DB behaviour) -->
+  <!-- APP LOGIC + SUPABASE -->
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -555,8 +539,8 @@
 
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentUser = null; // { id, email, role }
-    let employees = []; // cache
+    let currentUser = null;
+    let employees = [];
 
     function showToast(message) {
       const toast = document.getElementById("toast");
@@ -598,7 +582,7 @@
         return;
       }
 
-      employees = data.map((row) => ({
+      employees = (data || []).map((row) => ({
         id: row.id,
         name: row.name,
         nationalId: row.identification_number,
@@ -613,7 +597,7 @@
       renderEmployees();
     }
 
-    // Login / logout
+    // Login
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
@@ -626,6 +610,9 @@
         return;
       }
 
+      loginBtn.disabled = true;
+      loginBtn.firstElementChild.textContent = "Signing in...";
+
       const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password,
@@ -634,6 +621,8 @@
       if (error) {
         console.error(error);
         showToast("Login failed");
+        loginBtn.disabled = false;
+        loginBtn.firstElementChild.textContent = "Sign In";
         return;
       }
 
@@ -641,6 +630,8 @@
       const role = await fetchUserRole(user.id);
       if (!role) {
         await supabaseClient.auth.signOut();
+        loginBtn.disabled = false;
+        loginBtn.firstElementChild.textContent = "Sign In";
         return;
       }
 
@@ -659,10 +650,12 @@
         tabAdd.classList.remove("opacity-40", "pointer-events-none");
       } else {
         tabAdd.classList.add("opacity-40", "pointer-events-none");
-        activateTab(true);
       }
 
-      fetchEmployees();
+      await fetchEmployees();
+
+      loginBtn.disabled = false;
+      loginBtn.firstElementChild.textContent = "Sign In";
     });
 
     logoutBtn.addEventListener("click", async () => {
@@ -671,4 +664,237 @@
       document.getElementById("emailInput").value = "";
       document.getElementById("passwordInput").value = "";
       document.getElementById("mainScreen").classList.add("hidden");
-     
+      document.getElementById("loginScreen").classList.remove("hidden");
+    });
+
+    // Tabs
+    const tabEmployees = document.getElementById("tabEmployees");
+    const tabAdd = document.getElementById("tabAdd");
+    const employeesView = document.getElementById("employeesView");
+    const addView = document.getElementById("addView");
+    const backToEmployeesBtn = document.getElementById("backToEmployeesBtn");
+
+    function activateTab(isEmployees) {
+      if (!isEmployees && currentUser?.role !== "creator") {
+        showToast("Only creator can add employees");
+        return;
+      }
+
+      if (isEmployees) {
+        tabEmployees.classList.add("text-primary");
+        tabEmployees.classList.remove("text-gray-400");
+        tabAdd.classList.remove("text-primary");
+        employeesView.parentElement.parentElement.classList.remove("hidden");
+        addView.classList.add("hidden");
+      } else {
+        tabAdd.classList.add("text-primary");
+        tabEmployees.classList.remove("text-primary");
+        employeesView.parentElement.parentElement.classList.add("hidden");
+        addView.classList.remove("hidden");
+      }
+    }
+
+    tabEmployees.addEventListener("click", () => activateTab(true));
+    tabAdd.addEventListener("click", () => activateTab(false));
+    backToEmployeesBtn.addEventListener("click", () => activateTab(true));
+
+    // Add employee
+    const saveEmployeeBtn = document.getElementById("saveEmployeeBtn");
+
+    saveEmployeeBtn.addEventListener("click", async () => {
+      if (currentUser?.role !== "creator") {
+        showToast("Only creator can add employees");
+        return;
+      }
+
+      const name = document.getElementById("newName").value.trim();
+      const nationalId = document.getElementById("newId").value.trim();
+      const mobile = document.getElementById("newMobile").value.trim();
+      const iban = document.getElementById("newIban").value.trim();
+      const email = document.getElementById("newEmail").value.trim();
+
+      if (!name || !nationalId || !iban) {
+        showToast("Name, ID and IBAN are required");
+        return;
+      }
+
+      saveEmployeeBtn.disabled = true;
+      saveEmployeeBtn.textContent = "Saving...";
+
+      const { data, error } = await supabaseClient
+        .from("employees")
+        .insert({
+          name,
+          identification_number: nationalId,
+          mobile,
+          iban,
+          email,
+          qiwa_status: "pending",
+          gosi_status: "pending",
+          mudad_status: "pending",
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error(error);
+        showToast("Error adding employee");
+      } else {
+        employees.unshift({
+          id: data.id,
+          name: data.name,
+          nationalId: data.identification_number,
+          mobile: data.mobile,
+          iban: data.iban,
+          email: data.email,
+          qiwa: data.qiwa_status,
+          gosi: data.gosi_status,
+          mudad: data.mudad_status,
+        });
+        renderEmployees();
+        showToast("Employee added");
+
+        document.getElementById("newName").value = "";
+        document.getElementById("newId").value = "";
+        document.getElementById("newMobile").value = "";
+        document.getElementById("newIban").value = "";
+        document.getElementById("newEmail").value = "";
+
+        activateTab(true);
+      }
+
+      saveEmployeeBtn.disabled = false;
+      saveEmployeeBtn.textContent = "Confirm & Add Employee";
+    });
+
+    // Render employees
+    function renderEmployees() {
+      employeesView.innerHTML = "";
+
+      if (employees.length === 0) {
+        employeesView.innerHTML =
+          '<p class="text-xs text-slate-300 text-center py-8">No employees yet. Use "Add Employee" to create one.</p>';
+        return;
+      }
+
+      employees.forEach((emp) => {
+        const card = document.createElement("div");
+        card.className =
+          "bg-surface-light dark:bg-surface-dark rounded-2xl border border-gray-200 dark:border-white/10 px-4 py-3 space-y-2 shadow-sm";
+
+        const nameRow = document.createElement("div");
+        nameRow.className = "flex items-start justify-between gap-2";
+
+        nameRow.innerHTML = `
+          <div>
+            <p class="text-sm font-semibold">${emp.name}</p>
+            <p class="text-[11px] text-slate-500 dark:text-gray-300 mt-0.5">ID: ${
+              emp.nationalId || "-"
+            }</p>
+            <p class="text-[11px] text-slate-500 dark:text-gray-300">Mobile: ${
+              emp.mobile || "-"
+            }</p>
+            <p class="text-[11px] text-slate-500 dark:text-gray-300 truncate">IBAN: ${
+              emp.iban || "-"
+            }</p>
+          </div>
+        `;
+
+        card.appendChild(nameRow);
+
+        const statuses = document.createElement("div");
+        statuses.className = "grid grid-cols-3 gap-2 mt-2";
+
+        ["qiwa", "gosi", "mudad"].forEach((key) => {
+          const value = emp[key];
+          const isDone = value === "done";
+          const label = key.toUpperCase();
+
+          const badge = document.createElement("div");
+          badge.className =
+            "flex flex-col items-center justify-between bg-black/5 dark:bg-black/30 rounded-2xl border border-white/10 px-2 py-2 text-[10px] text-center";
+
+          const statusPill = `
+            <span class="px-2 py-0.5 rounded-full text-[10px] ${
+              isDone ? "bg-emerald-500" : "bg-slate-500"
+            } text-white">
+              ${isDone ? "Done" : "Pending"}
+            </span>
+          `;
+
+          let actionBtn = "";
+          if (currentUser?.role === "updater") {
+            actionBtn = `
+              <button data-emp="${emp.id}" data-key="${key}"
+                class="mt-1 px-2 py-0.5 rounded-full border border-white/20 text-[10px] bg-black/10 hover:bg-black/20">
+                ${isDone ? "Mark pending" : "Mark done"}
+              </button>
+            `;
+          }
+
+          badge.innerHTML = `
+            <span class="uppercase tracking-wide text-slate-600 dark:text-slate-200 mb-1">${label}</span>
+            ${statusPill}
+            ${actionBtn}
+          `;
+
+          statuses.appendChild(badge);
+        });
+
+        card.appendChild(statuses);
+        employeesView.appendChild(card);
+      });
+
+      document.querySelectorAll("[data-emp]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const empId = Number(btn.getAttribute("data-emp"));
+          const key = btn.getAttribute("data-key");
+          handleStatusChange(empId, key);
+        });
+      });
+    }
+
+    async function handleStatusChange(empId, key) {
+      if (currentUser?.role !== "updater") {
+        showToast("Only updater can change statuses");
+        return;
+      }
+
+      const emp = employees.find((e) => e.id === empId);
+      if (!emp) return;
+
+      const current = emp[key];
+      const target = current === "done" ? "pending" : "done";
+
+      const confirmed = window.confirm(
+        `Change ${key.toUpperCase()} status for ${emp.name} from "${current}" to "${target}"?`
+      );
+      if (!confirmed) return;
+
+      const columnMap = {
+        qiwa: "qiwa_status",
+        gosi: "gosi_status",
+        mudad: "mudad_status",
+      };
+
+      const { error } = await supabaseClient
+        .from("employees")
+        .update({ [columnMap[key]]: target })
+        .eq("id", empId);
+
+      if (error) {
+        console.error(error);
+        showToast("Error updating status");
+        return;
+      }
+
+      emp[key] = target;
+      renderEmployees();
+      showToast(`${key.toUpperCase()} updated`);
+    }
+
+    // Initial state
+    activateTab(true);
+  </script>
+</body>
+</html>
