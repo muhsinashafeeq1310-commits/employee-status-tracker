@@ -15,7 +15,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Eman Bakery">
-    <meta name="theme-color" content="#221510">
+    <meta name="theme-color" content="#f8f6f6">
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -31,7 +31,8 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#ee5b2b",
+                        "primary": "#2563eb",
+                        "success": "#10b981",
                         "background-light": "#f8f6f6",
                         "background-dark": "#221510",
                         "surface-dark": "#332019",
@@ -39,13 +40,6 @@
                     },
                     fontFamily: {
                         "display": ["Plus Jakarta Sans", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "2xl": "1rem",
-                        "full": "9999px"
                     },
                 },
             },
@@ -56,7 +50,7 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Glass Utilities */
+        /* Glass login panel */
         .glass-panel {
             background: rgba(34, 21, 16, 0.75);
             backdrop-filter: blur(12px);
@@ -70,7 +64,7 @@
         }
         .glass-input:focus {
             background: rgba(0, 0, 0, 0.4);
-            border-color: #ee5b2b;
+            border-color: #2563eb;
         }
 
         /* Animations */
@@ -89,8 +83,8 @@
 
         /* Loader */
         .loader {
-            border: 2px solid rgba(255,255,255,0.1);
-            border-top: 2px solid #ee5b2b;
+            border: 2px solid rgba(37,99,235,0.1);
+            border-top: 2px solid #2563eb;
             border-radius: 50%;
             width: 16px;
             height: 16px;
@@ -101,32 +95,34 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Status Tiles */
-        .tile-done {
-            background: rgba(22, 163, 74, 0.15);
-            border: 1px solid rgba(22, 163, 74, 0.4);
-            color: #4ade80;
+        /* Progress bar */
+        .progress-item {
+            position: relative;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.3s;
         }
-        .tile-pending {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: #94a3b8;
+        .progress-item.active {
+            background: #10b981;
+            color: white;
+        }
+        .progress-item.inactive {
+            background: #f3f4f6;
+            color: #6b7280;
         }
     </style>
 </head>
 
-<!-- NOTE: changed overflow-hidden -> overflow-x-hidden so vertical scroll works -->
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white h-screen w-full overflow-x-hidden relative selection:bg-primary selection:text-white">
+<body class="bg-background-light font-display text-slate-900 h-screen w-full overflow-x-hidden relative selection:bg-primary selection:text-white">
 
     <!-- Global Loader -->
-    <div id="globalLoader" class="fixed inset-0 z-50 bg-background-dark flex flex-col items-center justify-center">
+    <div id="globalLoader" class="fixed inset-0 z-50 bg-background-light flex flex-col items-center justify-center">
         <div class="loader w-10 h-10 border-4"></div>
         <p class="mt-4 text-xs font-bold tracking-widest text-primary/80 uppercase">Loading Portal...</p>
     </div>
 
     <!-- ================= LOGIN SCREEN ================= -->
     <div id="loginScreen" class="absolute inset-0 z-40 bg-background-dark flex flex-col justify-between pt-12 pb-8 px-6">
-        <!-- Background -->
         <div class="absolute inset-0 w-full h-full z-0">
             <div class="absolute inset-0 bg-black/60 z-10"></div>
             <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCIedT2HX6xp-TB6TEt-HPdFTt6ksEbxJ7I3-xves9ZVsToQrwfniIpxiF9lfZMbMjf2AQ2luzQW10psGSSuRTlgWw4Gb8P-Gs4mxGH7kqdyKm2ZsJaDHRCT_kxAGSvK7zjbU9utdprA-70YdCm9TLIXeM1nUmymquEwRnzv3cKCjaodZBU5TC7XiggYndaEMUZQFb9h0tNBeDfaOsara72XDY-yW35I4GV8kTGjucAc08auHuwHg4dd0s3lyjwn6Uf4C4rJznzZCt2');"></div>
@@ -134,7 +130,7 @@
 
         <div class="relative z-20 flex-1 flex flex-col justify-center items-center w-full max-w-md mx-auto">
             <div class="mb-8 text-center">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 backdrop-blur-md mb-4 border border-primary/30 shadow-[0_0_15px_rgba(238,91,43,0.3)]">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 backdrop-blur-md mb-4 border border-primary/30 shadow-[0_0_15px_rgba(37,99,235,0.3)]">
                     <span class="material-symbols-outlined text-primary text-4xl">bakery_dining</span>
                 </div>
                 <h1 class="text-white tracking-[0.2em] text-3xl font-extrabold leading-tight mb-1 drop-shadow-lg">EMAN</h1>
@@ -159,7 +155,7 @@
                         <input id="passwordInput" class="glass-input w-full rounded-lg pl-10 pr-4 py-3.5 outline-none transition-all placeholder:text-white/30 text-sm font-medium" placeholder="Password" type="password"/>
                     </div>
 
-                    <button id="loginBtn" class="w-full bg-primary hover:bg-[#d94a1f] active:scale-[0.98] text-white font-bold py-3.5 px-4 rounded-lg shadow-lg shadow-primary/25 transition-all mt-2 flex items-center justify-center gap-2">
+                    <button id="loginBtn" class="w-full bg-primary hover:bg-primary/90 active:scale-[0.98] text-white font-bold py-3.5 px-4 rounded-lg shadow-lg shadow-primary/25 transition-all mt-2 flex items-center justify-center gap-2">
                         <span>Sign In</span>
                         <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
                     </button>
@@ -176,257 +172,223 @@
     </div>
 
     <!-- ================= MAIN DASHBOARD ================= -->
-    <div id="mainScreen" class="hidden flex flex-col h-full bg-background-light dark:bg-background-dark">
+    <div id="mainScreen" class="hidden flex flex-col h-full bg-background-light">
         <!-- Top Bar -->
-        <div class="flex items-center justify-between px-5 pt-safe-top pb-4 sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm pt-4 border-b border-white/5">
+        <div class="flex items-center justify-between px-5 pt-4 pb-4 sticky top-0 z-20 bg-surface-light/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="h-10 w-10 rounded-full bg-surface-dark border border-primary/30 flex items-center justify-center">
+                <div class="h-10 w-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
                     <span class="material-symbols-outlined text-primary">person</span>
                 </div>
                 <div>
-                    <h1 class="text-xs font-medium text-gray-500 dark:text-gray-400 leading-none">Logged in as</h1>
-                    <p id="currentUserDisplay" class="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate max-w-[150px]">User</p>
+                    <h1 class="text-xs font-medium text-gray-500 leading-none">Logged in as</h1>
+                    <p id="currentUserDisplay" class="text-sm font-bold text-gray-900 leading-tight truncate max-w-[150px]">User</p>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <button id="logoutBtn" class="relative p-2 rounded-full bg-surface-dark border border-white/5 hover:bg-red-900/20 text-gray-400 hover:text-red-400 transition-colors">
-                    <span class="material-symbols-outlined">logout</span>
+            <div class="flex items-center gap-3">
+                <span id="roleBadge" class="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full uppercase tracking-wider">Loading...</span>
+                <button id="logoutBtn" class="relative p-2 rounded-full bg-gray-100 border border-gray-200 hover:bg-red-50 text-gray-600 hover:text-red-500 transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">logout</span>
                 </button>
             </div>
         </div>
 
         <!-- Scrollable Content -->
-        <main class="flex-1 overflow-y-auto hide-scrollbar pb-24 px-5 pt-6">
-            <!-- Role Badge & Count -->
-            <div class="flex justify-between items-center mb-6">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/5 shadow-sm">
-                    <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                    <span id="roleBadge" class="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Loading...</span>
-                </div>
-                <span id="empCount" class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">0 Files</span>
-            </div>
-
-            <!-- Registry selector -->
-            <div class="mb-6">
-                <div class="relative">
-                    <select class="block w-full rounded-xl border-0 py-3.5 pl-4 pr-10 bg-surface-light text-gray-900 ring-1 ring-gray-200 focus:ring-primary focus:outline-none text-sm font-semibold">
-                        <option>Employee Registry – Qiwa / Gosi / Mudad</option>
-                    </select>
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 pointer-events-none">
-                        <span class="material-symbols-outlined">unfold_more</span>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
+        <main class="flex-1 overflow-y-auto hide-scrollbar pb-8 px-5 pt-6">
+            
+            <!-- Progress Dashboard (4 columns) -->
             <div class="mb-8">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">bolt</span> Quick Actions
+                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">dashboard</span> Progress Overview
                 </h2>
-                <div class="grid grid-cols-2 gap-3">
-                    <!-- Add Staff (Only visible to Creators) -->
-                    <button id="btnOpenAdd" class="col-span-2 bg-primary hover:bg-primary/90 active:scale-[0.98] transition-all rounded-xl p-5 flex items-center justify-between shadow-lg shadow-primary/20 group hidden">
-                        <div class="flex flex-col items-start">
-                            <span class="text-white font-bold text-lg">Add Staff</span>
-                            <span class="text-white/80 text-xs font-medium mt-1">Onboard employee</span>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Column 1: Start only -->
+                    <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
+                        <div class="flex flex-col gap-2">
+                            <div class="progress-item inactive flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase">Start</span>
+                                <span id="countStart" class="text-lg font-extrabold">0</span>
+                            </div>
                         </div>
-                        <div class="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                            <span class="material-symbols-outlined text-white">person_add</span>
+                    </div>
+
+                    <!-- Column 2: Start + Qiwa -->
+                    <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
+                        <div class="flex flex-col gap-2">
+                            <div class="progress-item active flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase">Start</span>
+                                <span class="material-symbols-outlined text-sm">check</span>
+                            </div>
+                            <div class="progress-item active flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase">Qiwa</span>
+                                <span id="countQiwa" class="text-lg font-extrabold">0</span>
+                            </div>
                         </div>
-                    </button>
-                    <!-- Refresh List -->
-                    <button onclick="fetchEmployees()" class="bg-surface-light dark:bg-surface-dark active:scale-[0.98] transition-all rounded-xl p-4 flex flex-col gap-3 shadow-sm border border-gray-100 dark:border-white/5">
-                        <div class="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                            <span class="material-symbols-outlined">refresh</span>
+                    </div>
+
+                    <!-- Column 3: Start + Qiwa + Gosi -->
+                    <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
+                        <div class="flex flex-col gap-2">
+                            <div class="progress-item active flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase">Start</span>
+                                <span class="material-symbols-outlined text-sm">check</span>
+                            </div>
+                            <div class="progress-item active flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase">Qiwa</span>
+                                <span class="material-symbols-outlined text-sm">check</span>
+                            </div>
+                            <div class="progress-item active flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase">Gosi</span>
+                                <span id="countGosi" class="text-lg font-extrabold">0</span>
+                            </div>
                         </div>
-                        <div class="text-left">
-                            <p class="font-bold text-gray-900 dark:text-gray-100">Refresh</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Update List</p>
+                    </div>
+
+                    <!-- Column 4: All green (Start + Qiwa + Gosi + Mudad) -->
+                    <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
+                        <div class="flex flex-col gap-2">
+                            <div class="progress-item active flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase">Start</span>
+                                <span class="material-symbols-outlined text-sm">check</span>
+                            </div>
+                            <div class="progress-item active flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase">Qiwa</span>
+                                <span class="material-symbols-outlined text-sm">check</span>
+                            </div>
+                            <div class="progress-item active flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase">Gosi</span>
+                                <span class="material-symbols-outlined text-sm">check</span>
+                            </div>
+                            <div class="progress-item active flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase">Mudad</span>
+                                <span id="countMudad" class="text-lg font-extrabold">0</span>
+                            </div>
                         </div>
-                    </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Employee List -->
+            <!-- Buckets Board -->
+            <div class="mb-8 space-y-6">
+                <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">view_column</span> Employee Pipeline
+                </h2>
+
+                <!-- Bucket: Start -->
+                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                            <span class="h-2 w-2 rounded-full bg-gray-400"></span> Start
+                        </h3>
+                        <span id="badgeStart" class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">0</span>
+                    </div>
+                    <div id="bucketStart" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                        <!-- Cards -->
+                    </div>
+                </div>
+
+                <!-- Bucket: Qiwa -->
+                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                            <span class="h-2 w-2 rounded-full bg-blue-500"></span> Qiwa
+                        </h3>
+                        <span id="badgeQiwa" class="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">0</span>
+                    </div>
+                    <div id="bucketQiwa" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
+                </div>
+
+                <!-- Bucket: Waiting for Contract Approval -->
+                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                            <span class="h-2 w-2 rounded-full bg-yellow-500"></span> Waiting Contract Approval
+                        </h3>
+                        <span id="badgeWaiting" class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded">0</span>
+                    </div>
+                    <div id="bucketWaiting" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
+                </div>
+
+                <!-- Bucket: Gosi -->
+                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                            <span class="h-2 w-2 rounded-full bg-purple-500"></span> Gosi
+                        </h3>
+                        <span id="badgeGosi" class="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded">0</span>
+                    </div>
+                    <div id="bucketGosi" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
+                </div>
+
+                <!-- Bucket: Mudad -->
+                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                            <span class="h-2 w-2 rounded-full bg-orange-500"></span> Mudad
+                        </h3>
+                        <span id="badgeMudad" class="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">0</span>
+                    </div>
+                    <div id="bucketMudad" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Finished List -->
             <div class="mb-8">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Employee Directory</h2>
-                <div id="employeesView" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <!-- Cards injected here -->
+                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-success">check_circle</span> Completed
+                </h2>
+                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                            <span class="h-2 w-2 rounded-full bg-success"></span> All Steps Finished
+                        </h3>
+                        <span id="badgeFinished" class="text-xs font-bold text-success bg-green-50 px-2 py-1 rounded">0</span>
+                    </div>
+                    <div id="listFinished" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
                 </div>
             </div>
 
             <!-- Activity Logs Section -->
             <div class="mt-8 pb-8">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Recent Activity</h2>
-                <div id="activityLogView" class="space-y-3">
+                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">history</span> Recent Activity
+                </h2>
+                <div id="activityLogView" class="space-y-3 bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
                     <!-- Logs injected here -->
                 </div>
             </div>
         </main>
-
-        <!-- Bottom Nav -->
-        <div class="fixed bottom-0 left-0 right-0 bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-white/5 pb-safe-bottom pt-3 px-6 z-30">
-            <nav class="flex justify-around items-center max-w-lg mx-auto pb-4">
-                <button class="flex flex-col items-center gap-1 text-primary group">
-                    <span class="material-symbols-outlined text-[28px]">dashboard</span>
-                    <span class="text-[10px] font-bold">Home</span>
-                </button>
-                <div class="relative -top-6">
-                    <button onclick="fetchEmployees()" class="h-14 w-14 rounded-full bg-surface-dark border-4 border-background-light dark:border-background-dark text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform">
-                        <span class="material-symbols-outlined text-[28px] text-primary">sync</span>
-                    </button>
-                </div>
-                <button class="flex flex-col items-center gap-1 text-gray-400 group">
-                    <span class="material-symbols-outlined text-[28px]">settings</span>
-                    <span class="text-[10px] font-medium">Settings</span>
-                </button>
-            </nav>
-        </div>
     </div>
 
     <!-- ================= DETAIL MODAL ================= -->
     <div id="detailModal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center modal-hidden">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeDetailModal()"></div>
-        <div id="detailContent" class="bg-surface-dark w-full max-w-lg p-6 rounded-t-2xl sm:rounded-2xl border border-white/10 relative z-10 mx-auto max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-center mb-6">
-                <div class="w-12 h-1 bg-white/20 rounded-full"></div>
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDetailModal()"></div>
+        <div class="bg-surface-light w-full max-w-lg p-6 rounded-t-2xl sm:rounded-2xl border border-gray-200 relative z-10 mx-auto max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-center mb-4">
+                <div class="w-12 h-1 bg-gray-300 rounded-full"></div>
             </div>
             <div id="modalBody" class="space-y-6">
                 <!-- Content injected via JS -->
             </div>
-            <button onclick="closeDetailModal()" class="w-full mt-8 py-3.5 bg-white/5 text-white/50 font-bold rounded-xl uppercase tracking-widest text-xs hover:bg-white/10 transition-colors">Close</button>
-        </div>
-    </div>
-
-    <!-- ================= ADD ENTRY SCREEN (Overlay) ================= -->
-    <!-- White background + card stack of 11 remaining employees -->
-    <div id="addScreen" class="fixed inset-0 z-50 bg-background-light/95 flex flex-col modal-hidden">
-        <!-- Header -->
-        <header class="flex items-center justify-between px-4 py-3 bg-surface-light border-b border-gray-200 shadow-sm">
-            <button id="btnCloseAdd" class="p-2 text-gray-400 hover:text-gray-700 transition-colors">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-            <h1 class="text-sm font-bold tracking-[0.2em] text-gray-500 uppercase">
-                Guided Journaling
-            </h1>
-            <div class="w-10"></div>
-        </header>
-
-        <!-- Form Content -->
-        <main class="flex-1 px-4 py-6 space-y-8 overflow-y-auto hide-scrollbar">
-            <!-- Top card: remaining employees -->
-            <section class="max-w-xl mx-auto">
-                <div
-                    id="execCard"
-                    class="bg-surface-light rounded-3xl shadow-xl border border-gray-100 px-8 py-6 flex flex-col items-center text-center transform translate-y-4 opacity-0 scale-95 transition-all duration-500 ease-out"
-                >
-                    <p class="text-[11px] tracking-[0.25em] uppercase text-gray-400 mb-2">
-                        Remaining Employees
-                    </p>
-                    <h2
-                        id="selectedNameLabel"
-                        class="text-lg font-semibold text-gray-900 tracking-tight mb-1"
-                    >
-                        Choose employee to onboard
-                    </h2>
-                    <p
-                        id="selectedIdLabel"
-                        class="text-[11px] text-gray-400 tracking-[0.2em] uppercase"
-                    >
-                        ID will appear here
-                    </p>
-
-                    <div class="mt-4 flex items-center gap-3">
-                        <div
-                            id="selectedAvatar"
-                            class="h-10 w-10 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold uppercase"
-                        >
-                            --
-                        </div>
-                        <span class="text-[11px] text-gray-400 uppercase tracking-[0.16em]">
-                            Tap a card below
-                        </span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Grid of 11 employee cards (name + ID) -->
-            <section class="max-w-5xl mx-auto">
-                <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.18em] mb-3 text-center">
-                    Choose employee to onboard
-                </p>
-                <div
-                    id="pendingGrid"
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center"
-                >
-                    <!-- Cards injected by JS -->
-                </div>
-            </section>
-
-            <!-- Details section: same fields as before -->
-            <section class="max-w-xl mx-auto w-full">
-                <h3 class="block text-sm font-semibold text-gray-700 mb-3 ml-1">
-                    File details (auto from selection)
-                </h3>
-                <div class="space-y-3">
-                    <input
-                        id="newId"
-                        type="text"
-                        placeholder="National ID (auto-filled)"
-                        class="w-full bg-white border border-gray-200 rounded-xl px-4 py-4 text-gray-500 text-sm"
-                        readonly
-                    />
-                    <input
-                        id="newMobile"
-                        type="tel"
-                        placeholder="Mobile Number"
-                        class="w-full bg-surface-light border border-gray-200 rounded-xl px-4 py-4 text-gray-900 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
-                    />
-                    <input
-                        id="newEmail"
-                        type="email"
-                        placeholder="Email Address"
-                        class="w-full bg-surface-light border border-gray-200 rounded-xl px-4 py-4 text-gray-900 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
-                    />
-                    <input
-                        id="newIban"
-                        type="text"
-                        placeholder="IBAN"
-                        class="w-full bg-surface-light border border-gray-200 rounded-xl px-4 py-4 text-gray-900 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
-                    />
-                </div>
-                <p class="mt-3 text-[11px] text-gray-400 tracking-wide">
-                    When you tap a card, the name and ID show on the top card and these fields are filled.
-                    You can still edit mobile, email or IBAN before saving.
-                </p>
-            </section>
-        </main>
-
-        <!-- Footer Action -->
-        <div class="p-4 bg-surface-light border-t border-gray-200 pb-safe-bottom">
-            <button id="saveEmployeeBtn" class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-4 text-sm font-bold text-white shadow-lg active:scale-[0.98] transition-all">
-                <span>Confirm &amp; Submit</span>
-                <span class="material-symbols-outlined text-[20px]">check_circle</span>
-            </button>
+            <button onclick="closeDetailModal()" class="w-full mt-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">Close</button>
         </div>
     </div>
 
     <!-- CONFIRM MODAL -->
     <div id="confirmModal" class="fixed inset-0 z-[70] flex items-end sm:items-center justify-center modal-hidden">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-        <div class="bg-surface-dark w-full max-w-sm p-6 rounded-t-2xl sm:rounded-2xl border border-white/10 relative z-10 mx-4 mb-safe-bottom">
-            <h3 class="text-xl font-bold text-white mb-2" id="modalTitle">Confirm</h3>
-            <p class="text-sm text-gray-400 mb-6" id="modalText">Are you sure?</p>
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="bg-surface-light w-full max-w-sm p-6 rounded-t-2xl sm:rounded-2xl border border-gray-200 relative z-10 mx-4 shadow-2xl">
+            <h3 class="text-xl font-bold text-gray-900 mb-2" id="modalTitle">Confirm</h3>
+            <p class="text-sm text-gray-600 mb-6" id="modalText">Are you sure?</p>
             <div class="flex gap-3">
-                <button id="modalCancel" class="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-sm">Cancel</button>
+                <button id="modalCancel" class="flex-1 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm">Cancel</button>
                 <button id="modalConfirm" class="flex-1 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm shadow-lg shadow-primary/20">Confirm</button>
             </div>
         </div>
     </div>
 
     <!-- Toast -->
-    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 z-[80] modal-hidden">
-        <div class="bg-surface-dark border border-primary/50 text-white font-bold px-6 py-3 rounded-full shadow-2xl flex items-center gap-2">
+    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-[80] modal-hidden">
+        <div class="bg-gray-900 text-white font-bold px-6 py-3 rounded-full shadow-2xl flex items-center gap-2">
             <span class="material-symbols-outlined text-primary text-sm">info</span>
             <span id="toastMsg" class="text-xs tracking-wide">Notification</span>
         </div>
@@ -441,65 +403,10 @@
 
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Pre-loaded Data (existing 35 employees)
-        const PRE_EMPLOYEES = [
-            { name: "NAHEEMUDHEEN PARATHODI", id: "2235923253", mobile: "0552821842", iban: "SA6345000000852160290001", email: "naheemptd@emanbakeries.com" },
-            { name: "SHAMSUDHEEN MANATTU", id: "2307985529", mobile: "0554658796", iban: "SA54658796543500000023340110001", email: "shamsumanat9890@gmail.com" },
-            { name: "IBRAHIM BADUSHAN THOTTATHIKUDIYI", id: "2331355376", mobile: "0532001228", iban: "SA1745000000262432735001", email: "badushai803@gmail.com" },
-            { name: "ALFAS ASLAM", id: "2503874980", mobile: "0540407512", iban: "SA40407512424500000023340524001", email: "alfasaslu7@gmail.com" },
-            { name: "MUHAMMED SHALI VAZHAYIL", id: "2455820023", mobile: "0540357284", iban: "SA614500000023340532001", email: "salivazhayil@gmail.com" },
-            { name: "SHERIN KOCHUKONICKAL AZEEZ", id: "2354488948", mobile: "0546311750", iban: "SA814500000023340714001", email: "kasherin384@gmail.com" },
-            { name: "SHIJAS KAREEM PALLIMUKIL", id: "2256400710", mobile: "0557679177", iban: "SA034500000023340722001", email: "pkshijas556@gmail.com" },
-            { name: "SINEESH PATHUKUDI MUHAMMED", id: "2440029813", mobile: "0546344301", iban: "SA224500000023340730001", email: "akkuansal72@gmail.com" },
-            { name: "MUHAMMED PARAKKUNNATHU EBRAHIM", id: "2377814138", mobile: "0567278143", iban: "SA894500000023340748001", email: "foumalmammu@gmail.com" },
-            { name: "ASINSHA ASAINAR VELLIRIPPIL", id: "2478222298", mobile: "0541537246", iban: "SA204500000023341449001", email: "asinshaasi@gmail.com" },
-            { name: "CHEVU NISSAR MUTTATHUCHALIL MOIDU", id: "2309399752", mobile: "0545214900", iban: "SA734500000023341456001", email: "fasilchevunizarnizar@gmail.com" },
-            { name: "SUMANDAS SUKHANDU BIKASH", id: "2205956697", mobile: "0573106917", iban: "SA024500000023342488001", email: "sumonchaudary0012@gmail.com" },
-            { name: "SHABEER ALI PANAKKATHODEN", id: "2481393557", mobile: "0548796167", iban: "SA804500000023341316001", email: "shabirp313@gmail.com" },
-            { name: "AHAMMED KABEER VANKALATH", id: "2311162198", mobile: "0560413288", iban: "SA024500000023341324001", email: "ahammadkhabeer@gmail.com" },
-            { name: "MUHSIN KURUTTUKAVIL MUSTHAFA", id: "2501103358", mobile: "0542677218", iban: "SA444500000023341357001", email: "muhsinkrtkvl17@gmail.com" },
-            { name: "ASHKAR ENJAKUDIYIL ALI", id: "2501925479", mobile: "0561504608", iban: "SA794500000023341530001", email: "ashkarali1232@gmail.com" },
-            { name: "ASHRAF MOONNAN KANDATHIL KOMU", id: "2311479220", mobile: "0559151648", iban: "SA714500000023341399001", email: "asharafbapu4@gmail.com" },
-            { name: "ABDUSSAMAD PANDALAN", id: "2308915301", mobile: "0581341225", iban: "SA214500000023341720001", email: "samadthelakkad@gmail.com" },
-            { name: "MUSTHAFA PATHAYAPURAKKAL", id: "2322180403", mobile: "0577343723", iban: "SA124500000023341415001", email: "m95042906@gmail.com" },
-            { name: "ARIF KOORIMANNIL POOVATHIKKAL", id: "2453005585", mobile: "0580876240", iban: "SA6345000000262434046001", email: "sinansilu382@gmail.com" },
-            { name: "RIYAS KILIVAYIL ALAVIKUTTY KILIVAYIL", id: "2303530915", mobile: "0560438943", iban: "SA6745000000221675051001", email: "riyasvga786786@gmail.com" },
-            { name: "MANSOORALI MANSOORALI PUTHAN", id: "2405299500", mobile: "0546238774", iban: "SA054500000023341555001", email: "mansooreman4@gmail.com" },
-            { name: "KONTHALAM THELLIKKUNNEL ABDUL AZEES", id: "2366253124", mobile: "0566770269", iban: "SA124500000023341803001", email: "konthalamazees3806@gmail.com" },
-            { name: "RIFAS KANJIRAKKATTU KUDIYIL BASHEER", id: "2501103424", mobile: "0547522498", iban: "SA0445000000221672819001", email: "rifaskbasheer@gmail.com" },
-            { name: "AGHIL ALIYAKKOTT GANGADHARAN", id: "2439707783", mobile: "0562692551", iban: "SA9345000000221672785001", email: "vishnuaghil67@gmail.com" },
-            { name: "ABDUL AZEEZ AYIMPADI", id: "2289306652", mobile: "0567538526", iban: "SA104500000023341746001", email: "azeeseman123@gmail.com" },
-            { name: "SHAMSUDHEEN KURUTTUKAVIL SAINUDHEEN", id: "2511077311", mobile: "0560531091", iban: "SA824500000023341761001", email: "shamslabba786@gmail.com" },
-            { name: "JISHNU RAVEENDRAN", id: "2485790337", mobile: "0566304691", iban: "SA5345000000221673197001", email: "jishnur8089@gmail.com" },
-            { name: "ANSAL RASAK", id: "2477053272", mobile: "0561569020", iban: "SA6445000000221673171001", email: "ansalrasak408@gmail.com" },
-            { name: "SABEER KADOOKUNNAN KUNHIMOHAMED", id: "2308393285", mobile: "0503762558", iban: "SA214500000023342108001", email: "shifashifinkk@gmail.com" },
-            { name: "KABEER POOVATHUM CHOTTIL MUHAMMED", id: "2245613761", mobile: "0545984250", iban: "SA094500000023342348001", email: "safvankabeer007@gmail.com" },
-            { name: "EBRAHIM LATHEEF KAVANA PARAMBIL", id: "2309489785", mobile: "0567642933", iban: "SA134500000023342462001", email: "latheef20k5@gmail.com" },
-            { name: "ABDUL MANAF KURUTTAKAVIL MUSTHAFA", id: "2301750994", mobile: "0560247459", iban: "SA494500000023343197001", email: "manafmusthafa3@gmail.com" },
-            { name: "NEJMUDHEEN SAKHIB", id: "2481486153", mobile: "0568357829", iban: "SA444500000023344849001", email: "nejmudheensakhib786@gmail.com" },
-            { name: "ABDUL MUNIR VAZHAYIL", id: "2289427870", mobile: "0593395106", iban: "SA284500000023343908001", email: "muneervazhayil78@gmail.com" }
-        ];
-
-        // Remaining 11 employees that appear as cards in Add screen
-        const REMAINING_EMPLOYEES = [
-            { name: "Sidhik Kuruttukavil Kochu Muhammed", id: "2289943199", mobile: "", email: "", iban: "" },
-            { name: "Abdul Jabbar Mannakuzhi Maithen",     id: "2329326967", mobile: "", email: "", iban: "" },
-            { name: "Anvar Husain Mohammed Anchukandan",  id: "2345158345", mobile: "", email: "", iban: "" },
-            { name: "Mohamed Safwan M Sally",             id: "2347675510", mobile: "", email: "", iban: "" },
-            { name: "Muhammed Rafi Aliparambil",          id: "2354265015", mobile: "", email: "", iban: "" },
-            { name: "Sulfi Puthiyedathu Basheer",         id: "2376846297", mobile: "", email: "", iban: "" },
-            { name: "Sabeeb Manat Hassan Kutty",          id: "2455539706", mobile: "", email: "", iban: "" },
-            { name: "Al Ameen Kadukkunnan",               id: "2485790295", mobile: "", email: "", iban: "" },
-            { name: "Ansif Ali Kuruttukavil Alikunju",    id: "2501924977", mobile: "", email: "", iban: "" },
-            { name: "Md Akter Hosen",                     id: "2515498364", mobile: "", email: "", iban: "" },
-            { name: "Mobarok Hossen",                     id: "2552187540", mobile: "", email: "", iban: "" }
-        ];
-
         let currentUser = null;
         let employees = [];
-        let selectedPendingEmployee = null;
 
-        // --- Init: just hide loader (dropdown no longer used) ---
+        // --- Init ---
         const init = () => {
             document.getElementById('globalLoader').style.display = 'none';
         };
@@ -533,9 +440,6 @@
             document.getElementById('currentUserDisplay').textContent = currentUser.email.split('@')[0];
             document.getElementById('roleBadge').textContent = currentUser.role.toUpperCase();
 
-            if (currentUser.role === 'creator')
-                document.getElementById('btnOpenAdd').classList.remove('hidden');
-
             fetchEmployees();
             setupRealtime();
         };
@@ -547,6 +451,20 @@
             });
         };
 
+        // --- Bucket logic ---
+        function getBucket(emp) {
+            const q = emp.qiwa_status || 'pending';
+            const g = emp.gosi_status || 'pending';
+            const m = emp.mudad_status || 'pending';
+
+            if (q === 'done' && g === 'done' && m === 'done') return 'finished';
+            if (m === 'in_progress') return 'mudad';
+            if (g === 'in_progress') return 'gosi';
+            if (q === 'done' && g === 'pending') return 'waiting';
+            if (q === 'in_progress') return 'qiwa';
+            return 'start';
+        }
+
         // --- Data ---
         window.fetchEmployees = async () => {
             const { data, error } = await supabaseClient
@@ -555,53 +473,96 @@
                 .order('created_at', { ascending: false });
             if (!error) {
                 employees = data;
-                renderEmployees();
-                document.getElementById('empCount').textContent = `${employees.length} Files`;
+                renderBoard();
             }
         };
 
-        function renderEmployees() {
-            const list = document.getElementById('employeesView');
-            if (employees.length === 0) {
-                list.innerHTML = `<div class="col-span-3 text-center text-gray-500 py-12">No files found.</div>`;
-                return;
-            }
+        function renderBoard() {
+            const buckets = {
+                start: [], qiwa: [], waiting: [], gosi: [], mudad: [], finished: []
+            };
 
-            list.innerHTML = employees.map(emp => `
-                <div onclick="openDetailModal('${emp.id}')" class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 flex flex-col gap-2 shadow-sm border border-gray-100 dark:border-white/5 relative group cursor-pointer active:scale-95 transition-all">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-bold text-gray-900 dark:text-white truncate pr-2 text-sm">${emp.name}</h3>
-                            <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 font-mono uppercase tracking-wide">ID: ${emp.identification_number}</p>
-                        </div>
-                        <span class="material-symbols-outlined text-gray-300">chevron_right</span>
-                    </div>
-                </div>
-            `).join('');
+            employees.forEach(emp => {
+                const b = getBucket(emp);
+                buckets[b].push(emp);
+            });
+
+            // Progress counts (for top 4 columns)
+            document.getElementById('countStart').textContent = buckets.start.length;
+            document.getElementById('countQiwa').textContent = buckets.qiwa.length;
+            document.getElementById('countGosi').textContent = buckets.gosi.length;
+            document.getElementById('countMudad').textContent = buckets.mudad.length;
+
+            // Bucket badges
+            document.getElementById('badgeStart').textContent = buckets.start.length;
+            document.getElementById('badgeQiwa').textContent = buckets.qiwa.length;
+            document.getElementById('badgeWaiting').textContent = buckets.waiting.length;
+            document.getElementById('badgeGosi').textContent = buckets.gosi.length;
+            document.getElementById('badgeMudad').textContent = buckets.mudad.length;
+            document.getElementById('badgeFinished').textContent = buckets.finished.length;
+
+            // Render cards
+            document.getElementById('bucketStart').innerHTML = buckets.start.map(renderCard).join('');
+            document.getElementById('bucketQiwa').innerHTML = buckets.qiwa.map(renderCard).join('');
+            document.getElementById('bucketWaiting').innerHTML = buckets.waiting.map(renderCard).join('');
+            document.getElementById('bucketGosi').innerHTML = buckets.gosi.map(renderCard).join('');
+            document.getElementById('bucketMudad').innerHTML = buckets.mudad.map(renderCard).join('');
+            document.getElementById('listFinished').innerHTML = buckets.finished.map(renderCard).join('');
         }
 
-        // --- DETAIL MODAL LOGIC ---
+        function renderCard(emp) {
+            return `
+                <div onclick="openDetailModal('${emp.id}')" class="bg-white rounded-lg p-3 border border-gray-200 shadow-sm cursor-pointer hover:shadow-md hover:border-primary/50 transition-all active:scale-95">
+                    <h4 class="font-bold text-gray-900 text-xs truncate mb-1">${emp.name}</h4>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wide font-mono">ID: ${emp.identification_number}</p>
+                </div>
+            `;
+        }
+
+        // --- DETAIL MODAL + ROLE ACTIONS ---
         window.openDetailModal = (id) => {
             const emp = employees.find(e => e.id == id);
             if (!emp) return;
 
+            const bucket = getBucket(emp);
             const body = document.getElementById('modalBody');
+
+            let actionButton = '';
+
+            if (currentUser.role === 'creator') {
+                if (bucket === 'start') {
+                    actionButton = `<button onclick="moveToQiwa('${emp.id}')" class="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg">Add IBAN & Mobile & Email → Move to Qiwa</button>`;
+                } else if (bucket === 'waiting') {
+                    actionButton = `<button onclick="approveContract('${emp.id}')" class="w-full py-3 bg-success text-white font-bold rounded-xl hover:bg-success/90 transition-all shadow-lg">Contract Approved → Move to Gosi</button>`;
+                }
+            } else if (currentUser.role === 'updater') {
+                if (bucket === 'qiwa') {
+                    actionButton = `<button onclick="completeQiwa('${emp.id}')" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg">Qiwa Done → Waiting Contract Approval</button>`;
+                } else if (bucket === 'gosi') {
+                    actionButton = `<button onclick="completeGosi('${emp.id}')" class="w-full py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-all shadow-lg">Gosi Done → Move to Mudad</button>`;
+                } else if (bucket === 'mudad') {
+                    actionButton = `<button onclick="completeMudad('${emp.id}')" class="w-full py-3 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 transition-all shadow-lg">Mudad Done → Finished</button>`;
+                }
+            }
+
             body.innerHTML = `
-                <div>
-                    <h2 class="text-xl font-bold text-white leading-tight">${emp.name}</h2>
-                    <p class="text-xs font-bold text-gray-400 mt-1 uppercase tracking-widest">ID: ${emp.identification_number}</p>
+                <div class="text-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-900 leading-tight">${emp.name}</h2>
+                    <p class="text-xs font-bold text-gray-500 mt-1 uppercase tracking-widest">ID: ${emp.identification_number}</p>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-3 mb-4">
                     ${renderDetailRow('Mobile', emp.mobile || 'N/A')}
                     ${renderDetailRow('Email', emp.email || 'N/A')}
                     ${renderDetailRow('IBAN', emp.iban || 'N/A')}
                 </div>
 
-                <div class="grid grid-cols-3 gap-2 pt-4">
-                    <p class="col-span-3 text-[10px] font-black uppercase text-gray-500 mb-1">Status Files</p>
-                    ${['qiwa', 'gosi', 'mudad'].map(key => renderStatusTile(emp, key)).join('')}
+                <div class="mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <p class="text-xs font-bold text-gray-500 uppercase mb-2">Current Stage</p>
+                    <p class="text-sm font-bold text-gray-900 capitalize">${bucket.replace('_', ' ')}</p>
                 </div>
+
+                ${actionButton}
             `;
 
             const modal = document.getElementById('detailModal');
@@ -617,26 +578,14 @@
 
         function renderDetailRow(label, value) {
             return `
-                <div class="bg-black/20 p-3 rounded-xl border border-white/5 flex justify-between items-center group">
-                    <div class="overflow-hidden">
+                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 flex justify-between items-center">
+                    <div class="overflow-hidden flex-1">
                         <p class="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">${label}</p>
-                        <p class="text-sm font-bold text-gray-200 truncate pr-2 select-all">${value}</p>
+                        <p class="text-sm font-semibold text-gray-900 truncate select-all">${value}</p>
                     </div>
-                    <button onclick="copyToClipboard('${value}')" class="p-2 text-gray-500 hover:text-white transition-colors">
+                    <button onclick="copyToClipboard('${value}')" class="p-2 text-gray-400 hover:text-primary transition-colors">
                         <span class="material-symbols-outlined text-[18px]">content_copy</span>
                     </button>
-                </div>
-            `;
-        }
-
-        function renderStatusTile(emp, key) {
-            const done = emp[key + '_status'] === 'done';
-            const isUpdater = currentUser && currentUser.role === 'updater';
-            return `
-                <div onclick="${isUpdater ? `toggleStatus('${emp.id}', '${key}', '${emp.name}')` : ''}"
-                     class="flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${isUpdater ? 'cursor-pointer active:scale-95 hover:border-primary/50' : ''} ${done ? 'tile-done' : 'tile-pending'}">
-                    <span class="text-[9px] font-bold uppercase mb-1 tracking-wider opacity-70">${key}</span>
-                    <span class="material-symbols-outlined text-xl">${done ? 'check_circle' : 'pending'}</span>
                 </div>
             `;
         }
@@ -647,208 +596,98 @@
             showToast('Copied!');
         };
 
-        window.toggleStatus = (id, key, name) => {
-            const emp = employees.find(e => e.id == id);
-            const current = emp[key + '_status'];
-            const next = current === 'done' ? 'pending' : 'done';
-
-            askConfirmation('Update Status', `Change ${key.toUpperCase()} for ${name} to ${next.toUpperCase()}?`, async () => {
-                const { error } = await supabaseClient
-                    .from('employees')
-                    .update({ [key + '_status']: next })
-                    .eq('id', id);
+        // --- ACTIONS (all with confirmation) ---
+        window.moveToQiwa = (id) => {
+            askConfirmation('Move to Qiwa', 'Add contact details and move employee to Qiwa stage?', async () => {
+                // In real flow, you'd update mobile/email/iban here if user edited fields
+                const { error } = await supabaseClient.from('employees').update({ qiwa_status: 'in_progress' }).eq('id', id);
                 if (!error) {
-                    await supabaseClient.from('activity_logs').insert({
-                        user_email: currentUser.email,
-                        action_type: 'UPDATED',
-                        message: `${key.toUpperCase()} for ${name} -> ${next}`
-                    });
-                    fetchEmployees();
+                    await logActivity('MOVED', `Employee moved to Qiwa stage`);
                     closeDetailModal();
-                    showToast('Status Updated');
+                    fetchEmployees();
+                    showToast('Moved to Qiwa');
                 }
             });
         };
 
-        // --- Add Form helpers (cards) ---
-        function initialsFromName(name) {
-            return name
-                .split(' ')
-                .filter(Boolean)
-                .map(p => p[0])
-                .join('')
-                .slice(0, 2)
-                .toUpperCase();
-        }
-
-        function renderPendingCards() {
-            const grid = document.getElementById('pendingGrid');
-            if (!grid) return;
-
-            if (!REMAINING_EMPLOYEES.length) {
-                grid.innerHTML = '<div class="col-span-3 text-center text-gray-400 text-sm py-8">No remaining employees configured.</div>';
-                return;
-            }
-
-            grid.innerHTML = REMAINING_EMPLOYEES.map((emp, idx) => {
-                const initials = initialsFromName(emp.name);
-                return `
-                    <button
-                        type="button"
-                        id="pending-${emp.id}"
-                        onclick="selectPendingEmployee('${emp.id}')"
-                        class="pending-card w-full max-w-xs bg-surface-light rounded-2xl px-4 py-4 border border-gray-200 shadow-md text-left flex items-center gap-3 transform opacity-0 translate-y-4 scale-95 transition-all duration-500 ease-out"
-                        style="transition-delay: ${idx * 60}ms"
-                    >
-                        <div class="h-10 w-10 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold uppercase">
-                            ${initials}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900 truncate">${emp.name}</p>
-                            <p class="text-[11px] text-gray-500 uppercase tracking-[0.16em] mt-0.5">
-                                ID: ${emp.id}
-                            </p>
-                        </div>
-                    </button>
-                `;
-            }).join('');
-        }
-
-        window.selectPendingEmployee = (id) => {
-            const emp = REMAINING_EMPLOYEES.find(e => String(e.id) === String(id));
-            if (!emp) return;
-
-            selectedPendingEmployee = emp;
-
-            document
-                .querySelectorAll('.pending-card')
-                .forEach(el => el.classList.remove('ring-2', 'ring-primary', 'border-primary/80'));
-            const active = document.getElementById(`pending-${emp.id}`);
-            if (active) {
-                active.classList.add('ring-2', 'ring-primary', 'border-primary/80');
-            }
-
-            document.getElementById('selectedNameLabel').textContent = emp.name;
-            document.getElementById('selectedIdLabel').textContent = `ID: ${emp.id}`;
-            document.getElementById('selectedAvatar').textContent = initialsFromName(emp.name);
-
-            document.getElementById('newId').value = emp.id || '';
-            document.getElementById('newMobile').value = emp.mobile || '';
-            document.getElementById('newEmail').value = emp.email || '';
-            document.getElementById('newIban').value = emp.iban || '';
-        };
-
-        function animatePendingOverlayIn() {
-            const exec = document.getElementById('execCard');
-            if (exec) {
-                exec.classList.add('opacity-0', 'translate-y-4', 'scale-95');
-                setTimeout(() => {
-                    exec.classList.remove('opacity-0', 'translate-y-4', 'scale-95');
-                }, 20);
-            }
-
-            setTimeout(() => {
-                document.querySelectorAll('.pending-card').forEach(card => {
-                    card.classList.remove('opacity-0', 'translate-y-4', 'scale-95');
-                });
-            }, 40);
-        }
-
-        function markPendingAsUsed(id) {
-            const el = document.getElementById(`pending-${id}`);
-            if (!el) return;
-            el.classList.add('opacity-40', 'pointer-events-none');
-        }
-
-        // --- Add Form (open/close/save) ---
-        document.getElementById('btnOpenAdd').onclick = () => {
-            const add = document.getElementById('addScreen');
-            add.classList.remove('modal-hidden');
-            add.classList.add('modal-visible');
-
-            selectedPendingEmployee = null;
-
-            document.getElementById('newId').value = '';
-            document.getElementById('newMobile').value = '';
-            document.getElementById('newEmail').value = '';
-            document.getElementById('newIban').value = '';
-            document.getElementById('selectedNameLabel').textContent = 'Choose employee to onboard';
-            document.getElementById('selectedIdLabel').textContent = 'ID will appear here';
-            document.getElementById('selectedAvatar').textContent = '--';
-
-            renderPendingCards();
-            animatePendingOverlayIn();
-        };
-
-        document.getElementById('btnCloseAdd').onclick = () => {
-            const add = document.getElementById('addScreen');
-            add.classList.remove('modal-visible');
-            add.classList.add('modal-hidden');
-        };
-
-        document.getElementById('saveEmployeeBtn').onclick = async () => {
-            const btn = document.getElementById('saveEmployeeBtn');
-
-            if (!selectedPendingEmployee) {
-                return showToast('Please tap an employee card');
-            }
-
-            const name = selectedPendingEmployee.name;
-            const id = document.getElementById('newId').value;
-
-            if(!name || !id) return showToast('Missing ID for selected employee');
-
-            btn.innerHTML = '<div class="loader"></div>';
-
-            const { error } = await supabaseClient.from('employees').insert({
-                name,
-                identification_number: id,
-                mobile: document.getElementById('newMobile').value,
-                email: document.getElementById('newEmail').value,
-                iban: document.getElementById('newIban').value,
-                qiwa_status: 'pending',
-                gosi_status: 'pending',
-                mudad_status: 'pending'
+        window.completeQiwa = (id) => {
+            askConfirmation('Complete Qiwa', 'Mark Qiwa as done and move to Waiting for Contract Approval?', async () => {
+                const { error } = await supabaseClient.from('employees').update({ qiwa_status: 'done' }).eq('id', id);
+                if (!error) {
+                    await logActivity('UPDATED', `Qiwa completed, waiting contract approval`);
+                    closeDetailModal();
+                    fetchEmployees();
+                    showToast('Qiwa Done');
+                }
             });
-
-            if (!error) {
-                await supabaseClient.from('activity_logs').insert({
-                    user_email: currentUser.email,
-                    action_type: 'ADDED',
-                    message: `New Profile: ${name}`
-                });
-                showToast('Employee Added Successfully');
-                markPendingAsUsed(id);
-                document.getElementById('btnCloseAdd').click();
-                fetchEmployees();
-            } else {
-                showToast(error.message);
-            }
-            btn.innerHTML = '<span>Confirm & Submit</span><span class="material-symbols-outlined text-[20px]">check_circle</span>';
         };
+
+        window.approveContract = (id) => {
+            askConfirmation('Approve Contract', 'Confirm contract approval and move employee to Gosi stage?', async () => {
+                const { error } = await supabaseClient.from('employees').update({ gosi_status: 'in_progress' }).eq('id', id);
+                if (!error) {
+                    await logActivity('APPROVED', `Contract approved, moved to Gosi`);
+                    closeDetailModal();
+                    fetchEmployees();
+                    showToast('Contract Approved');
+                }
+            });
+        };
+
+        window.completeGosi = (id) => {
+            askConfirmation('Complete Gosi', 'Mark Gosi as done and move to Mudad?', async () => {
+                const { error } = await supabaseClient.from('employees').update({ gosi_status: 'done', mudad_status: 'in_progress' }).eq('id', id);
+                if (!error) {
+                    await logActivity('UPDATED', `Gosi completed, moved to Mudad`);
+                    closeDetailModal();
+                    fetchEmployees();
+                    showToast('Gosi Done');
+                }
+            });
+        };
+
+        window.completeMudad = (id) => {
+            askConfirmation('Complete Mudad', 'Mark Mudad as done and move employee to Finished?', async () => {
+                const { error } = await supabaseClient.from('employees').update({ mudad_status: 'done' }).eq('id', id);
+                if (!error) {
+                    await logActivity('COMPLETED', `All stages finished`);
+                    closeDetailModal();
+                    fetchEmployees();
+                    showToast('Mudad Done - Employee Finished');
+                }
+            });
+        };
+
+        async function logActivity(action, msg) {
+            await supabaseClient.from('activity_logs').insert({
+                user_email: currentUser.email,
+                action_type: action,
+                message: msg
+            });
+        }
 
         // --- Activity Logs ---
         function setupRealtime() {
             const logView = document.getElementById('activityLogView');
             const renderLog = (l) => {
                 const div = document.createElement('div');
-                div.className = "bg-surface-light dark:bg-surface-dark rounded-xl p-4 flex items-start gap-4 shadow-sm border border-gray-100 dark:border-white/5";
+                div.className = "bg-white rounded-xl p-4 flex items-start gap-4 shadow-sm border border-gray-100";
                 div.innerHTML = `
-                    <div class="shrink-0 h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center text-primary">
+                    <div class="shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                         <span class="material-symbols-outlined text-[20px]">${l.action_type === 'ADDED' ? 'person_add' : 'update'}</span>
                     </div>
-                    <div>
-                        <div class="flex justify-between items-start mb-1 w-full">
-                            <h3 class="font-semibold text-gray-900 dark:text-gray-100 text-sm">${l.user_email.split('@')[0]}</h3>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-semibold text-gray-900 text-sm truncate">${l.user_email.split('@')[0]}</h3>
                             <span class="text-[10px] text-gray-400 ml-2">${new Date(l.created_at).toLocaleTimeString()}</span>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">${l.message}</p>
+                        <p class="text-xs text-gray-600">${l.message}</p>
                     </div>
                 `;
                 logView.prepend(div);
             };
 
-            supabaseClient.from('activity_logs').select('*').order('created_at', {ascending:false}).limit(5)
+            supabaseClient.from('activity_logs').select('*').order('created_at', {ascending:false}).limit(8)
                 .then(({data}) => data?.forEach(renderLog));
 
             supabaseClient.channel('activity_logs').on(
