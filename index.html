@@ -1,900 +1,633 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html class="dark" lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-  />
-  <title>Eman Bakery – Employee Tracker</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+    
+    <!-- ANTI-CACHE HEADERS -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-    rel="stylesheet"
-  />
+    <title>Eman Bakery Portal</title>
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- iOS Native App Config -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Eman Bakery">
+    <meta name="theme-color" content="#221510">
 
-  <!-- Tailwind Config -->
-  <script>
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            primary: "#ee5b2b",
-            "background-light": "#f8f6f6",
-            "background-dark": "#221510",
-            "surface-dark": "#332019",
-            "surface-light": "#ffffff",
-          },
-          fontFamily: {
-            display: ["Plus Jakarta Sans", "sans-serif"],
-          },
-          borderRadius: {
-            DEFAULT: "0.25rem",
-            lg: "0.5rem",
-            xl: "0.75rem",
-            "2xl": "1rem",
-            full: "9999px",
-          },
-        },
-      },
-    };
-  </script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ee5b2b",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221510",
+                        "surface-dark": "#332019",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+    <style>
+        body { min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Glass Utilities */
+        .glass-panel {
+            background: rgba(34, 21, 16, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-input {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        .glass-input:focus {
+            background: rgba(0, 0, 0, 0.4);
+            border-color: #ee5b2b;
+        }
 
-  <style>
-    body {
-      min-height: max(884px, 100dvh);
-      font-family: "Plus Jakarta Sans", sans-serif;
-    }
-
-    .glass-panel {
-      background: rgba(34, 21, 16, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .glass-input {
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      color: white;
-    }
-
-    .glass-input:focus {
-      background: rgba(0, 0, 0, 0.4);
-      border-color: #ee5b2b;
-    }
-
-    .hide-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-
-    .hide-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    #toast {
-      transition: opacity 0.25s ease;
-    }
-  </style>
+        /* Animations */
+        .modal-hidden { opacity: 0; pointer-events: none; transform: translateY(100%) scale(0.95); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-visible { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Loader */
+        .loader { border: 2px solid rgba(255,255,255,0.1); border-top: 2px solid #ee5b2b; border-radius: 50%; width: 16px; height: 16px; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Status Tiles */
+        .tile-done { background: rgba(22, 163, 74, 0.15); border: 1px solid rgba(22, 163, 74, 0.4); color: #4ade80; }
+        .tile-pending { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); color: #94a3b8; }
+    </style>
 </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white h-screen w-full overflow-hidden relative selection:bg-primary selection:text-white">
 
-<body
-  class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display h-screen w-full overflow-hidden relative selection:bg-primary selection:text-white"
->
-  <!-- LOGIN SCREEN -->
-  <div
-    id="loginScreen"
-    class="absolute inset-0 flex flex-col justify-between items-center px-6 py-8 z-10"
-  >
-    <!-- Background Image with Overlay -->
-    <div class="absolute inset-0 w-full h-full z-0">
-      <div class="absolute inset-0 bg-black/40 z-10"></div>
-      <div
-        class="w-full h-full bg-cover bg-center bg-no-repeat transform scale-105"
-        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCIedT2HX6xp-TB6TEt-HPdFTt6ksEbxJ7I3-xves9ZVsToQrwfniIpxiF9lfZMbMjf2AQ2luzQW10psGSSuRTlgWw4Gb8P-Gs4mxGH7kqdyKm2ZsJaDHRCT_kxAGSvK7zjbU9utdprA-70YdCm9TLIXeM1nUmymquEwRnzv3cKCjaodZBU5TC7XiggYndaEMUZQFb9h0tNBeDfaOsara72XDY-yW35I4GV8kTGjucAc08auHuwHg4dd0s3lyjwn6Uf4C4rJznzZCt2');"
-      ></div>
+    <!-- Global Loader -->
+    <div id="globalLoader" class="fixed inset-0 z-50 bg-background-dark flex flex-col items-center justify-center">
+        <div class="loader w-10 h-10 border-4"></div>
+        <p class="mt-4 text-xs font-bold tracking-widest text-primary/80 uppercase">Loading Portal...</p>
     </div>
 
-    <!-- Login content -->
-    <div
-      class="relative z-20 flex-1 flex flex-col justify-center items-center w-full max-w-md"
-    >
-      <div class="mb-8 text-center">
-        <div
-          class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 backdrop-blur-md mb-4 border border-primary/30 shadow-[0_0_15px_rgba(238,91,43,0.3)]"
-        >
-          <span class="material-symbols-outlined text-primary text-4xl">
-            bakery_dining
-          </span>
+    <!-- ================= LOGIN SCREEN ================= -->
+    <div id="loginScreen" class="absolute inset-0 z-40 bg-background-dark flex flex-col justify-between pt-12 pb-8 px-6">
+        <!-- Background -->
+        <div class="absolute inset-0 w-full h-full z-0">
+            <div class="absolute inset-0 bg-black/60 z-10"></div>
+            <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCIedT2HX6xp-TB6TEt-HPdFTt6ksEbxJ7I3-xves9ZVsToQrwfniIpxiF9lfZMbMjf2AQ2luzQW10psGSSuRTlgWw4Gb8P-Gs4mxGH7kqdyKm2ZsJaDHRCT_kxAGSvK7zjbU9utdprA-70YdCm9TLIXeM1nUmymquEwRnzv3cKCjaodZBU5TC7XiggYndaEMUZQFb9h0tNBeDfaOsara72XDY-yW35I4GV8kTGjucAc08auHuwHg4dd0s3lyjwn6Uf4C4rJznzZCt2');"></div>
         </div>
-        <h1
-          class="text-white tracking-[0.2em] text-3xl font-extrabold leading-tight mb-1 drop-shadow-lg"
-        >
-          EMAN
-        </h1>
-        <p
-          class="text-white/80 text-sm font-medium tracking-widest uppercase opacity-90"
-        >
-          Bakery &amp; Co.
-        </p>
-      </div>
 
-      <div
-        class="w-full glass-panel rounded-2xl p-6 shadow-2xl relative overflow-hidden group"
-      >
-        <div
-          class="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none"
-        ></div>
-        <h2 class="text-white text-xl font-bold mb-1 text-center">
-          Welcome Back
-        </h2>
-        <p class="text-white/60 text-sm text-center mb-6">
-          Enter your credentials to access the portal.
-        </p>
-
-        <form class="space-y-4" onsubmit="event.preventDefault();">
-          <div class="relative group/input">
-            <div
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
-              <span
-                class="material-symbols-outlined text-white/50 group-focus-within/input:text-primary transition-colors"
-              >
-                mail
-              </span>
+        <div class="relative z-20 flex-1 flex flex-col justify-center items-center w-full max-w-md mx-auto">
+            <div class="mb-8 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 backdrop-blur-md mb-4 border border-primary/30 shadow-[0_0_15px_rgba(238,91,43,0.3)]">
+                    <span class="material-symbols-outlined text-primary text-4xl">bakery_dining</span>
+                </div>
+                <h1 class="text-white tracking-[0.2em] text-3xl font-extrabold leading-tight mb-1 drop-shadow-lg">EMAN</h1>
+                <p class="text-white/80 text-sm font-medium tracking-widest uppercase opacity-90">Bakery &amp; Co.</p>
             </div>
-            <input
-              id="emailInput"
-              type="email"
-              autocomplete="username"
-              class="glass-input w-full rounded-lg pl-10 pr-4 py-3.5 outline-none transition-all placeholder:text-white/30 text-sm font-medium"
-              placeholder="Email address"
-            />
-          </div>
 
-          <div class="relative group/input">
-            <div
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
-              <span
-                class="material-symbols-outlined text-white/50 group-focus-within/input:text-primary transition-colors"
-              >
-                lock
-              </span>
+            <div class="w-full glass-panel rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+                <h2 class="text-white text-xl font-bold mb-1 text-center">Welcome Back</h2>
+                <p class="text-white/60 text-sm text-center mb-6">Enter your credentials to access.</p>
+                
+                <div class="space-y-4">
+                    <div class="relative group/input">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="material-symbols-outlined text-white/50">badge</span>
+                        </div>
+                        <input id="emailInput" class="glass-input w-full rounded-lg pl-10 pr-4 py-3.5 outline-none transition-all placeholder:text-white/30 text-sm font-medium" placeholder="Email Address" type="email"/>
+                    </div>
+                    <div class="relative group/input">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="material-symbols-outlined text-white/50">lock</span>
+                        </div>
+                        <input id="passwordInput" class="glass-input w-full rounded-lg pl-10 pr-4 py-3.5 outline-none transition-all placeholder:text-white/30 text-sm font-medium" placeholder="Password" type="password"/>
+                    </div>
+                    
+                    <button id="loginBtn" class="w-full bg-primary hover:bg-[#d94a1f] active:scale-[0.98] text-white font-bold py-3.5 px-4 rounded-lg shadow-lg shadow-primary/25 transition-all mt-2 flex items-center justify-center gap-2">
+                        <span>Sign In</span>
+                        <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                    </button>
+                </div>
             </div>
-            <input
-              id="passwordInput"
-              type="password"
-              autocomplete="current-password"
-              class="glass-input w-full rounded-lg pl-10 pr-10 py-3.5 outline-none transition-all placeholder:text-white/30 text-sm font-medium"
-              placeholder="Password"
-            />
-            <button
-              type="button"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center text-white/40 hover:text-white transition-colors"
-              onclick="this.previousElementSibling.type = this.previousElementSibling.type === 'password' ? 'text' : 'password';"
-            >
-              <span class="material-symbols-outlined text-[20px]">
-                visibility
-              </span>
+            
+            <div class="mt-6">
+                <button onclick="window.location.reload(true)" class="flex items-center gap-2 px-4 py-2 rounded-full bg-black/20 backdrop-blur-sm border border-white/5 text-white/70 hover:bg-black/40 hover:text-white transition-all">
+                    <span class="material-symbols-outlined text-[18px] text-primary">system_update</span>
+                    <span class="text-xs font-semibold tracking-wide">Update App</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MAIN DASHBOARD ================= -->
+    <div id="mainScreen" class="hidden flex flex-col h-full bg-background-light dark:bg-background-dark">
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between px-5 pt-safe-top pb-4 sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm pt-4 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-surface-dark border border-primary/30 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary">person</span>
+                </div>
+                <div>
+                    <h1 class="text-xs font-medium text-gray-500 dark:text-gray-400 leading-none">Logged in as</h1>
+                    <p id="currentUserDisplay" class="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate max-w-[150px]">User</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button id="logoutBtn" class="relative p-2 rounded-full bg-surface-dark border border-white/5 hover:bg-red-900/20 text-gray-400 hover:text-red-400 transition-colors">
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable Content -->
+        <main class="flex-1 overflow-y-auto hide-scrollbar pb-24 px-5 pt-6">
+            <!-- Role Badge & Count -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/5 shadow-sm">
+                    <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span id="roleBadge" class="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Loading...</span>
+                </div>
+                <span id="empCount" class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">0 Files</span>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mb-8">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">bolt</span> Quick Actions
+                </h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Add Staff (Only visible to Creators) -->
+                    <button id="btnOpenAdd" class="col-span-2 bg-primary hover:bg-primary/90 active:scale-[0.98] transition-all rounded-xl p-5 flex items-center justify-between shadow-lg shadow-primary/20 group hidden">
+                        <div class="flex flex-col items-start">
+                            <span class="text-white font-bold text-lg">Add New Staff</span>
+                            <span class="text-white/80 text-xs font-medium mt-1">Onboard a new employee</span>
+                        </div>
+                        <div class="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                            <span class="material-symbols-outlined text-white">person_add</span>
+                        </div>
+                    </button>
+                    <!-- Refresh List -->
+                    <button onclick="fetchEmployees()" class="bg-surface-light dark:bg-surface-dark active:scale-[0.98] transition-all rounded-xl p-4 flex flex-col gap-3 shadow-sm border border-gray-100 dark:border-white/5">
+                        <div class="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <span class="material-symbols-outlined">refresh</span>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-bold text-gray-900 dark:text-gray-100">Refresh</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Update List</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Employee List - 3 COLUMN GRID RESTORED -->
+            <div class="mb-8">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Employee Directory</h2>
+                <div id="employeesView" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <!-- Cards injected here -->
+                </div>
+            </div>
+            
+            <!-- Activity Logs Section -->
+            <div class="mt-8 pb-8">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Recent Activity</h2>
+                <div id="activityLogView" class="space-y-3">
+                    <!-- Logs injected here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Nav -->
+        <div class="fixed bottom-0 left-0 right-0 bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-white/5 pb-safe-bottom pt-3 px-6 z-30">
+            <nav class="flex justify-around items-center max-w-lg mx-auto pb-4">
+                <button class="flex flex-col items-center gap-1 text-primary group">
+                    <span class="material-symbols-outlined text-[28px]">dashboard</span>
+                    <span class="text-[10px] font-bold">Home</span>
+                </button>
+                <div class="relative -top-6">
+                    <button onclick="fetchEmployees()" class="h-14 w-14 rounded-full bg-surface-dark border-4 border-background-light dark:border-background-dark text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform">
+                        <span class="material-symbols-outlined text-[28px] text-primary">sync</span>
+                    </button>
+                </div>
+                <button class="flex flex-col items-center gap-1 text-gray-400 group">
+                    <span class="material-symbols-outlined text-[28px]">settings</span>
+                    <span class="text-[10px] font-medium">Settings</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ================= DETAIL MODAL (The one we missed!) ================= -->
+    <div id="detailModal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center modal-hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeDetailModal()"></div>
+        <div id="detailContent" class="bg-surface-dark w-full max-w-lg p-6 rounded-t-2xl sm:rounded-2xl border border-white/10 relative z-10 mx-auto max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-center mb-6">
+                <div class="w-12 h-1 bg-white/20 rounded-full"></div>
+            </div>
+            <div id="modalBody" class="space-y-6">
+                <!-- Content injected via JS -->
+            </div>
+            <button onclick="closeDetailModal()" class="w-full mt-8 py-3.5 bg-white/5 text-white/50 font-bold rounded-xl uppercase tracking-widest text-xs hover:bg-white/10 transition-colors">Close</button>
+        </div>
+    </div>
+
+    <!-- ================= ADD ENTRY SCREEN (Overlay) ================= -->
+    <div id="addScreen" class="fixed inset-0 z-50 bg-background-dark flex flex-col modal-hidden">
+        <!-- Header -->
+        <header class="flex items-center justify-between px-4 py-3 bg-surface-dark border-b border-white/5">
+            <button id="btnCloseAdd" class="p-2 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
             </button>
-          </div>
+            <h1 class="text-lg font-bold tracking-tight text-white">New Employee</h1>
+            <div class="w-10"></div>
+        </header>
 
-          <div class="flex justify-end pt-1">
-            <span
-              class="text-primary text-xs font-semibold hover:text-primary/80 transition-colors cursor-default"
-            >
-              Forgot Password?
-            </span>
-          </div>
-
-          <button
-            id="loginBtn"
-            type="button"
-            class="w-full bg-primary hover:bg-[#d94a1f] active:scale-[0.98] text-white font-bold py-3.5 px-4 rounded-lg shadow-lg shadow-primary/25 transition-all duration-200 mt-2 flex items-center justify-center gap-2 group/btn"
-          >
-            <span>Sign In</span>
-            <span
-              class="material-symbols-outlined text-[20px] group-hover/btn:translate-x-1 transition-transform"
-            >
-              arrow_forward
-            </span>
-          </button>
-        </form>
-
-        <div class="relative flex py-5 items-center">
-          <div class="flex-grow border-t border-white/10"></div>
-          <span class="flex-shrink-0 mx-4 text-white/30 text-xs"
-            >Or login with</span
-          >
-          <div class="flex-grow border-t border-white/10"></div>
-        </div>
-
-        <button
-          type="button"
-          class="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white py-3 rounded-lg transition-colors flex items-center justify-center gap-2 group/faceid"
-        >
-          <span
-            class="material-symbols-outlined text-[24px] text-white/80 group-hover/faceid:text-white"
-            >face</span
-          >
-          <span
-            class="text-sm font-medium text-white/80 group-hover/faceid:text-white"
-            >Face ID</span
-          >
-        </button>
-      </div>
-    </div>
-
-    <div class="relative z-20 flex flex-col items-center gap-4 mt-6">
-      <button
-        type="button"
-        onclick="window.location.reload(true)"
-        class="flex items-center gap-2 px-4 py-2 rounded-full bg-black/20 backdrop-blur-sm border border-white/5 text-white/70 hover:bg-black/40 hover:text-white transition-all"
-      >
-        <span
-          class="material-symbols-outlined text-[18px] animate-pulse text-primary"
-          >system_update</span
-        >
-        <span class="text-xs font-semibold tracking-wide"
-          >Check for Updates</span
-        >
-      </button>
-      <p class="text-white/20 text-[10px] font-medium tracking-widest">
-        v2.4.0 • EMAN BAKERY IOS
-      </p>
-    </div>
-  </div>
-
-  <!-- MAIN APP -->
-  <div
-    id="mainScreen"
-    class="hidden h-full flex flex-col bg-background-light dark:bg-background-dark"
-  >
-    <!-- Top Bar -->
-    <div
-      class="flex items-center justify-between px-5 pt-8 pb-4 sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm"
-    >
-      <div class="flex items-center gap-3">
-        <div class="relative">
-          <div
-            class="h-10 w-10 rounded-full bg-cover bg-center border-2 border-primary/30"
-            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA5jpM50wc4XNeQRl0GySwhLMBg4vU0imh0moyHXZTMzPZ4zN4MRdWN6vE5UtKf9tiKEjmsFZuPUGMm6Si2tGFahj5qNfU_JDILxFBo1u5d2nGvczVRMMWPx9LuTsdoF1UxclH49xf9xzk8Kg2BqSbPtS_sQqGxQPub1fPp3_ZKtgS5MeHKzS8XTaKIMk8uwsFSDfQFMLvFn6B1iixJJn6OqjVLbUCQv8dXKBTTQw-7TKYKSpBeu3A83LCPOjt7wiRZ6vVCdMhOW4FG');"
-          ></div>
-          <div
-            class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-background-light dark:border-background-dark"
-          ></div>
-        </div>
-        <div>
-          <h1
-            class="text-sm font-medium text-gray-500 dark:text-gray-400 leading-none"
-          >
-            Employee Portal
-          </h1>
-          <p
-            class="text-lg font-bold text-gray-900 dark:text-white leading-tight"
-          >
-            Eman Bakery
-          </p>
-          <p
-            id="currentUserRole"
-            class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 uppercase tracking-widest"
-          ></p>
-        </div>
-      </div>
-      <button
-        id="logoutBtn"
-        class="text-[11px] px-3 py-1.5 rounded-full border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-100 bg-white/70 dark:bg-surface-dark hover:bg-white dark:hover:bg-surface-dark/80 transition-colors"
-      >
-        Log out
-      </button>
-    </div>
-
-    <!-- Content -->
-    <main class="flex-1 overflow-y-auto hide-scrollbar pb-24">
-      <div class="px-5 mb-6">
-        <div class="relative">
-          <select
-            class="w-full appearance-none bg-surface-light dark:bg-surface-dark border-0 rounded-xl py-3 pl-4 pr-10 text-sm font-semibold text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-primary/50 shadow-sm transition-shadow"
-          >
-            <option>Employee Registry – Qiwa / Gosi / Mudad</option>
-          </select>
-          <div
-            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500"
-          >
-            <span class="material-symbols-outlined text-lg">expand_more</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Employees list -->
-      <div class="px-5 mb-8">
-        <h2
-          class="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2"
-        >
-          <span class="material-symbols-outlined text-primary">group</span>
-          Employee Onboarding
-        </h2>
-        <div id="employeesView" class="flex flex-col gap-3"></div>
-      </div>
-
-      <div class="h-6"></div>
-    </main>
-
-    <!-- ADD EMPLOYEE VIEW -->
-    <div
-      id="addView"
-      class="hidden bg-background-light dark:bg-background-dark min-h-[70vh] flex flex-col"
-    >
-      <header
-        class="sticky top-0 z-20 flex items-center justify-between px-4 py-3 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5"
-      >
-        <button
-          type="button"
-          id="backToEmployeesBtn"
-          class="flex items-center justify-center p-2 -ml-2 text-slate-500 dark:text-gray-400 hover:text-primary transition-colors rounded-full hover:bg-black/5 dark:hover:bg-white/5"
-        >
-          <span class="material-symbols-outlined text-[24px]">arrow_back</span>
-        </button>
-        <h1 class="text-lg font-bold tracking-tight text-center flex-1">
-          New Employee
-        </h1>
-        <span class="w-8 h-8"></span>
-      </header>
-
-      <main class="flex-1 px-4 py-6 space-y-6 pb-24">
-        <section class="space-y-3">
-          <label
-            class="block text-sm font-semibold text-slate-700 dark:text-gray-200 ml-1"
-          >
-            Employee details
-          </label>
-
-          <div class="space-y-3">
-            <div>
-              <label
-                class="block text-xs font-semibold text-slate-500 dark:text-gray-400 ml-1 mb-1"
-              >
-                Full name
-              </label>
-              <input
-                id="newName"
-                type="text"
-                class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:ring-[#4E3629] dark:text-white sm:text-sm"
-                placeholder="Employee name"
-              />
+        <!-- Form Content -->
+        <main class="flex-1 px-4 py-6 space-y-6 overflow-y-auto">
+            <div class="space-y-3">
+                <label class="block text-sm font-semibold text-gray-200 ml-1">Quick Select Employee</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 pointer-events-none">
+                        <span class="material-symbols-outlined">person_search</span>
+                    </span>
+                    <select id="nameDropdown" class="block w-full rounded-xl border-0 py-3.5 pl-10 bg-surface-dark text-white ring-1 ring-white/10 focus:ring-primary">
+                        <option value="">Select from list...</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label
-                  class="block text-xs font-semibold text-slate-500 dark:text-gray-400 ml-1 mb-1"
-                >
-                  ID number
-                </label>
-                <input
-                  id="newId"
-                  type="text"
-                  class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:ring-[#4E3629] dark:text-white sm:text-sm"
-                  placeholder="National ID"
-                />
-              </div>
-              <div>
-                <label
-                  class="block text-xs font-semibold text-slate-500 dark:text-gray-400 ml-1 mb-1"
-                >
-                  Mobile
-                </label>
-                <input
-                  id="newMobile"
-                  type="text"
-                  class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:ring-[#4E3629] dark:text-white sm:text-sm"
-                  placeholder="05xxxxxxxx"
-                />
-              </div>
+            <div class="space-y-4">
+                <label class="block text-sm font-semibold text-gray-200 ml-1">Details</label>
+                <div class="space-y-3">
+                    <input id="newId" type="text" placeholder="National ID (Auto-filled)" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-4 text-white/50" readonly>
+                    <input id="newMobile" type="tel" placeholder="Mobile Number" class="w-full bg-surface-dark border border-white/10 rounded-xl px-4 py-4 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                    <input id="newEmail" type="email" placeholder="Email Address" class="w-full bg-surface-dark border border-white/10 rounded-xl px-4 py-4 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                    <input id="newIban" type="text" placeholder="IBAN" class="w-full bg-surface-dark border border-white/10 rounded-xl px-4 py-4 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                </div>
             </div>
+        </main>
 
-            <div>
-              <label
-                class="block text-xs font-semibold text-slate-500 dark:text-gray-400 ml-1 mb-1"
-              >
-                IBAN
-              </label>
-              <input
-                id="newIban"
-                type="text"
-                class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:ring-[#4E3629] dark:text-white sm:text-sm"
-                placeholder="SA••••"
-              />
-            </div>
-
-            <div>
-              <label
-                class="block text-xs font-semibold text-slate-500 dark:text-gray-400 ml-1 mb-1"
-              >
-                Email
-              </label>
-              <input
-                id="newEmail"
-                type="email"
-                class="block w-full rounded-xl border-0 py-3 px-4 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:ring-[#4E3629] dark:text-white sm:text-sm"
-                placeholder="name@example.com"
-              />
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <div
-        class="fixed bottom-0 left-0 right-0 p-4 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 z-30"
-      >
-        <div class="mx-auto w-full max-w-md flex flex-col gap-3">
-          <button
-            id="saveEmployeeBtn"
-            type="button"
-            class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-4 text-sm font-bold leading-6 text-white shadow-sm hover:bg-primary/90 active:scale-[0.98] transition-all"
-          >
-            Confirm &amp; Add Employee
-            <span class="material-symbols-outlined text-[20px]"
-              >check_circle</span
-            >
-          </button>
+        <!-- Footer Action -->
+        <div class="p-4 bg-surface-dark border-t border-white/5 pb-safe-bottom">
+            <button id="saveEmployeeBtn" class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-4 text-sm font-bold text-white shadow-lg active:scale-[0.98] transition-all">
+                <span>Confirm & Submit</span>
+                <span class="material-symbols-outlined text-[20px]">check_circle</span>
+            </button>
         </div>
-      </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <div
-      class="fixed bottom-0 left-0 right-0 bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-white/5 pb-5 pt-3 px-6 z-50"
-    >
-      <nav class="flex justify-between items-center max-w-lg mx-auto">
-        <button
-          id="tabEmployees"
-          class="flex flex-col items-center gap-1 text-primary group"
-        >
-          <span
-            class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform"
-            >dashboard</span
-          >
-          <span class="text-[10px] font-bold">Employees</span>
-        </button>
-        <button
-          id="tabAdd"
-          type="button"
-          class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors group"
-        >
-          <span
-            class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform"
-            >person_add</span
-          >
-          <span class="text-[10px] font-medium">Add Employee</span>
-        </button>
-
-        <div class="relative -top-6">
-          <button
-            type="button"
-            class="h-14 w-14 rounded-full bg-gray-800 dark:bg-[#4a2e25] border-4 border-background-light dark:border-background-dark text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-          >
-            <span class="material-symbols-outlined text-[28px]"
-              >qr_code_scanner</span
-            >
-          </button>
+    <!-- CONFIRM MODAL -->
+    <div id="confirmModal" class="fixed inset-0 z-[70] flex items-end sm:items-center justify-center modal-hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+        <div class="bg-surface-dark w-full max-w-sm p-6 rounded-t-2xl sm:rounded-2xl border border-white/10 relative z-10 mx-4 mb-safe-bottom">
+            <h3 class="text-xl font-bold text-white mb-2" id="modalTitle">Confirm</h3>
+            <p class="text-sm text-gray-400 mb-6" id="modalText">Are you sure?</p>
+            <div class="flex gap-3">
+                <button id="modalCancel" class="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-sm">Cancel</button>
+                <button id="modalConfirm" class="flex-1 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm shadow-lg shadow-primary/20">Confirm</button>
+            </div>
         </div>
-
-        <button
-          type="button"
-          class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors group"
-        >
-          <span
-            class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform"
-            >inventory</span
-          >
-          <span class="text-[10px] font-medium">Inventory</span>
-        </button>
-        <button
-          type="button"
-          class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors group"
-        >
-          <span
-            class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform"
-            >settings</span
-          >
-          <span class="text-[10px] font-medium">Settings</span>
-        </button>
-      </nav>
     </div>
-  </div>
 
-  <!-- Toast -->
-  <div
-    id="toast"
-    class="fixed bottom-5 inset-x-0 mx-auto max-w-xs px-4 opacity-0 pointer-events-none"
-  >
-    <div
-      class="bg-black/80 text-xs text-slate-100 rounded-2xl px-4 py-2.5 text-center shadow-lg border border-white/10"
-    >
-      <span id="toastMsg"></span>
+    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 z-[80] modal-hidden">
+        <div class="bg-surface-dark border border-primary/50 text-white font-bold px-6 py-3 rounded-full shadow-2xl flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-sm">info</span>
+            <span id="toastMsg" class="text-xs tracking-wide">Notification</span>
+        </div>
     </div>
-  </div>
 
-  <!-- APP LOGIC + SUPABASE -->
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+      
+        const SUPABASE_URL = 'https://ftkwyywgoutsvdcdvyja.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU';
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      
+        // Pre-loaded Data (ALL 35 EMPLOYEES RESTORED)
+        const PRE_EMPLOYEES = [
+            { name: "NAHEEMUDHEEN PARATHODI", id: "2235923253", mobile: "0552821842", iban: "SA6345000000852160290001", email: "naheemptd@emanbakeries.com" },
+            { name: "SHAMSUDHEEN MANATTU", id: "2307985529", mobile: "0554658796", iban: "SA54658796543500000023340110001", email: "shamsumanat9890@gmail.com" },
+            { name: "IBRAHIM BADUSHAN THOTTATHIKUDIYI", id: "2331355376", mobile: "0532001228", iban: "SA1745000000262432735001", email: "badushai803@gmail.com" },
+            { name: "ALFAS ASLAM", id: "2503874980", mobile: "0540407512", iban: "SA40407512424500000023340524001", email: "alfasaslu7@gmail.com" },
+            { name: "MUHAMMED SHALI VAZHAYIL", id: "2455820023", mobile: "0540357284", iban: "SA614500000023340532001", email: "salivazhayil@gmail.com" },
+            { name: "SHERIN KOCHUKONICKAL AZEEZ", id: "2354488948", mobile: "0546311750", iban: "SA814500000023340714001", email: "kasherin384@gmail.com" },
+            { name: "SHIJAS KAREEM PALLIMUKIL", id: "2256400710", mobile: "0557679177", iban: "SA034500000023340722001", email: "pkshijas556@gmail.com" },
+            { name: "SINEESH PATHUKUDI MUHAMMED", id: "2440029813", mobile: "0546344301", iban: "SA224500000023340730001", email: "akkuansal72@gmail.com" },
+            { name: "MUHAMMED PARAKKUNNATHU EBRAHIM", id: "2377814138", mobile: "0567278143", iban: "SA894500000023340748001", email: "foumalmammu@gmail.com" },
+            { name: "ASINSHA ASAINAR VELLIRIPPIL", id: "2478222298", mobile: "0541537246", iban: "SA204500000023341449001", email: "asinshaasi@gmail.com" },
+            { name: "CHEVU NISSAR MUTTATHUCHALIL MOIDU", id: "2309399752", mobile: "0545214900", iban: "SA734500000023341456001", email: "fasilchevunizarnizar@gmail.com" },
+            { name: "SUMANDAS SUKHANDU BIKASH", id: "2205956697", mobile: "0573106917", iban: "SA024500000023342488001", email: "sumonchaudary0012@gmail.com" },
+            { name: "SHABEER ALI PANAKKATHODEN", id: "2481393557", mobile: "0548796167", iban: "SA804500000023341316001", email: "shabirp313@gmail.com" },
+            { name: "AHAMMED KABEER VANKALATH", id: "2311162198", mobile: "0560413288", iban: "SA024500000023341324001", email: "ahammadkhabeer@gmail.com" },
+            { name: "MUHSIN KURUTTUKAVIL MUSTHAFA", id: "2501103358", mobile: "0542677218", iban: "SA444500000023341357001", email: "muhsinkrtkvl17@gmail.com" },
+            { name: "ASHKAR ENJAKUDIYIL ALI", id: "2501925479", mobile: "0561504608", iban: "SA794500000023341530001", email: "ashkarali1232@gmail.com" },
+            { name: "ASHRAF MOONNAN KANDATHIL KOMU", id: "2311479220", mobile: "0559151648", iban: "SA714500000023341399001", email: "asharafbapu4@gmail.com" },
+            { name: "ABDUSSAMAD PANDALAN", id: "2308915301", mobile: "0581341225", iban: "SA214500000023341720001", email: "samadthelakkad@gmail.com" },
+            { name: "MUSTHAFA PATHAYAPURAKKAL", id: "2322180403", mobile: "0577343723", iban: "SA124500000023341415001", email: "m95042906@gmail.com" },
+            { name: "ARIF KOORIMANNIL POOVATHIKKAL", id: "2453005585", mobile: "0580876240", iban: "SA6345000000262434046001", email: "sinansilu382@gmail.com" },
+            { name: "RIYAS KILIVAYIL ALAVIKUTTY KILIVAYIL", id: "2303530915", mobile: "0560438943", iban: "SA6745000000221675051001", email: "riyasvga786786@gmail.com" },
+            { name: "MANSOORALI MANSOORALI PUTHAN", id: "2405299500", mobile: "0546238774", iban: "SA054500000023341555001", email: "mansooreman4@gmail.com" },
+            { name: "KONTHALAM THELLIKKUNNEL ABDUL AZEES", id: "2366253124", mobile: "0566770269", iban: "SA124500000023341803001", email: "konthalamazees3806@gmail.com" },
+            { name: "RIFAS KANJIRAKKATTU KUDIYIL BASHEER", id: "2501103424", mobile: "0547522498", iban: "SA0445000000221672819001", email: "rifaskbasheer@gmail.com" },
+            { name: "AGHIL ALIYAKKOTT GANGADHARAN", id: "2439707783", mobile: "0562692551", iban: "SA9345000000221672785001", email: "vishnuaghil67@gmail.com" },
+            { name: "ABDUL AZEEZ AYIMPADI", id: "2289306652", mobile: "0567538526", iban: "SA104500000023341746001", email: "azeeseman123@gmail.com" },
+            { name: "SHAMSUDHEEN KURUTTUKAVIL SAINUDHEEN", id: "2511077311", mobile: "0560531091", iban: "SA824500000023341761001", email: "shamslabba786@gmail.com" },
+            { name: "JISHNU RAVEENDRAN", id: "2485790337", mobile: "0566304691", iban: "SA5345000000221673197001", email: "jishnur8089@gmail.com" },
+            { name: "ANSAL RASAK", id: "2477053272", mobile: "0561569020", iban: "SA6445000000221673171001", email: "ansalrasak408@gmail.com" },
+            { name: "SABEER KADOOKUNNAN KUNHIMOHAMED", id: "2308393285", mobile: "0503762558", iban: "SA214500000023342108001", email: "shifashifinkk@gmail.com" },
+            { name: "KABEER POOVATHUM CHOTTIL MUHAMMED", id: "2245613761", mobile: "0545984250", iban: "SA094500000023342348001", email: "safvankabeer007@gmail.com" },
+            { name: "EBRAHIM LATHEEF KAVANA PARAMBIL", id: "2309489785", mobile: "0567642933", iban: "SA134500000023342462001", email: "latheef20k5@gmail.com" },
+            { name: "ABDUL MANAF KURUTTAKAVIL MUSTHAFA", id: "2301750994", mobile: "0560247459", iban: "SA494500000023343197001", email: "manafmusthafa3@gmail.com" },
+            { name: "NEJMUDHEEN SAKHIB", id: "2481486153", mobile: "0568357829", iban: "SA444500000023344849001", email: "nejmudheensakhib786@gmail.com" },
+            { name: "ABDUL MUNIR VAZHAYIL", id: "2289427870", mobile: "0593395106", iban: "SA284500000023343908001", email: "muneervazhayil78@gmail.com" }
+        ];
 
-    const SUPABASE_URL = "https://ftkwyywgoutsvdcdvyja.supabase.co";
-    const SUPABASE_ANON_KEY =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU";
+        let currentUser = null;
+        let employees = [];
 
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // --- Init ---
+        const init = () => {
+            const dropdown = document.getElementById('nameDropdown');
+            PRE_EMPLOYEES.forEach(e => {
+                const opt = document.createElement('option');
+                opt.value = e.name;
+                opt.textContent = e.name;
+                dropdown.appendChild(opt);
+            });
+            document.getElementById('globalLoader').style.display = 'none';
+        }
+        init();
 
-    let currentUser = null;
-    let employees = [];
+        // --- Auth ---
+        document.getElementById('loginBtn').onclick = async () => {
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+            if(!email || !password) return showToast('Enter email and password');
+            
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) return showToast(error.message);
+            
+            const roleData = await supabaseClient.from('user_roles').select('role').eq('user_id', data.user.id).maybeSingle();
+            if (!roleData.data) { await supabaseClient.auth.signOut(); return showToast('No Role Assigned'); }
+            
+            currentUser = { id: data.user.id, email: data.user.email, role: roleData.data.role };
+            
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.remove('hidden');
+            
+            document.getElementById('currentUserDisplay').textContent = currentUser.email.split('@')[0];
+            document.getElementById('roleBadge').textContent = currentUser.role.toUpperCase();
+            
+            if (currentUser.role === 'creator') document.getElementById('btnOpenAdd').classList.remove('hidden');
+            
+            fetchEmployees();
+            setupRealtime();
+        };
 
-    function showToast(message) {
-      const toast = document.getElementById("toast");
-      const msg = document.getElementById("toastMsg");
-      msg.textContent = message;
-      toast.classList.remove("opacity-0");
-      toast.classList.add("opacity-100");
-      setTimeout(() => {
-        toast.classList.remove("opacity-100");
-        toast.classList.add("opacity-0");
-      }, 2000);
-    }
+        document.getElementById('logoutBtn').onclick = () => {
+            askConfirmation('Log Out', 'Sign out of portal?', async () => {
+                await supabaseClient.auth.signOut();
+                location.reload();
+            });
+        };
 
-    async function fetchUserRole(userId) {
-      const { data, error } = await supabaseClient
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .single();
+        // --- Data ---
+        window.fetchEmployees = async () => {
+            const { data, error } = await supabaseClient.from('employees').select('*').order('created_at', { ascending: false });
+            if (!error) {
+                employees = data;
+                renderEmployees();
+                document.getElementById('empCount').textContent = `${employees.length} Files`;
+            }
+        };
 
-      if (error) {
-        console.error(error);
-        showToast("No role found for this user");
-        return null;
-      }
+        function renderEmployees() {
+            const list = document.getElementById('employeesView');
+            if (employees.length === 0) {
+                list.innerHTML = `<div class="col-span-3 text-center text-gray-500 py-12">No files found.</div>`;
+                return;
+            }
+            
+            list.innerHTML = employees.map(emp => `
+                <div onclick="openDetailModal('${emp.id}')" class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 flex flex-col gap-2 shadow-sm border border-gray-100 dark:border-white/5 relative group cursor-pointer active:scale-95 transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-gray-900 dark:text-white truncate pr-2 text-sm">${emp.name}</h3>
+                            <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 font-mono uppercase tracking-wide">ID: ${emp.identification_number}</p>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-300">chevron_right</span>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-      return data.role;
-    }
+        // --- DETAIL MODAL LOGIC (RESTORED) ---
+        window.openDetailModal = (id) => {
+            const emp = employees.find(e => e.id == id);
+            if (!emp) return;
 
-    async function fetchEmployees() {
-      const { data, error } = await supabaseClient
-        .from("employees")
-        .select("*")
-        .order("created_at", { ascending: false });
+            const body = document.getElementById('modalBody');
+            body.innerHTML = `
+                <div>
+                    <h2 class="text-xl font-bold text-white leading-tight">${emp.name}</h2>
+                    <p class="text-xs font-bold text-gray-400 mt-1 uppercase tracking-widest">ID: ${emp.identification_number}</p>
+                </div>
 
-      if (error) {
-        console.error(error);
-        showToast("Error loading employees");
-        return;
-      }
+                <div class="space-y-3">
+                    ${renderDetailRow('Mobile', emp.mobile || 'N/A')}
+                    ${renderDetailRow('Email', emp.email || 'N/A')}
+                    ${renderDetailRow('IBAN', emp.iban || 'N/A')}
+                </div>
 
-      employees = (data || []).map((row) => ({
-        id: row.id,
-        name: row.name,
-        nationalId: row.identification_number,
-        mobile: row.mobile,
-        iban: row.iban,
-        email: row.email,
-        qiwa: row.qiwa_status,
-        gosi: row.gosi_status,
-        mudad: row.mudad_status,
-      }));
-
-      renderEmployees();
-    }
-
-    // Login
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    loginBtn.addEventListener("click", async () => {
-      const email = document.getElementById("emailInput").value.trim();
-      const password = document.getElementById("passwordInput").value.trim();
-
-      if (!email || !password) {
-        showToast("Email and password required");
-        return;
-      }
-
-      loginBtn.disabled = true;
-      loginBtn.firstElementChild.textContent = "Signing in...";
-
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        console.error(error);
-        showToast("Login failed");
-        loginBtn.disabled = false;
-        loginBtn.firstElementChild.textContent = "Sign In";
-        return;
-      }
-
-      const user = data.user;
-      const role = await fetchUserRole(user.id);
-      if (!role) {
-        await supabaseClient.auth.signOut();
-        loginBtn.disabled = false;
-        loginBtn.firstElementChild.textContent = "Sign In";
-        return;
-      }
-
-      currentUser = { id: user.id, email: user.email, role };
-
-      document.getElementById("loginScreen").classList.add("hidden");
-      document.getElementById("mainScreen").classList.remove("hidden");
-      document.getElementById(
-        "currentUserRole"
-      ).textContent = `${user.email} – ${
-        role === "creator" ? "Can add employees" : "Can update statuses"
-      }`;
-
-      const tabAdd = document.getElementById("tabAdd");
-      if (role === "creator") {
-        tabAdd.classList.remove("opacity-40", "pointer-events-none");
-      } else {
-        tabAdd.classList.add("opacity-40", "pointer-events-none");
-      }
-
-      await fetchEmployees();
-
-      loginBtn.disabled = false;
-      loginBtn.firstElementChild.textContent = "Sign In";
-    });
-
-    logoutBtn.addEventListener("click", async () => {
-      await supabaseClient.auth.signOut();
-      currentUser = null;
-      document.getElementById("emailInput").value = "";
-      document.getElementById("passwordInput").value = "";
-      document.getElementById("mainScreen").classList.add("hidden");
-      document.getElementById("loginScreen").classList.remove("hidden");
-    });
-
-    // Tabs
-    const tabEmployees = document.getElementById("tabEmployees");
-    const tabAdd = document.getElementById("tabAdd");
-    const employeesView = document.getElementById("employeesView");
-    const addView = document.getElementById("addView");
-    const backToEmployeesBtn = document.getElementById("backToEmployeesBtn");
-
-    function activateTab(isEmployees) {
-      if (!isEmployees && currentUser?.role !== "creator") {
-        showToast("Only creator can add employees");
-        return;
-      }
-
-      if (isEmployees) {
-        tabEmployees.classList.add("text-primary");
-        tabEmployees.classList.remove("text-gray-400");
-        tabAdd.classList.remove("text-primary");
-        employeesView.parentElement.parentElement.classList.remove("hidden");
-        addView.classList.add("hidden");
-      } else {
-        tabAdd.classList.add("text-primary");
-        tabEmployees.classList.remove("text-primary");
-        employeesView.parentElement.parentElement.classList.add("hidden");
-        addView.classList.remove("hidden");
-      }
-    }
-
-    tabEmployees.addEventListener("click", () => activateTab(true));
-    tabAdd.addEventListener("click", () => activateTab(false));
-    backToEmployeesBtn.addEventListener("click", () => activateTab(true));
-
-    // Add employee
-    const saveEmployeeBtn = document.getElementById("saveEmployeeBtn");
-
-    saveEmployeeBtn.addEventListener("click", async () => {
-      if (currentUser?.role !== "creator") {
-        showToast("Only creator can add employees");
-        return;
-      }
-
-      const name = document.getElementById("newName").value.trim();
-      const nationalId = document.getElementById("newId").value.trim();
-      const mobile = document.getElementById("newMobile").value.trim();
-      const iban = document.getElementById("newIban").value.trim();
-      const email = document.getElementById("newEmail").value.trim();
-
-      if (!name || !nationalId || !iban) {
-        showToast("Name, ID and IBAN are required");
-        return;
-      }
-
-      saveEmployeeBtn.disabled = true;
-      saveEmployeeBtn.textContent = "Saving...";
-
-      const { data, error } = await supabaseClient
-        .from("employees")
-        .insert({
-          name,
-          identification_number: nationalId,
-          mobile,
-          iban,
-          email,
-          qiwa_status: "pending",
-          gosi_status: "pending",
-          mudad_status: "pending",
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error(error);
-        showToast("Error adding employee");
-      } else {
-        employees.unshift({
-          id: data.id,
-          name: data.name,
-          nationalId: data.identification_number,
-          mobile: data.mobile,
-          iban: data.iban,
-          email: data.email,
-          qiwa: data.qiwa_status,
-          gosi: data.gosi_status,
-          mudad: data.mudad_status,
-        });
-        renderEmployees();
-        showToast("Employee added");
-
-        document.getElementById("newName").value = "";
-        document.getElementById("newId").value = "";
-        document.getElementById("newMobile").value = "";
-        document.getElementById("newIban").value = "";
-        document.getElementById("newEmail").value = "";
-
-        activateTab(true);
-      }
-
-      saveEmployeeBtn.disabled = false;
-      saveEmployeeBtn.textContent = "Confirm & Add Employee";
-    });
-
-    // Render employees
-    function renderEmployees() {
-      employeesView.innerHTML = "";
-
-      if (employees.length === 0) {
-        employeesView.innerHTML =
-          '<p class="text-xs text-slate-300 text-center py-8">No employees yet. Use "Add Employee" to create one.</p>';
-        return;
-      }
-
-      employees.forEach((emp) => {
-        const card = document.createElement("div");
-        card.className =
-          "bg-surface-light dark:bg-surface-dark rounded-2xl border border-gray-200 dark:border-white/10 px-4 py-3 space-y-2 shadow-sm";
-
-        const nameRow = document.createElement("div");
-        nameRow.className = "flex items-start justify-between gap-2";
-
-        nameRow.innerHTML = `
-          <div>
-            <p class="text-sm font-semibold">${emp.name}</p>
-            <p class="text-[11px] text-slate-500 dark:text-gray-300 mt-0.5">ID: ${
-              emp.nationalId || "-"
-            }</p>
-            <p class="text-[11px] text-slate-500 dark:text-gray-300">Mobile: ${
-              emp.mobile || "-"
-            }</p>
-            <p class="text-[11px] text-slate-500 dark:text-gray-300 truncate">IBAN: ${
-              emp.iban || "-"
-            }</p>
-          </div>
-        `;
-
-        card.appendChild(nameRow);
-
-        const statuses = document.createElement("div");
-        statuses.className = "grid grid-cols-3 gap-2 mt-2";
-
-        ["qiwa", "gosi", "mudad"].forEach((key) => {
-          const value = emp[key];
-          const isDone = value === "done";
-          const label = key.toUpperCase();
-
-          const badge = document.createElement("div");
-          badge.className =
-            "flex flex-col items-center justify-between bg-black/5 dark:bg-black/30 rounded-2xl border border-white/10 px-2 py-2 text-[10px] text-center";
-
-          const statusPill = `
-            <span class="px-2 py-0.5 rounded-full text-[10px] ${
-              isDone ? "bg-emerald-500" : "bg-slate-500"
-            } text-white">
-              ${isDone ? "Done" : "Pending"}
-            </span>
-          `;
-
-          let actionBtn = "";
-          if (currentUser?.role === "updater") {
-            actionBtn = `
-              <button data-emp="${emp.id}" data-key="${key}"
-                class="mt-1 px-2 py-0.5 rounded-full border border-white/20 text-[10px] bg-black/10 hover:bg-black/20">
-                ${isDone ? "Mark pending" : "Mark done"}
-              </button>
+                <div class="grid grid-cols-3 gap-2 pt-4">
+                    <p class="col-span-3 text-[10px] font-black uppercase text-gray-500 mb-1">Status Files</p>
+                    ${['qiwa', 'gosi', 'mudad'].map(key => renderStatusTile(emp, key)).join('')}
+                </div>
             `;
-          }
 
-          badge.innerHTML = `
-            <span class="uppercase tracking-wide text-slate-600 dark:text-slate-200 mb-1">${label}</span>
-            ${statusPill}
-            ${actionBtn}
-          `;
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('modal-hidden');
+            modal.classList.add('modal-visible');
+        };
 
-          statuses.appendChild(badge);
-        });
+        window.closeDetailModal = () => {
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('modal-visible');
+            modal.classList.add('modal-hidden');
+        };
 
-        card.appendChild(statuses);
-        employeesView.appendChild(card);
-      });
+        function renderDetailRow(label, value) {
+            return `
+                <div class="bg-black/20 p-3 rounded-xl border border-white/5 flex justify-between items-center group">
+                    <div class="overflow-hidden">
+                        <p class="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">${label}</p>
+                        <p class="text-sm font-bold text-gray-200 truncate pr-2 select-all">${value}</p>
+                    </div>
+                    <button onclick="copyToClipboard('${value}')" class="p-2 text-gray-500 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                    </button>
+                </div>
+            `;
+        }
 
-      document.querySelectorAll("[data-emp]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const empId = Number(btn.getAttribute("data-emp"));
-          const key = btn.getAttribute("data-key");
-          handleStatusChange(empId, key);
-        });
-      });
-    }
+        function renderStatusTile(emp, key) {
+            const done = emp[key + '_status'] === 'done';
+            const isUpdater = currentUser.role === 'updater';
+            return `
+                <div onclick="${isUpdater ? `toggleStatus('${emp.id}', '${key}', '${emp.name}')` : ''}"
+                     class="flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${isUpdater ? 'cursor-pointer active:scale-95 hover:border-primary/50' : ''} ${done ? 'tile-done' : 'tile-pending'}">
+                    <span class="text-[9px] font-bold uppercase mb-1 tracking-wider opacity-70">${key}</span>
+                    <span class="material-symbols-outlined text-xl">${done ? 'check_circle' : 'pending'}</span>
+                </div>
+            `;
+        }
 
-    async function handleStatusChange(empId, key) {
-      if (currentUser?.role !== "updater") {
-        showToast("Only updater can change statuses");
-        return;
-      }
+        window.copyToClipboard = (text) => {
+            if (text === 'N/A') return;
+            navigator.clipboard.writeText(text);
+            showToast('Copied!');
+        }
 
-      const emp = employees.find((e) => e.id === empId);
-      if (!emp) return;
+        window.toggleStatus = (id, key, name) => {
+            const emp = employees.find(e => e.id == id);
+            const current = emp[key + '_status'];
+            const next = current === 'done' ? 'pending' : 'done';
+            
+            askConfirmation('Update Status', `Change ${key.toUpperCase()} for ${name} to ${next.toUpperCase()}?`, async () => {
+                const { error } = await supabaseClient.from('employees').update({ [key + '_status']: next }).eq('id', id);
+                if (!error) {
+                    await supabaseClient.from('activity_logs').insert({ 
+                        user_email: currentUser.email, 
+                        action_type: 'UPDATED', 
+                        message: `${key.toUpperCase()} for ${name} -> ${next}`
+                    });
+                    fetchEmployees();
+                    closeDetailModal(); // Close modal to refresh or keep open and update UI (Simpler to close for now)
+                    showToast('Status Updated');
+                }
+            });
+        };
 
-      const current = emp[key];
-      const target = current === "done" ? "pending" : "done";
+        // --- Add Form ---
+        document.getElementById('btnOpenAdd').onclick = () => {
+            document.getElementById('addScreen').classList.remove('modal-hidden');
+            document.getElementById('addScreen').classList.add('modal-visible');
+        };
+        document.getElementById('btnCloseAdd').onclick = () => {
+            document.getElementById('addScreen').classList.remove('modal-visible');
+            document.getElementById('addScreen').classList.add('modal-hidden');
+        };
 
-      const confirmed = window.confirm(
-        `Change ${key.toUpperCase()} status for ${emp.name} from "${current}" to "${target}"?`
-      );
-      if (!confirmed) return;
+        document.getElementById('nameDropdown').onchange = (e) => {
+            const sel = PRE_EMPLOYEES.find(x => x.name === e.target.value);
+            if (sel) {
+                document.getElementById('newId').value = sel.id;
+                document.getElementById('newMobile').value = sel.mobile || '';
+                document.getElementById('newEmail').value = sel.email || '';
+                document.getElementById('newIban').value = sel.iban || '';
+            }
+        };
 
-      const columnMap = {
-        qiwa: "qiwa_status",
-        gosi: "gosi_status",
-        mudad: "mudad_status",
-      };
+        document.getElementById('saveEmployeeBtn').onclick = async () => {
+            const btn = document.getElementById('saveEmployeeBtn');
+            const name = document.getElementById('nameDropdown').value;
+            const id = document.getElementById('newId').value;
+            
+            if(!name || !id) return showToast('Please select an employee');
+            
+            btn.innerHTML = '<div class="loader"></div>';
+            
+            const { error } = await supabaseClient.from('employees').insert({
+                name, identification_number: id, 
+                mobile: document.getElementById('newMobile').value,
+                email: document.getElementById('newEmail').value,
+                iban: document.getElementById('newIban').value,
+                qiwa_status: 'pending', gosi_status: 'pending', mudad_status: 'pending'
+            });
 
-      const { error } = await supabaseClient
-        .from("employees")
-        .update({ [columnMap[key]]: target })
-        .eq("id", empId);
+            if (!error) {
+                await supabaseClient.from('activity_logs').insert({ 
+                    user_email: currentUser.email, action_type: 'ADDED', message: `New Profile: ${name}`
+                });
+                showToast('Employee Added Successfully');
+                document.getElementById('btnCloseAdd').click();
+                fetchEmployees();
+            } else {
+                showToast(error.message);
+            }
+            btn.innerHTML = '<span>Confirm & Submit</span><span class="material-symbols-outlined text-[20px]">check_circle</span>';
+        };
 
-      if (error) {
-        console.error(error);
-        showToast("Error updating status");
-        return;
-      }
+        // --- Activity Logs ---
+        function setupRealtime() {
+            const logView = document.getElementById('activityLogView');
+            const renderLog = (l) => {
+                const div = document.createElement('div');
+                div.className = "bg-surface-light dark:bg-surface-dark rounded-xl p-4 flex items-start gap-4 shadow-sm border border-gray-100 dark:border-white/5";
+                div.innerHTML = `
+                    <div class="shrink-0 h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined text-[20px]">${l.action_type === 'ADDED' ? 'person_add' : 'update'}</span>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-start mb-1 w-full">
+                            <h3 class="font-semibold text-gray-900 dark:text-gray-100 text-sm">${l.user_email.split('@')[0]}</h3>
+                            <span class="text-[10px] text-gray-400 ml-2">${new Date(l.created_at).toLocaleTimeString()}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">${l.message}</p>
+                    </div>
+                `;
+                logView.prepend(div);
+            };
 
-      emp[key] = target;
-      renderEmployees();
-      showToast(`${key.toUpperCase()} updated`);
-    }
+            supabaseClient.from('activity_logs').select('*').order('created_at', {ascending:false}).limit(5)
+                .then(({data}) => data?.forEach(renderLog));
 
-    // Initial state
-    activateTab(true);
-  </script>
+            supabaseClient.channel('activity_logs').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
+                renderLog(payload.new);
+                showToast('New Activity');
+            }).subscribe();
+        }
+
+        // --- Utilities ---
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            t.classList.remove('modal-hidden'); t.classList.add('modal-visible');
+            setTimeout(() => { t.classList.remove('modal-visible'); t.classList.add('modal-hidden'); }, 3000);
+        }
+
+        function askConfirmation(title, text, cb) {
+            const m = document.getElementById('confirmModal');
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalText').textContent = text;
+            m.classList.remove('modal-hidden'); m.classList.add('modal-visible');
+            
+            document.getElementById('modalConfirm').onclick = () => { 
+                cb(); m.classList.remove('modal-visible'); m.classList.add('modal-hidden'); 
+            };
+            document.getElementById('modalCancel').onclick = () => { 
+                m.classList.remove('modal-visible'); m.classList.add('modal-hidden'); 
+            };
+        }
+    </script>
 </body>
 </html>
