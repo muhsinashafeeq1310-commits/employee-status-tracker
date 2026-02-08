@@ -191,7 +191,7 @@
   </style>
 </head>
 
-<body class="min-h-screen flex flex-col overflow-hidden relative">
+<body class="min-h-screen flex flex-col overflow-x-hidden relative">
 
   <!-- GLOBAL LOADER -->
   <div
@@ -326,10 +326,13 @@
     >
       <div class="flex items-center gap-4">
         <div class="relative group">
+          <!-- avatar is neutral: can be updated later -->
           <div
-            class="h-11 w-11 rounded-full bg-cover bg-center border border-gray-100 shadow-sm transition-transform duration-300 group-active:scale-95"
-            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA5jpM50wc4XNeQRl0GySwhLMBg4vU0imh0moyHXZTMzPZ4zN4MRdWN6vE5UtKf9tiKEjmsFZuPUGMm6Si2tGFahj5qNfU_JDILxFBo1u5d2nGvczVRMMWPx9LuTsdoF1UxclH49xf9xzk8Kg2BqSbPtS_sQqGxQPub1fPp3_ZKtgS5MeHKzS8XTaKIMk8uwsFSDfQFMLvFn6B1iixJJn6OqjVLbUCQv8dXKBTTQw-7TKYKSpBeu3A83LCPOjt7wiRZ6vVCdMhOW4FG');"
-          ></div>
+            class="h-11 w-11 rounded-full bg-gradient-to-br from-slate-700 to-slate-500 border border-gray-100 shadow-sm flex items-center justify-center text-xs font-bold text-white uppercase"
+            id="headerAvatar"
+          >
+            EM
+          </div>
           <div
             class="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white"
           ></div>
@@ -338,7 +341,7 @@
           <h1
             class="text-[11px] font-bold text-accent uppercase tracking-wider mb-0.5"
           >
-            Welcome Back
+            Welcome back
           </h1>
           <p
             id="currentUserDisplay"
@@ -421,7 +424,7 @@
         </h2>
 
         <div class="flex flex-col gap-5">
-          <!-- Add New Entry (visual, optional) -->
+          <!-- Add New Entry (visual only) -->
           <button
             type="button"
             class="flex items-center justify-between group p-1 -ml-1"
@@ -473,11 +476,11 @@
               </div>
             </button>
 
-            <!-- Add Staff (opens add overlay) -->
+            <!-- Add Staff (opens add overlay; enabled only for creators) -->
             <button
               id="btnOpenAdd"
               type="button"
-              class="flex items-center gap-3 group"
+              class="flex items-center gap-3 group opacity-40 pointer-events-none"
             >
               <div
                 class="h-8 w-8 flex items-center justify-center rounded-lg bg-gray-100 text-text-muted group-hover:bg-accent/10 group-hover:text-accent transition-all"
@@ -638,229 +641,128 @@
     </div>
   </div>
 
-  <!-- ================= ADD ENTRY / ADD EMPLOYEE ================= -->
+  <!-- ================= ADD ENTRY / ADD EMPLOYEE (CARD SELECTION) ================= -->
   <div
     id="addScreen"
-    class="fixed inset-0 z-50 overflow-y-auto pb-24 modal-hidden"
+    class="fixed inset-0 z-50 bg-background-dark/95 flex flex-col modal-hidden"
   >
+    <!-- Header -->
     <header
-      class="w-full flex items-center justify-between px-8 py-8 relative z-20"
+      class="flex items-center justify-between px-4 py-3 bg-surface-dark/90 border-b border-white/10 backdrop-blur-md"
     >
       <button
         id="btnCloseAdd"
         type="button"
-        class="text-dark-slate/60 hover:text-dark-slate transition-colors"
+        class="p-2 text-gray-400 hover:text-white transition-colors"
       >
-        <span class="material-symbols-outlined font-light">arrow_back_ios</span>
+        <span class="material-symbols-outlined">close</span>
       </button>
-      <span class="font-serif italic text-dark-slate text-xl">
+      <span class="font-serif italic text-soft-white text-lg">
         Guided Journaling
       </span>
       <div class="w-8"></div>
     </header>
 
-    <main class="max-w-md mx-auto px-6 relative z-20 pb-16">
-      <!-- Executive Role -->
-      <section class="floating-card">
-        <h2 class="font-serif text-3xl mb-2 text-dark-slate">Executive Role</h2>
-        <p
-          class="text-steel-blue text-xs uppercase tracking-widest mb-8"
+    <!-- Content -->
+    <main class="flex-1 px-4 py-6 space-y-6 overflow-y-auto hide-scrollbar">
+      <!-- Executive Role / Selected employee -->
+      <section class="max-w-md mx-auto">
+        <div
+          id="execCard"
+          class="relative rounded-3xl bg-surface-light/5 backdrop-blur-xl border border-white/10 shadow-2xl px-6 py-6 flex flex-col items-center text-center transform translate-y-4 opacity-0 scale-95 transition-all duration-500 ease-out"
         >
-          Who is managing this entry?
-        </p>
-        <div class="w-full space-y-6">
-          <div class="relative">
-            <select
-              id="nameDropdown"
-              class="pill-container appearance-none !bg-transparent text-dark-slate font-sans border-dark-slate/10"
-            >
-              <option value="">Select employee...</option>
-            </select>
-            <span
-              class="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-dark-slate/40"
-              >expand_more</span
-            >
-          </div>
-          <div class="flex justify-center gap-4">
-            <div
-              class="w-12 h-12 rounded-full ring-1 ring-white/50 ring-offset-2 ring-offset-transparent overflow-hidden"
-            >
-              <img
-                class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all cursor-pointer"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnxOrv8MEWJtnNjFOQba5hYks_ounUI5f7ol6uh0_r2s2iwgSvzdM5nnqThkAmVfHhYJVpaBzd-WdDeSRt5rMughwO3vJgUnByzfrsic6p0DdTe3aZXjYeJVKHQRtNVlZlRpq4hDJIAIh8biHtmhAwnOCHckhHHSnmpZS7aqO9IiFlcQuembevtRjYb9IS3ibQqkgw7V1sbjMlDfoiOhCi8yXYuipSJsV0uOmZlxLLYfPi9lY70SoV5Hq1_nLTGmhgMmLB1pXvADJC"
-                alt=""
-              />
-            </div>
-            <div
-              class="w-12 h-12 rounded-full ring-1 ring-white/20 ring-offset-2 ring-offset-transparent overflow-hidden opacity-40"
-            >
-              <img
-                class="w-full h-full object-cover grayscale"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK_5Pi0j4RbPET4yfTdFuHx_PXqato3Ihy5h9Yw-tEQSZ3M5vc-Wev2ctX-LOdtC84r5G71yIOGUsR3qhq4fQQGLf1NK9SbOLLEkop4Tf8NtSNKb5V66lPaWUbSSOWKdRm0Z7x2hwFuGpeEoaObxThXCb0yVt-w2UqBnQFcfAx2qxSCv8QhopMitFr41fH0fnZCkHHfJCHsCszaLpiRbZYO-dkwCGhOXeT7PDPRwVCtaRouGMfnIio_bTmENtlwxBgjsAOWDsSuzWO"
-                alt=""
-              />
-            </div>
-            <div
-              class="w-12 h-12 rounded-full ring-1 ring-white/20 ring-offset-2 ring-offset-transparent overflow-hidden opacity-40"
-            >
-              <img
-                class="w-full h-full object-cover grayscale"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDieO1npmGaxpVjXWivEhqxogCusNziGECpHolsRA4wdKC5i6P6TP_cHJ-HzLwhtsPPPw7jjBeuHmhzqvEFz8j4l1KDism9CLrHp2NYodP9IoXSPA1k8v8cxe14wJkHkjUXF8y1Kfjq8BDdq-Byzh2OCsvvuscOX6mUtKICdshiFfA3zeAZ9yP1oERFCfHbpJzwhxcK0V7ovc5xHJ_ysrv9aUZRd0dUxl_JmvIAnE09dg9TSxsV4dj1dpIWcSOAgXx2iEuU2Z8j68y5"
-                alt=""
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Temporal Point -->
-      <section class="floating-card !bg-white/5">
-        <h2 class="font-serif text-3xl mb-2 text-white">Temporal Point</h2>
-        <p
-          class="text-steel-blue text-xs uppercase tracking-widest mb-8"
-        >
-          Scheduling &amp; Timeline
-        </p>
-        <div class="w-full space-y-4">
-          <div class="relative">
-            <input
-              class="pill-container !bg-white/10 border-white/10 text-white"
-              type="date"
-            />
-          </div>
-          <div class="relative">
-            <input
-              class="pill-container !bg-white/10 border-white/10 text-white"
-              type="time"
-            />
-          </div>
-        </div>
-      </section>
-
-      <!-- Domain -->
-      <section class="floating-card !bg-white/5">
-        <h2 class="font-serif text-3xl mb-2 text-white">Domain</h2>
-        <p
-          class="text-steel-blue text-xs uppercase tracking-widest mb-8"
-        >
-          Category of Operation
-        </p>
-        <div class="grid grid-cols-2 gap-3 w-full">
-          <button
-            type="button"
-            class="flex flex-col items-center justify-center gap-2 p-4 rounded-[25px] border border-white/30 bg-white/20 text-white transition-all"
-          >
-            <span class="material-symbols-outlined font-light"
-              >bakery_dining</span
-            >
-            <span class="text-[10px] tracking-tighter uppercase">Baking</span>
-          </button>
-          <button
-            type="button"
-            class="flex flex-col items-center justify-center gap-2 p-4 rounded-[25px] border border-white/10 bg-white/5 text-white/60 hover:text-white transition-all"
-          >
-            <span class="material-symbols-outlined font-light"
-              >local_shipping</span
-            >
-            <span class="text-[10px] tracking-tighter uppercase"
-              >Logistics</span
-            >
-          </button>
-          <button
-            type="button"
-            class="flex flex-col items-center justify-center gap-2 p-4 rounded-[25px] border border-white/10 bg-white/5 text-white/60 hover:text-white transition-all"
-          >
-            <span class="material-symbols-outlined font-light">storefront</span>
-            <span class="text-[10px] tracking-tighter uppercase">Service</span>
-          </button>
-          <button
-            type="button"
-            class="flex flex-col items-center justify-center gap-2 p-4 rounded-[25px] border border-white/10 bg-white/5 text-white/60 hover:text-white transition-all"
-          >
-            <span class="material-symbols-outlined font-light"
-              >inventory_2</span
-            >
-            <span class="text-[10px] tracking-tighter uppercase">Audit</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Insights + technical details (ID, mobile, email, IBAN) -->
-      <section class="floating-card !bg-dark-slate/40 border-white/5">
-        <h2 class="font-serif text-3xl mb-2 text-white/90">Insights</h2>
-        <p
-          class="text-steel-blue text-xs uppercase tracking-widest mb-8"
-        >
-          Detailed Observations
-        </p>
-        <textarea
-          class="w-full rounded-[25px] border-white/10 bg-white/5 p-6 text-white placeholder-steel-blue/40 focus:ring-0 focus:border-white/30 resize-none text-sm leading-relaxed"
-          placeholder="Log executive details or shift anomalies here..."
-          rows="4"
-        ></textarea>
-
-        <div class="w-full mt-6 space-y-3 text-left">
-          <p
-            class="text-[10px] text-steel-blue/70 uppercase tracking-widest mb-1"
-          >
-            System Fields (used for Supabase profile)
+          <p class="text-[11px] tracking-[0.25em] uppercase text-steel-blue mb-2">
+            Executive Role
           </p>
-          <div class="space-y-3">
-            <input
-              id="newId"
-              type="text"
-              placeholder="National ID (auto-filled)"
-              class="pill-container !bg-white/10 border-white/10 text-white"
-              readonly
-            />
-            <input
-              id="newMobile"
-              type="tel"
-              placeholder="Mobile Number"
-              class="pill-container !bg-white/10 border-white/10 text-white"
-            />
-            <input
-              id="newEmail"
-              type="email"
-              placeholder="Email Address"
-              class="pill-container !bg-white/10 border-white/10 text-white"
-            />
-            <input
-              id="newIban"
-              type="text"
-              placeholder="IBAN"
-              class="pill-container !bg-white/10 border-white/10 text-white"
-            />
+          <h2
+            id="selectedNameLabel"
+            class="text-xl font-semibold text-soft-white tracking-tight mb-1"
+          >
+            Tap an employee card below
+          </h2>
+          <p
+            id="selectedIdLabel"
+            class="text-[11px] text-steel-blue/80 tracking-[0.2em] uppercase"
+          >
+            ID will appear here
+          </p>
+
+          <div class="mt-4 flex items-center gap-3">
+            <div
+              id="selectedAvatar"
+              class="h-10 w-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-500 flex items-center justify-center text-xs font-bold text-white uppercase"
+            >
+              --
+            </div>
+            <span class="text-[11px] text-steel-blue/80 uppercase tracking-[0.16em]">
+              Remaining employees
+            </span>
           </div>
         </div>
       </section>
 
-      <div class="flex flex-col gap-4 mt-8 mb-12">
-        <button
-          id="saveEmployeeBtn"
-          type="button"
-          class="btn-pill bg-white text-dark-slate shadow-xl hover:shadow-white/10"
+      <!-- Employee selection cards -->
+      <section class="max-w-3xl mx-auto">
+        <p class="text-[11px] font-semibold text-steel-blue/90 uppercase tracking-[0.18em] mb-3 text-center">
+          Choose employee to onboard
+        </p>
+        <div
+          id="pendingGrid"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center"
         >
-          Confirm &amp; Submit
-          <span class="material-symbols-outlined text-sm">north_east</span>
-        </button>
-        <button
-          type="button"
-          class="btn-pill border border-white/20 text-white/80 hover:bg-white/5 backdrop-blur-sm"
-        >
-          Save as Draft
-        </button>
-      </div>
+          <!-- Cards injected by JS -->
+        </div>
+      </section>
+
+      <!-- Details (ID + contact / bank) -->
+      <section class="max-w-md mx-auto w-full">
+        <h3 class="block text-sm font-semibold text-soft-white mb-3 ml-1">
+          File details (auto from selection)
+        </h3>
+        <div class="space-y-3">
+          <input
+            id="newId"
+            type="text"
+            placeholder="National ID (auto-filled)"
+            class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-4 text-white/60 text-sm"
+            readonly
+          />
+          <input
+            id="newMobile"
+            type="tel"
+            placeholder="Mobile Number"
+            class="w-full bg-surface-dark border border-white/10 rounded-xl px-4 py-4 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
+          />
+          <input
+            id="newEmail"
+            type="email"
+            placeholder="Email Address"
+            class="w-full bg-surface-dark border border-white/10 rounded-xl px-4 py-4 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
+          />
+          <input
+            id="newIban"
+            type="text"
+            placeholder="IBAN"
+            class="w-full bg-surface-dark border border-white/10 rounded-xl px-4 py-4 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
+          />
+        </div>
+        <p class="mt-3 text-[11px] text-steel-blue/80 tracking-wide">
+          These fields are filled when you tap an employee card. You can edit
+          mobile, email or IBAN before saving if needed.
+        </p>
+      </section>
     </main>
 
-    <!-- side dots -->
-    <div
-      class="fixed right-6 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-30 opacity-50"
-    >
-      <div class="w-1.5 h-1.5 rounded-full bg-dark-slate"></div>
-      <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
-      <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
-      <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+    <!-- Footer Action -->
+    <div class="p-4 bg-surface-dark/95 border-t border-white/10 pb-safe-bottom">
+      <button
+        id="saveEmployeeBtn"
+        type="button"
+        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-4 text-sm font-bold text-white shadow-lg active:scale-95 transition-all"
+      >
+        <span>Confirm &amp; Submit</span>
+        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+      </button>
     </div>
   </div>
 
@@ -929,7 +831,7 @@
 
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Pre-loaded employees (from your current code)
+    // Pre-loaded employees (35 already used in your app)
     const PRE_EMPLOYEES = [
       { name: "NAHEEMUDHEEN PARATHODI", id: "2235923253", mobile: "0552821842", iban: "SA6345000000852160290001", email: "naheemptd@emanbakeries.com" },
       { name: "SHAMSUDHEEN MANATTU", id: "2307985529", mobile: "0554658796", iban: "SA54658796543500000023340110001", email: "shamsumanat9890@gmail.com" },
@@ -941,7 +843,7 @@
       { name: "SINEESH PATHUKUDI MUHAMMED", id: "2440029813", mobile: "0546344301", iban: "SA224500000023340730001", email: "akkuansal72@gmail.com" },
       { name: "MUHAMMED PARAKKUNNATHU EBRAHIM", id: "2377814138", mobile: "0567278143", iban: "SA894500000023340748001", email: "foumalmammu@gmail.com" },
       { name: "ASINSHA ASAINAR VELLIRIPPIL", id: "2478222298", mobile: "0541537246", iban: "SA204500000023341449001", email: "asinshaasi@gmail.com" },
-      { name: "CHEVU NISSAR MUTTATHUCHALIL MOIDU", id: "2309399752", mobile: "0545214900", iban: "SA734500000023341456001", email: "fasilchevunizarnizar@gmail.com" },
+      { name: "CHEVU NISSAR MUTTATHUCHALIL MOIDU", id: "2309399752", mobile: "0545214900", iban: "SA734500000023341456001", email: "fasilchevunissar@gmail.com" },
       { name: "SUMANDAS SUKHANDU BIKASH", id: "2205956697", mobile: "0573106917", iban: "SA024500000023342488001", email: "sumonchaudary0012@gmail.com" },
       { name: "SHABEER ALI PANAKKATHODEN", id: "2481393557", mobile: "0548796167", iban: "SA804500000023341316001", email: "shabirp313@gmail.com" },
       { name: "AHAMMED KABEER VANKALATH", id: "2311162198", mobile: "0560413288", iban: "SA024500000023341324001", email: "ahammadkhabeer@gmail.com" },
@@ -968,8 +870,90 @@
       { name: "ABDUL MUNIR VAZHAYIL", id: "2289427870", mobile: "0593395106", iban: "SA284500000023343908001", email: "muneervazhayil78@gmail.com" }
     ];
 
+    // Remaining 11 employees that should appear as selectable cards
+    const REMAINING_EMPLOYEES = [
+      {
+        name: "Sidhik Kuruttukavil Kochu Muhammed",
+        id: "2289943199",
+        mobile: "",
+        email: "",
+        iban: ""
+      },
+      {
+        name: "Abdul Jabbar Mannakuzhi Maithen",
+        id: "2329326967",
+        mobile: "",
+        email: "",
+        iban: ""
+      },
+      {
+        name: "Anvar Husain Mohammed Anchukandan",
+        id: "2345158345",
+        mobile: "",
+        email: "",
+        iban: ""
+      },
+      {
+        name: "Mohamed Safwan M Sally",
+        id: "2347675510",
+        mobile: "",
+        email: "",
+        iban: ""
+      },
+      {
+        name: "Muhammed Rafi Aliparambil",
+        id: "2354265015",
+        mobile: "",
+        email: "",
+        iban: ""
+      },
+      {
+        name: "Sulfi Puthiyedathu Basheer",
+        id: "2376846297",
+        mobile: "",
+        email: "",
+        iban: ""
+      },
+      {
+        name: "Sabeeb Manat Hassan Kutty",
+        id: "2455539706",
+        mobile: "",
+        email: "",
+        iban: ""
+      },
+      {
+        name: "Al Ameen Kadukkunnan",
+        id: "2485790295",
+        mobile: "",
+        email: "",
+        iban: ""
+      },
+      {
+        name: "Ansif Ali Kuruttukavil Alikunju",
+        id: "2501924977",
+        mobile: "",
+        email: "",
+        iban: ""
+      },
+      {
+        name: "Md Akter Hosen",
+        id: "2515498364",
+        mobile: "",
+        email: "",
+        iban: ""
+      },
+      {
+        name: "Mobarok Hossen",
+        id: "2552187540",
+        mobile: "",
+        email: "",
+        iban: ""
+      }
+    ];
+
     let currentUser = null;
     let employees = [];
+    let selectedPendingEmployee = null;
 
     const loginScreen = document.getElementById("loginScreen");
     const mainScreen = document.getElementById("mainScreen");
@@ -977,7 +961,6 @@
 
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
-    const nameDropdown = document.getElementById("nameDropdown");
     const saveEmployeeBtn = document.getElementById("saveEmployeeBtn");
     const btnOpenAdd = document.getElementById("btnOpenAdd");
     const btnCloseAdd = document.getElementById("btnCloseAdd");
@@ -988,6 +971,7 @@
     const roleBadge = document.getElementById("roleBadge");
     const empCount = document.getElementById("empCount");
     const currentUserDisplay = document.getElementById("currentUserDisplay");
+    const headerAvatar = document.getElementById("headerAvatar");
 
     const globalLoader = document.getElementById("globalLoader");
 
@@ -1138,6 +1122,104 @@
         }
       );
     };
+
+    // Helpers for pending cards
+    function initialsFromName(name) {
+      return name
+        .split(" ")
+        .filter(Boolean)
+        .map((p) => p[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
+    }
+
+    function renderPendingCards() {
+      const grid = document.getElementById("pendingGrid");
+      if (!grid) return;
+
+      if (!REMAINING_EMPLOYEES.length) {
+        grid.innerHTML =
+          '<div class="col-span-3 text-center text-steel-blue/80 text-sm py-8">No remaining employees configured.</div>';
+        return;
+      }
+
+      grid.innerHTML = REMAINING_EMPLOYEES.map((emp, idx) => {
+        const initials = initialsFromName(emp.name);
+        return `
+          <button
+            type="button"
+            id="pending-${emp.id}"
+            onclick="window.selectPendingEmployee && window.selectPendingEmployee('${emp.id}')"
+            class="pending-card w-full max-w-xs bg-surface-dark rounded-2xl px-4 py-4 border border-white/10 shadow-xl text-left flex items-center gap-3 transform opacity-0 translate-y-4 scale-95 transition-all duration-500 ease-out"
+            style="transition-delay: ${idx * 60}ms"
+          >
+            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-500 flex items-center justify-center text-xs font-bold text-white uppercase">
+              ${initials}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-white truncate">${emp.name}</p>
+              <p class="text-[11px] text-gray-400 uppercase tracking-[0.16em] mt-0.5">
+                ID: ${emp.id}
+              </p>
+            </div>
+          </button>
+        `;
+      }).join("");
+    }
+
+    window.selectPendingEmployee = (id) => {
+      const emp = REMAINING_EMPLOYEES.find((e) => String(e.id) === String(id));
+      if (!emp) return;
+
+      selectedPendingEmployee = emp;
+
+      // Highlight card
+      document
+        .querySelectorAll(".pending-card")
+        .forEach((el) => el.classList.remove("ring-2", "ring-primary", "border-primary/80"));
+      const active = document.getElementById(`pending-${emp.id}`);
+      if (active) {
+        active.classList.add("ring-2", "ring-primary", "border-primary/80");
+      }
+
+      // Fill top card
+      const nameLabel = document.getElementById("selectedNameLabel");
+      const idLabel = document.getElementById("selectedIdLabel");
+      const avatar = document.getElementById("selectedAvatar");
+
+      if (nameLabel) nameLabel.textContent = emp.name;
+      if (idLabel) idLabel.textContent = `ID: ${emp.id}`;
+      if (avatar) avatar.textContent = initialsFromName(emp.name);
+
+      // Fill form fields
+      document.getElementById("newId").value = emp.id || "";
+      document.getElementById("newMobile").value = emp.mobile || "";
+      document.getElementById("newEmail").value = emp.email || "";
+      document.getElementById("newIban").value = emp.iban || "";
+    };
+
+    function animatePendingOverlayIn() {
+      const exec = document.getElementById("execCard");
+      if (exec) {
+        exec.classList.add("opacity-0", "translate-y-4", "scale-95");
+        setTimeout(() => {
+          exec.classList.remove("opacity-0", "translate-y-4", "scale-95");
+        }, 20);
+      }
+
+      setTimeout(() => {
+        document.querySelectorAll(".pending-card").forEach((card) => {
+          card.classList.remove("opacity-0", "translate-y-4", "scale-95");
+        });
+      }, 40);
+    }
+
+    function markPendingAsUsed(id) {
+      const el = document.getElementById(`pending-${id}`);
+      if (!el) return;
+      el.classList.add("opacity-40", "pointer-events-none");
+    }
 
     // Data
     async function fetchEmployees() {
@@ -1301,16 +1383,14 @@
         role: roleRow.role
       };
 
-      currentUserDisplay.textContent = user.email.split("@")[0];
+      const namePart = user.email.split("@")[0];
+      currentUserDisplay.textContent = namePart;
       roleBadge.textContent = currentUser.role.toUpperCase();
+      if (headerAvatar) headerAvatar.textContent = initialsFromName(namePart);
 
       // Only creators can open add-screen
       if (currentUser.role === "creator") {
-        btnOpenAdd.classList.remove(
-          "opacity-40",
-          "pointer-events-none",
-          "hidden"
-        );
+        btnOpenAdd.classList.remove("opacity-40", "pointer-events-none");
       } else {
         btnOpenAdd.classList.add("opacity-40", "pointer-events-none");
       }
@@ -1332,23 +1412,32 @@
       });
     }
 
-    // Add employee
+    // Add employee (card overlay)
     function openAdd() {
       addScreen.classList.remove("modal-hidden");
       addScreen.classList.add("modal-visible");
+
+      selectedPendingEmployee = null;
+
+      document.getElementById("newId").value = "";
+      document.getElementById("newMobile").value = "";
+      document.getElementById("newEmail").value = "";
+      document.getElementById("newIban").value = "";
+
+      const nameLabel = document.getElementById("selectedNameLabel");
+      const idLabel = document.getElementById("selectedIdLabel");
+      const avatar = document.getElementById("selectedAvatar");
+      if (nameLabel) nameLabel.textContent = "Tap an employee card below";
+      if (idLabel) idLabel.textContent = "ID will appear here";
+      if (avatar) avatar.textContent = "--";
+
+      renderPendingCards();
+      animatePendingOverlayIn();
     }
+
     function closeAdd() {
       addScreen.classList.remove("modal-visible");
       addScreen.classList.add("modal-hidden");
-    }
-
-    function handleNameChange(e) {
-      const sel = PRE_EMPLOYEES.find((x) => x.name === e.target.value);
-      if (!sel) return;
-      document.getElementById("newId").value = sel.id || "";
-      document.getElementById("newMobile").value = sel.mobile || "";
-      document.getElementById("newEmail").value = sel.email || "";
-      document.getElementById("newIban").value = sel.iban || "";
     }
 
     async function handleSaveEmployee() {
@@ -1357,10 +1446,15 @@
         return;
       }
 
-      const name = nameDropdown.value;
+      if (!selectedPendingEmployee) {
+        showToast("Please tap an employee card");
+        return;
+      }
+
+      const name = selectedPendingEmployee.name;
       const id = document.getElementById("newId").value.trim();
       if (!name || !id) {
-        showToast("Select an employee from list");
+        showToast("Missing ID for selected employee");
         return;
       }
 
@@ -1391,31 +1485,22 @@
           message: `New profile: ${name}`
         });
         showToast("Employee added");
+        markPendingAsUsed(id);
         closeAdd();
         await fetchEmployees();
       }
 
       saveEmployeeBtn.disabled = false;
       saveEmployeeBtn.innerHTML =
-        '<span>Confirm & Submit</span><span class="material-symbols-outlined text-[20px]">north_east</span>';
+        '<span>Confirm & Submit</span><span class="material-symbols-outlined text-[20px]">check_circle</span>';
     }
 
     // Init
     (function init() {
-      // preload dropdown
-      PRE_EMPLOYEES.forEach((e) => {
-        const opt = document.createElement("option");
-        opt.value = e.name;
-        opt.textContent = e.name;
-        nameDropdown.appendChild(opt);
-      });
-
-      // bind events
       loginBtn.addEventListener("click", handleLogin);
       logoutBtn.addEventListener("click", handleLogout);
       btnOpenAdd.addEventListener("click", openAdd);
       btnCloseAdd.addEventListener("click", closeAdd);
-      nameDropdown.addEventListener("change", handleNameChange);
       saveEmployeeBtn.addEventListener("click", handleSaveEmployee);
 
       // hide loader
