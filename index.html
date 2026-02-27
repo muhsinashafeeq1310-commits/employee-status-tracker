@@ -1,734 +1,701 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+
+<html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
-
-    <!-- ANTI-CACHE HEADERS -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-
-    <title>Eman Bakery Portal</title>
-
-    <!-- iOS Native App Config -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Eman Bakery">
-    <meta name="theme-color" content="#f8f6f6">
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#2563eb",
-                        "success": "#10b981",
-                        "background-light": "#f8f6f6",
-                        "background-dark": "#221510",
-                        "surface-dark": "#332019",
-                        "surface-light": "#ffffff",
-                    },
-                    fontFamily: {
-                        "display": ["Plus Jakarta Sans", "sans-serif"]
-                    },
-                },
-            },
-        }
-    </script>
+    <meta name="apple-mobile-web-app-title" content="Compliance">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23667eea' width='180' height='180'/><text x='50%' y='50%' font-size='80' fill='white' text-anchor='middle' dominant-baseline='middle' font-weight='bold'>C</text></svg>">
+    <link rel="manifest" href="manifest.json">
+    <title>Employee Compliance Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Glass login panel */
-        .glass-panel {
-            background: rgba(34, 21, 16, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .glass-input {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: white;
-        }
-        .glass-input:focus {
-            background: rgba(0, 0, 0, 0.4);
-            border-color: #2563eb;
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #38ef7d;
+            --warning: #ff6a00;
+            --danger: #ee0979;
+            --info: #0d6efd;
         }
 
-        /* Animations */
-        .modal-hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(100%) scale(0.95);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+```
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow-x: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f5f5f5;
+    }
+    
+    /* HEADER */
+    .header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        padding: 20px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 5px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .header p {
+        margin: 0;
+        font-size: 13px;
+        opacity: 0.9;
+    }
+    
+    /* FILTER BAR */
+    .filter-bar {
+        background: white;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .filter-btn {
+        padding: 8px 15px;
+        border-radius: 20px;
+        border: 2px solid #ddd;
+        background: white;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .filter-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    /* DASHBOARD STATS */
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .stat-box {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-top: 4px solid var(--primary);
+    }
+    
+    .stat-number {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0;
+    }
+    
+    .stat-label {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    /* MAIN CONTAINER */
+    .container-main {
+        padding: 15px;
+        padding-bottom: 100px;
+        max-width: 100%;
+    }
+    
+    /* EMPLOYEE CARD */
+    .employee-card {
+        background: white;
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        cursor: pointer;
+        transition: all 0.3s;
+        border-left: 5px solid var(--primary);
+    }
+    
+    .employee-card:active {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    
+    .employee-card.compliant {
+        border-left-color: var(--success);
+    }
+    
+    .employee-card.warning {
+        border-left-color: var(--warning);
+    }
+    
+    .employee-card.critical {
+        border-left-color: var(--danger);
+    }
+    
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+    
+    .card-id {
+        background: #f0f0f0;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 13px;
+        color: #333;
+    }
+    
+    .compliance-badge {
+        font-weight: 700;
+        font-size: 13px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        color: white;
+    }
+    
+    .compliance-badge.compliant {
+        background: var(--success);
+    }
+    
+    .compliance-badge.warning {
+        background: var(--warning);
+    }
+    
+    .compliance-badge.critical {
+        background: var(--danger);
+    }
+    
+    .employee-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+        word-break: break-word;
+    }
+    
+    .card-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 12px;
+        font-size: 12px;
+    }
+    
+    .detail-item {
+        background: #f8f9fa;
+        padding: 8px;
+        border-radius: 8px;
+    }
+    
+    .detail-label {
+        color: #999;
+        font-weight: 500;
+        margin-bottom: 2px;
+    }
+    
+    .detail-value {
+        color: #333;
+        font-weight: 600;
+        font-size: 13px;
+    }
+    
+    .compliance-bar {
+        width: 100%;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    
+    .compliance-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transition: width 0.3s;
+    }
+    
+    /* ISSUES LIST */
+    .issues-section {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+    }
+    
+    .issue-badge {
+        display: inline-block;
+        background: #ffe0e0;
+        color: #c30000;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+    
+    /* MODAL */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 1000;
+        animation: fadeIn 0.2s;
+    }
+    
+    .modal-overlay.active {
+        display: flex;
+        align-items: flex-end;
+    }
+    
+    .modal-content {
+        background: white;
+        width: 100%;
+        max-height: 90vh;
+        border-radius: 20px 20px 0 0;
+        padding: 20px;
+        overflow-y: auto;
+        animation: slideUp 0.3s;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .modal-close {
+        background: #f0f0f0;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #333;
+    }
+    
+    .modal-body {
+        margin-bottom: 20px;
+    }
+    
+    .modal-section {
+        margin-bottom: 20px;
+    }
+    
+    .modal-section h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .recommendation {
+        background: #e3f2fd;
+        border-left: 4px solid var(--info);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: #333;
+    }
+    
+    .recommendation strong {
+        color: var(--info);
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+    
+    /* EMPTY STATE */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+    
+    .empty-state i {
+        font-size: 64px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state p {
+        color: #999;
+        font-size: 14px;
+    }
+    
+    /* FOOTER */
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #eee;
+        padding: 10px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        z-index: 99;
+    }
+    
+    .footer-btn {
+        flex: 1;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        background: var(--primary);
+        color: white;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+    }
+    
+    @media (min-width: 768px) {
+        .container-main {
+            max-width: 800px;
+            margin: 0 auto;
         }
-        .modal-visible {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0) scale(1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        .dashboard-stats {
+            grid-template-columns: repeat(4, 1fr);
         }
+        
+        .footer {
+            position: static;
+            padding: 20px;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .footer-btn {
+            max-width: 200px;
+        }
+    }
+</style>
+```
 
-        /* Loader */
-        .loader {
-            border: 2px solid rgba(37,99,235,0.1);
-            border-top: 2px solid #2563eb;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Progress bar */
-        .progress-item {
-            position: relative;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            transition: all 0.3s;
-        }
-        .progress-item.active {
-            background: #10b981;
-            color: white;
-        }
-        .progress-item.inactive {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-    </style>
 </head>
-
-<body class="bg-background-light font-display text-slate-900 h-screen w-full overflow-x-hidden relative selection:bg-primary selection:text-white">
-
-    <!-- Global Loader -->
-    <div id="globalLoader" class="fixed inset-0 z-50 bg-background-light flex flex-col items-center justify-center">
-        <div class="loader w-10 h-10 border-4"></div>
-        <p class="mt-4 text-xs font-bold tracking-widest text-primary/80 uppercase">Loading Portal...</p>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <h1><i class="fas fa-clipboard-check"></i> Compliance Dashboard</h1>
+        <p>Employee Reconciliation & Compliance Analysis</p>
     </div>
 
-    <!-- ================= LOGIN SCREEN ================= -->
-    <div id="loginScreen" class="absolute inset-0 z-40 bg-background-dark flex flex-col justify-between pt-12 pb-8 px-6">
-        <div class="absolute inset-0 w-full h-full z-0">
-            <div class="absolute inset-0 bg-black/60 z-10"></div>
-            <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCIedT2HX6xp-TB6TEt-HPdFTt6ksEbxJ7I3-xves9ZVsToQrwfniIpxiF9lfZMbMjf2AQ2luzQW10psGSSuRTlgWw4Gb8P-Gs4mxGH7kqdyKm2ZsJaDHRCT_kxAGSvK7zjbU9utdprA-70YdCm9TLIXeM1nUmymquEwRnzv3cKCjaodZBU5TC7XiggYndaEMUZQFb9h0tNBeDfaOsara72XDY-yW35I4GV8kTGjucAc08auHuwHg4dd0s3lyjwn6Uf4C4rJznzZCt2');"></div>
-        </div>
-
-        <div class="relative z-20 flex-1 flex flex-col justify-center items-center w-full max-w-md mx-auto">
-            <div class="mb-8 text-center">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 backdrop-blur-md mb-4 border border-primary/30 shadow-[0_0_15px_rgba(37,99,235,0.3)]">
-                    <span class="material-symbols-outlined text-primary text-4xl">bakery_dining</span>
-                </div>
-                <h1 class="text-white tracking-[0.2em] text-3xl font-extrabold leading-tight mb-1 drop-shadow-lg">EMAN</h1>
-                <p class="text-white/80 text-sm font-medium tracking-widest uppercase opacity-90">Bakery &amp; Co.</p>
-            </div>
-
-            <div class="w-full glass-panel rounded-2xl p-6 shadow-2xl relative overflow-hidden">
-                <h2 class="text-white text-xl font-bold mb-1 text-center">Welcome Back</h2>
-                <p class="text-white/60 text-sm text-center mb-6">Enter your credentials to access.</p>
-
-                <div class="space-y-4">
-                    <div class="relative group/input">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-white/50">badge</span>
-                        </div>
-                        <input id="emailInput" class="glass-input w-full rounded-lg pl-10 pr-4 py-3.5 outline-none transition-all placeholder:text-white/30 text-sm font-medium" placeholder="Email Address" type="email"/>
-                    </div>
-                    <div class="relative group/input">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-white/50">lock</span>
-                        </div>
-                        <input id="passwordInput" class="glass-input w-full rounded-lg pl-10 pr-4 py-3.5 outline-none transition-all placeholder:text-white/30 text-sm font-medium" placeholder="Password" type="password"/>
-                    </div>
-
-                    <button id="loginBtn" class="w-full bg-primary hover:bg-primary/90 active:scale-[0.98] text-white font-bold py-3.5 px-4 rounded-lg shadow-lg shadow-primary/25 transition-all mt-2 flex items-center justify-center gap-2">
-                        <span>Sign In</span>
-                        <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="mt-6">
-                <button onclick="window.location.reload(true)" class="flex items-center gap-2 px-4 py-2 rounded-full bg-black/20 backdrop-blur-sm border border-white/5 text-white/70 hover:bg-black/40 hover:text-white transition-all">
-                    <span class="material-symbols-outlined text-[18px] text-primary">system_update</span>
-                    <span class="text-xs font-semibold tracking-wide">Update App</span>
-                </button>
-            </div>
-        </div>
+```
+<!-- DASHBOARD STATS -->
+<div class="dashboard-stats">
+    <div class="stat-box">
+        <div class="stat-number">55</div>
+        <div class="stat-label">Total Employees</div>
     </div>
+    <div class="stat-box" style="border-top-color: var(--success);">
+        <div class="stat-number" style="color: var(--success);">41</div>
+        <div class="stat-label">Salary Ready</div>
+    </div>
+    <div class="stat-box" style="border-top-color: var(--warning);">
+        <div class="stat-number" style="color: var(--warning);">75.9%</div>
+        <div class="stat-label">Avg Compliance</div>
+    </div>
+    <div class="stat-box" style="border-top-color: var(--info);">
+        <div class="stat-number" style="color: var(--info);">2</div>
+        <div class="stat-label">100% Compliant</div>
+    </div>
+</div>
 
-    <!-- ================= MAIN DASHBOARD ================= -->
-    <div id="mainScreen" class="hidden flex flex-col h-full bg-background-light">
-        <!-- Top Bar -->
-        <div class="flex items-center justify-between px-5 pt-4 pb-4 sticky top-0 z-20 bg-surface-light/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="h-10 w-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-primary">person</span>
-                </div>
-                <div>
-                    <h1 class="text-xs font-medium text-gray-500 leading-none">Logged in as</h1>
-                    <p id="currentUserDisplay" class="text-sm font-bold text-gray-900 leading-tight truncate max-w-[150px]">User</p>
-                </div>
+<!-- FILTER BAR -->
+<div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">
+        <i class="fas fa-list"></i> All
+    </button>
+    <button class="filter-btn" data-filter="compliant">
+        <i class="fas fa-check-circle"></i> Compliant
+    </button>
+    <button class="filter-btn" data-filter="warning">
+        <i class="fas fa-exclamation-circle"></i> Warning
+    </button>
+    <button class="filter-btn" data-filter="saudi">
+        <i class="fas fa-passport"></i> Saudi
+    </button>
+    <button class="filter-btn" data-filter="expat">
+        <i class="fas fa-globe"></i> Expat
+    </button>
+</div>
+
+<!-- EMPLOYEE CARDS CONTAINER -->
+<div class="container-main" id="cardsContainer">
+    <!-- Cards will be injected here -->
+</div>
+
+<!-- EMPTY STATE -->
+<div class="empty-state" id="emptyState" style="display: none;">
+    <i class="fas fa-search"></i>
+    <p>No employees found matching your filter</p>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div>
+                <div style="font-size: 14px; color: #999; margin-bottom: 5px;" id="modalId"></div>
+                <h2 style="margin: 0; font-size: 18px;" id="modalName"></h2>
             </div>
-            <div class="flex items-center gap-3">
-                <span id="roleBadge" class="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full uppercase tracking-wider">Loading...</span>
-                <button id="logoutBtn" class="relative p-2 rounded-full bg-gray-100 border border-gray-200 hover:bg-red-50 text-gray-600 hover:text-red-500 transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">logout</span>
-                </button>
-            </div>
+            <button class="modal-close" onclick="closeModal()">×</button>
         </div>
+        <div class="modal-body" id="modalBody"></div>
+    </div>
+</div>
 
-        <!-- Scrollable Content -->
-        <main class="flex-1 overflow-y-auto hide-scrollbar pb-8 px-5 pt-6">
+<!-- FOOTER -->
+<div class="footer">
+    <button class="footer-btn" onclick="downloadReport()">
+        <i class="fas fa-download"></i> Download Report
+    </button>
+    <button class="footer-btn" style="background: #999;">
+        <i class="fas fa-share"></i> Share
+    </button>
+</div>
+
+<script>
+    // Employee data
+    const employees = [
+        {id: 'EM-001', name: 'خلود عايد فهيد الشمري', nationality: 'Saudi', salary: 4000, compliance: 62.5, iban: '', status: 'warning', issues: ['Missing IBAN', 'Missing Joining Date', 'Invalid Qiwa Status'], category: 'saudi'},
+        {id: 'EM-002', name: 'أمينه غازي محمد العتيبي', nationality: 'Saudi', salary: 4000, compliance: 62.5, iban: '', status: 'warning', issues: ['Missing IBAN', 'Missing Joining Date', 'Invalid Qiwa Status'], category: 'saudi'},
+        {id: 'EM-003', name: 'عبدالله عواد عبدالله الشمري', nationality: 'Saudi', salary: 4000, compliance: 75.0, iban: '', status: 'warning', issues: ['Missing IBAN', 'Missing Joining Date'], category: 'saudi'},
+        {id: 'EM-004', name: 'عبدالله محمد عبدالله الشمري', nationality: 'Saudi', salary: 4000, compliance: 75.0, iban: '', status: 'warning', issues: ['Missing IBAN', 'Missing Joining Date'], category: 'saudi'},
+        {id: 'EM-005', name: 'طلال محمد عبدالله الشمري', nationality: 'Saudi', salary: 4000, compliance: 75.0, iban: '', status: 'warning', issues: ['Missing IBAN', 'Missing Joining Date'], category: 'saudi'},
+        {id: 'EM-006', name: 'رزان غازي عبدالله الشمري', nationality: 'Saudi', salary: 4000, compliance: 75.0, iban: '', status: 'warning', issues: ['Missing IBAN', 'Missing Joining Date'], category: 'saudi'},
+        {id: 'EM-007', name: 'ألين نايف بن عبدالله الشمري', nationality: 'Saudi', salary: 4000, compliance: 62.5, iban: '', status: 'warning', issues: ['Missing IBAN', 'Missing Joining Date', 'Invalid Qiwa Status'], category: 'saudi'},
+        {id: 'EM-008', name: 'بندر غازي عبدالله الشمري', nationality: 'Saudi', salary: 4000, compliance: 62.5, iban: '', status: 'warning', issues: ['Missing IBAN', 'Missing Joining Date', 'Invalid Qiwa Status - TERMINATED'], category: 'saudi'},
+        {id: 'EM-009', name: 'يقين محمد عبدالله الشمري', nationality: 'Saudi', salary: 4000, compliance: 62.5, iban: '', status: 'warning', issues: ['Missing IBAN', 'Missing Joining Date', 'Invalid Qiwa Status - CANCELED'], category: 'saudi'},
+        {id: 'EM-010', name: 'SUMANDAS SUKHANDU BIKASH', nationality: 'Bengali', salary: 1300, compliance: 100, iban: 'SA0245000000023342488001', status: 'compliant', issues: [], category: 'expat'},
+        {id: 'EM-011', name: 'NAHEEMUDHEEN - - PARATHODI', nationality: 'Indian', salary: 12000, compliance: 100, iban: 'SA6345000000852160290001', status: 'compliant', issues: [], category: 'expat'},
+        {id: 'EM-016', name: 'SIDHIK KURUTTUKAVIL KOCHU MUHAMMED', nationality: 'Indian', salary: 8000, compliance: 87.5, iban: 'SA7280000867608017687666', status: 'warning', issues: ['Missing Joining Date'], category: 'expat'},
+        {id: 'EM-029', name: 'ANVAR HUSAIN MOHAMMED ANCHUKANDAN', nationality: 'Indian', salary: 1300, compliance: 87.5, iban: '', status: 'warning', issues: ['Missing IBAN'], category: 'expat'},
+        {id: 'EM-030', name: 'MOHAMED SAFWAN M SALLY', nationality: 'Indian', salary: 1300, compliance: 75.0, iban: '', status: 'warning', issues: ['Missing IBAN', 'Missing Joining Date'], category: 'expat'},
+    ];
+    
+    let currentFilter = 'all';
+    
+    function renderCards(filter = 'all') {
+        const container = document.getElementById('cardsContainer');
+        const emptyState = document.getElementById('emptyState');
+        
+        let filtered = employees;
+        if (filter === 'compliant') filtered = employees.filter(e => e.compliance === 100);
+        else if (filter === 'warning') filtered = employees.filter(e => e.compliance < 100);
+        else if (filter === 'saudi') filtered = employees.filter(e => e.category === 'saudi');
+        else if (filter === 'expat') filtered = employees.filter(e => e.category === 'expat');
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+        
+        emptyState.style.display = 'none';
+        container.innerHTML = filtered.map(emp => `
+            <div class="employee-card ${emp.status}" onclick="openModal('${emp.id}')">
+                <div class="card-header">
+                    <div class="card-id">${emp.id}</div>
+                    <div class="compliance-badge ${emp.status}">
+                        ${emp.compliance}% <i class="fas fa-${emp.compliance === 100 ? 'check-circle' : 'exclamation-circle'}"></i>
+                    </div>
+                </div>
+                
+                <div class="employee-name">${emp.name}</div>
+                
+                <div class="compliance-bar">
+                    <div class="compliance-fill" style="width: ${emp.compliance}%"></div>
+                </div>
+                
+                <div class="card-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Nationality</div>
+                        <div class="detail-value">${emp.nationality}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Salary</div>
+                        <div class="detail-value">SAR ${emp.salary.toLocaleString()}</div>
+                    </div>
+                </div>
+                
+                ${emp.issues.length > 0 ? `
+                    <div class="issues-section">
+                        ${emp.issues.map(issue => `<span class="issue-badge"><i class="fas fa-times-circle"></i> ${issue}</span>`).join('')}
+                    </div>
+                ` : '<div class="issues-section"><span style="color: var(--success); font-weight: 600; font-size: 12px;"><i class="fas fa-check-circle"></i> All requirements met</span></div>'}
+            </div>
+        `).join('');
+    }
+    
+    function openModal(empId) {
+        const emp = employees.find(e => e.id === empId);
+        document.getElementById('modalId').textContent = emp.id;
+        document.getElementById('modalName').textContent = emp.name;
+        
+        const recommendations = getRecommendations(emp);
+        
+        document.getElementById('modalBody').innerHTML = `
+            <div class="modal-section">
+                <h3><i class="fas fa-info-circle"></i> Employee Information</h3>
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 13px;">
+                    <div style="margin-bottom: 8px;"><strong>Nationality:</strong> ${emp.nationality}</div>
+                    <div style="margin-bottom: 8px;"><strong>Monthly Salary:</strong> SAR ${emp.salary.toLocaleString()}</div>
+                    <div style="margin-bottom: 8px;"><strong>IBAN Status:</strong> ${emp.iban ? '✓ Present' : '✗ Missing'}</div>
+                    <div><strong>Compliance Score:</strong> ${emp.compliance}%</div>
+                </div>
+            </div>
             
-            <!-- Progress Dashboard (4 columns) -->
-            <div class="mb-8">
-                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">dashboard</span> Progress Overview
-                </h2>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <!-- Column 1: Start only -->
-                    <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                        <div class="flex flex-col gap-2">
-                            <div class="progress-item inactive flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase">Start</span>
-                                <span id="countStart" class="text-lg font-extrabold">0</span>
-                            </div>
-                        </div>
+            ${emp.issues.length > 0 ? `
+                <div class="modal-section">
+                    <h3><i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> Outstanding Issues</h3>
+                    <div style="background: #fff3cd; padding: 12px; border-radius: 8px; font-size: 13px; border-left: 4px solid var(--warning);">
+                        <ul style="margin: 0; padding-left: 20px;">
+                            ${emp.issues.map(issue => `<li>${issue}</li>`).join('')}
+                        </ul>
                     </div>
-
-                    <!-- Column 2: Start + Qiwa -->
-                    <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                        <div class="flex flex-col gap-2">
-                            <div class="progress-item active flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase">Start</span>
-                                <span class="material-symbols-outlined text-sm">check</span>
-                            </div>
-                            <div class="progress-item active flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase">Qiwa</span>
-                                <span id="countQiwa" class="text-lg font-extrabold">0</span>
-                            </div>
-                        </div>
+                </div>
+            ` : `
+                <div class="modal-section">
+                    <h3><i class="fas fa-check-circle" style="color: var(--success);"></i> Full Compliance</h3>
+                    <div style="background: #d4edda; padding: 12px; border-radius: 8px; font-size: 13px; border-left: 4px solid var(--success);">
+                        All required fields are present and compliant with Saudi labor regulations.
                     </div>
-
-                    <!-- Column 3: Start + Qiwa + Gosi -->
-                    <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                        <div class="flex flex-col gap-2">
-                            <div class="progress-item active flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase">Start</span>
-                                <span class="material-symbols-outlined text-sm">check</span>
-                            </div>
-                            <div class="progress-item active flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase">Qiwa</span>
-                                <span class="material-symbols-outlined text-sm">check</span>
-                            </div>
-                            <div class="progress-item active flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase">Gosi</span>
-                                <span id="countGosi" class="text-lg font-extrabold">0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Column 4: All green (Start + Qiwa + Gosi + Mudad) -->
-                    <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                        <div class="flex flex-col gap-2">
-                            <div class="progress-item active flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase">Start</span>
-                                <span class="material-symbols-outlined text-sm">check</span>
-                            </div>
-                            <div class="progress-item active flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase">Qiwa</span>
-                                <span class="material-symbols-outlined text-sm">check</span>
-                            </div>
-                            <div class="progress-item active flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase">Gosi</span>
-                                <span class="material-symbols-outlined text-sm">check</span>
-                            </div>
-                            <div class="progress-item active flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase">Mudad</span>
-                                <span id="countMudad" class="text-lg font-extrabold">0</span>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+            `}
+            
+            <div class="modal-section">
+                <h3><i class="fas fa-tasks"></i> Required Actions</h3>
+                ${recommendations.map(rec => `<div class="recommendation"><strong>→</strong> ${rec}</div>`).join('')}
+            </div>
+            
+            <div class="modal-section">
+                <h3><i class="fas fa-gavel"></i> Regulatory Reference</h3>
+                <div style="background: #e7f3ff; padding: 12px; border-radius: 8px; font-size: 12px; border-left: 4px solid var(--info);">
+                    <div style="margin-bottom: 6px;"><strong>Saudi Labor Law Article 44:</strong> Employment contracts must be in writing and include all material terms</div>
+                    <div style="margin-bottom: 6px;"><strong>GOSI Registration:</strong> All employees must be registered within 30 days of employment</div>
+                    <div><strong>Mudad/WPS:</strong> Salary payments must be tracked through approved wage protection system</div>
                 </div>
             </div>
-
-            <!-- Buckets Board -->
-            <div class="mb-8 space-y-6">
-                <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">view_column</span> Employee Pipeline
-                </h2>
-
-                <!-- Bucket: Start -->
-                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-gray-400"></span> Start
-                        </h3>
-                        <span id="badgeStart" class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">0</span>
-                    </div>
-                    <div id="bucketStart" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-                        <!-- Cards -->
-                    </div>
-                </div>
-
-                <!-- Bucket: Qiwa -->
-                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-blue-500"></span> Qiwa
-                        </h3>
-                        <span id="badgeQiwa" class="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">0</span>
-                    </div>
-                    <div id="bucketQiwa" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
-                </div>
-
-                <!-- Bucket: Waiting for Contract Approval -->
-                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-yellow-500"></span> Waiting Contract Approval
-                        </h3>
-                        <span id="badgeWaiting" class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded">0</span>
-                    </div>
-                    <div id="bucketWaiting" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
-                </div>
-
-                <!-- Bucket: Gosi -->
-                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-purple-500"></span> Gosi
-                        </h3>
-                        <span id="badgeGosi" class="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded">0</span>
-                    </div>
-                    <div id="bucketGosi" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
-                </div>
-
-                <!-- Bucket: Mudad -->
-                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-orange-500"></span> Mudad
-                        </h3>
-                        <span id="badgeMudad" class="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">0</span>
-                    </div>
-                    <div id="bucketMudad" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
-                </div>
-            </div>
-
-            <!-- Finished List -->
-            <div class="mb-8">
-                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-success">check_circle</span> Completed
-                </h2>
-                <div class="bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-success"></span> All Steps Finished
-                        </h3>
-                        <span id="badgeFinished" class="text-xs font-bold text-success bg-green-50 px-2 py-1 rounded">0</span>
-                    </div>
-                    <div id="listFinished" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
-                </div>
-            </div>
-
-            <!-- Activity Logs Section -->
-            <div class="mt-8 pb-8">
-                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">history</span> Recent Activity
-                </h2>
-                <div id="activityLogView" class="space-y-3 bg-surface-light rounded-xl p-4 border border-gray-200 shadow-sm">
-                    <!-- Logs injected here -->
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- ================= DETAIL MODAL ================= -->
-    <div id="detailModal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center modal-hidden">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDetailModal()"></div>
-        <div class="bg-surface-light w-full max-w-lg p-6 rounded-t-2xl sm:rounded-2xl border border-gray-200 relative z-10 mx-auto max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div class="flex justify-center mb-4">
-                <div class="w-12 h-1 bg-gray-300 rounded-full"></div>
-            </div>
-            <div id="modalBody" class="space-y-6">
-                <!-- Content injected via JS -->
-            </div>
-            <button onclick="closeDetailModal()" class="w-full mt-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">Close</button>
-        </div>
-    </div>
-
-    <!-- CONFIRM MODAL -->
-    <div id="confirmModal" class="fixed inset-0 z-[70] flex items-end sm:items-center justify-center modal-hidden">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-        <div class="bg-surface-light w-full max-w-sm p-6 rounded-t-2xl sm:rounded-2xl border border-gray-200 relative z-10 mx-4 shadow-2xl">
-            <h3 class="text-xl font-bold text-gray-900 mb-2" id="modalTitle">Confirm</h3>
-            <p class="text-sm text-gray-600 mb-6" id="modalText">Are you sure?</p>
-            <div class="flex gap-3">
-                <button id="modalCancel" class="flex-1 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm">Cancel</button>
-                <button id="modalConfirm" class="flex-1 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm shadow-lg shadow-primary/20">Confirm</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast -->
-    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-[80] modal-hidden">
-        <div class="bg-gray-900 text-white font-bold px-6 py-3 rounded-full shadow-2xl flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-sm">info</span>
-            <span id="toastMsg" class="text-xs tracking-wide">Notification</span>
-        </div>
-    </div>
-
-    <!-- APP SCRIPT -->
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-        const SUPABASE_URL = 'https://ftkwyywgoutsvdcdvyja.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0a3d5eXdnb3V0c3ZkY2R2eWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjMsImV4cCI6MjA4NjA1MzYyM30.RgII5Z89N17xHU7CMqbvGtA1tdLkxJLqz2NVC_xo-SU';
-
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let currentUser = null;
-        let employees = [];
-
-        // --- Init ---
-        const init = () => {
-            document.getElementById('globalLoader').style.display = 'none';
-        };
-        init();
-
-        // --- Auth ---
-        document.getElementById('loginBtn').onclick = async () => {
-            const email = document.getElementById('emailInput').value.trim();
-            const password = document.getElementById('passwordInput').value.trim();
-            if(!email || !password) return showToast('Enter email and password');
-
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) return showToast(error.message);
-
-            const roleData = await supabaseClient
-                .from('user_roles')
-                .select('role')
-                .eq('user_id', data.user.id)
-                .maybeSingle();
-
-            if (!roleData.data) {
-                await supabaseClient.auth.signOut();
-                return showToast('No Role Assigned');
-            }
-
-            currentUser = { id: data.user.id, email: data.user.email, role: roleData.data.role };
-
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainScreen').classList.remove('hidden');
-
-            document.getElementById('currentUserDisplay').textContent = currentUser.email.split('@')[0];
-            document.getElementById('roleBadge').textContent = currentUser.role.toUpperCase();
-
-            fetchEmployees();
-            setupRealtime();
-        };
-
-        document.getElementById('logoutBtn').onclick = () => {
-            askConfirmation('Log Out', 'Sign out of portal?', async () => {
-                await supabaseClient.auth.signOut();
-                location.reload();
-            });
-        };
-
-        // --- Bucket logic ---
-        function getBucket(emp) {
-            const q = emp.qiwa_status || 'pending';
-            const g = emp.gosi_status || 'pending';
-            const m = emp.mudad_status || 'pending';
-
-            if (q === 'done' && g === 'done' && m === 'done') return 'finished';
-            if (m === 'in_progress') return 'mudad';
-            if (g === 'in_progress') return 'gosi';
-            if (q === 'done' && g === 'pending') return 'waiting';
-            if (q === 'in_progress') return 'qiwa';
-            return 'start';
+        `;
+        
+        document.getElementById('detailModal').classList.add('active');
+    }
+    
+    function closeModal() {
+        document.getElementById('detailModal').classList.remove('active');
+    }
+    
+    function getRecommendations(emp) {
+        const recommendations = [];
+        
+        if (emp.issues.includes('Missing IBAN')) {
+            recommendations.push('Collect bank account IBAN from employee');
+            recommendations.push('Verify IBAN is in Saudi format (SA + 22 digits)');
+            recommendations.push('Update Mudad/WPS system with banking information');
         }
-
-        // --- Data ---
-        window.fetchEmployees = async () => {
-            const { data, error } = await supabaseClient
-                .from('employees')
-                .select('*')
-                .order('created_at', { ascending: false });
-            if (!error) {
-                employees = data;
-                renderBoard();
-            }
-        };
-
-        function renderBoard() {
-            const buckets = {
-                start: [], qiwa: [], waiting: [], gosi: [], mudad: [], finished: []
-            };
-
-            employees.forEach(emp => {
-                const b = getBucket(emp);
-                buckets[b].push(emp);
-            });
-
-            // Progress counts (for top 4 columns)
-            document.getElementById('countStart').textContent = buckets.start.length;
-            document.getElementById('countQiwa').textContent = buckets.qiwa.length;
-            document.getElementById('countGosi').textContent = buckets.gosi.length;
-            document.getElementById('countMudad').textContent = buckets.mudad.length;
-
-            // Bucket badges
-            document.getElementById('badgeStart').textContent = buckets.start.length;
-            document.getElementById('badgeQiwa').textContent = buckets.qiwa.length;
-            document.getElementById('badgeWaiting').textContent = buckets.waiting.length;
-            document.getElementById('badgeGosi').textContent = buckets.gosi.length;
-            document.getElementById('badgeMudad').textContent = buckets.mudad.length;
-            document.getElementById('badgeFinished').textContent = buckets.finished.length;
-
-            // Render cards
-            document.getElementById('bucketStart').innerHTML = buckets.start.map(renderCard).join('');
-            document.getElementById('bucketQiwa').innerHTML = buckets.qiwa.map(renderCard).join('');
-            document.getElementById('bucketWaiting').innerHTML = buckets.waiting.map(renderCard).join('');
-            document.getElementById('bucketGosi').innerHTML = buckets.gosi.map(renderCard).join('');
-            document.getElementById('bucketMudad').innerHTML = buckets.mudad.map(renderCard).join('');
-            document.getElementById('listFinished').innerHTML = buckets.finished.map(renderCard).join('');
+        
+        if (emp.issues.includes('Missing Joining Date')) {
+            recommendations.push('Retrieve contract start date from Qiwa system');
+            recommendations.push('Ensure joining date is documented in employment record');
         }
-
-        function renderCard(emp) {
-            return `
-                <div onclick="openDetailModal('${emp.id}')" class="bg-white rounded-lg p-3 border border-gray-200 shadow-sm cursor-pointer hover:shadow-md hover:border-primary/50 transition-all active:scale-95">
-                    <h4 class="font-bold text-gray-900 text-xs truncate mb-1">${emp.name}</h4>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-wide font-mono">ID: ${emp.identification_number}</p>
-                </div>
-            `;
+        
+        if (emp.issues.includes('Invalid Qiwa Status')) {
+            recommendations.push('Review Qiwa contract status - ensure proper activation');
+            recommendations.push('If terminated, complete all exit procedures');
+            if (emp.id === 'EM-008') recommendations.push('Employee status: TERMINATED - Process final settlement');
+            if (emp.id === 'EM-009') recommendations.push('Employee status: CANCELED - Verify recruitment was actually canceled');
         }
-
-        // --- DETAIL MODAL + ROLE ACTIONS ---
-        window.openDetailModal = (id) => {
-            const emp = employees.find(e => e.id == id);
-            if (!emp) return;
-
-            const bucket = getBucket(emp);
-            const body = document.getElementById('modalBody');
-
-            let actionButton = '';
-
-            if (currentUser.role === 'creator') {
-                if (bucket === 'start') {
-                    actionButton = `<button onclick="moveToQiwa('${emp.id}')" class="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg">Add IBAN & Mobile & Email → Move to Qiwa</button>`;
-                } else if (bucket === 'waiting') {
-                    actionButton = `<button onclick="approveContract('${emp.id}')" class="w-full py-3 bg-success text-white font-bold rounded-xl hover:bg-success/90 transition-all shadow-lg">Contract Approved → Move to Gosi</button>`;
-                }
-            } else if (currentUser.role === 'updater') {
-                if (bucket === 'qiwa') {
-                    actionButton = `<button onclick="completeQiwa('${emp.id}')" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg">Qiwa Done → Waiting Contract Approval</button>`;
-                } else if (bucket === 'gosi') {
-                    actionButton = `<button onclick="completeGosi('${emp.id}')" class="w-full py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-all shadow-lg">Gosi Done → Move to Mudad</button>`;
-                } else if (bucket === 'mudad') {
-                    actionButton = `<button onclick="completeMudad('${emp.id}')" class="w-full py-3 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 transition-all shadow-lg">Mudad Done → Finished</button>`;
-                }
-            }
-
-            body.innerHTML = `
-                <div class="text-center mb-4">
-                    <h2 class="text-xl font-bold text-gray-900 leading-tight">${emp.name}</h2>
-                    <p class="text-xs font-bold text-gray-500 mt-1 uppercase tracking-widest">ID: ${emp.identification_number}</p>
-                </div>
-
-                <div class="space-y-3 mb-4">
-                    ${renderDetailRow('Mobile', emp.mobile || 'N/A')}
-                    ${renderDetailRow('Email', emp.email || 'N/A')}
-                    ${renderDetailRow('IBAN', emp.iban || 'N/A')}
-                </div>
-
-                <div class="mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
-                    <p class="text-xs font-bold text-gray-500 uppercase mb-2">Current Stage</p>
-                    <p class="text-sm font-bold text-gray-900 capitalize">${bucket.replace('_', ' ')}</p>
-                </div>
-
-                ${actionButton}
-            `;
-
-            const modal = document.getElementById('detailModal');
-            modal.classList.remove('modal-hidden');
-            modal.classList.add('modal-visible');
-        };
-
-        window.closeDetailModal = () => {
-            const modal = document.getElementById('detailModal');
-            modal.classList.remove('modal-visible');
-            modal.classList.add('modal-hidden');
-        };
-
-        function renderDetailRow(label, value) {
-            return `
-                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 flex justify-between items-center">
-                    <div class="overflow-hidden flex-1">
-                        <p class="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">${label}</p>
-                        <p class="text-sm font-semibold text-gray-900 truncate select-all">${value}</p>
-                    </div>
-                    <button onclick="copyToClipboard('${value}')" class="p-2 text-gray-400 hover:text-primary transition-colors">
-                        <span class="material-symbols-outlined text-[18px]">content_copy</span>
-                    </button>
-                </div>
-            `;
+        
+        if (recommendations.length === 0) {
+            recommendations.push('No action required - Employee is fully compliant');
         }
+        
+        return recommendations;
+    }
+    
+    function downloadReport() {
+        alert('Report generation feature - to be implemented');
+    }
+    
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            e.target.closest('.filter-btn').classList.add('active');
+            currentFilter = e.target.closest('.filter-btn').dataset.filter;
+            renderCards(currentFilter);
+        });
+    });
+    
+    // Close modal on background click
+    document.getElementById('detailModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('detailModal')) closeModal();
+    });
+    
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+    
+    // Initial render
+    renderCards();
+</script>
+```
 
-        window.copyToClipboard = (text) => {
-            if (text === 'N/A') return;
-            navigator.clipboard.writeText(text);
-            showToast('Copied!');
-        };
-
-        // --- ACTIONS (all with confirmation) ---
-        window.moveToQiwa = (id) => {
-            askConfirmation('Move to Qiwa', 'Add contact details and move employee to Qiwa stage?', async () => {
-                // In real flow, you'd update mobile/email/iban here if user edited fields
-                const { error } = await supabaseClient.from('employees').update({ qiwa_status: 'in_progress' }).eq('id', id);
-                if (!error) {
-                    await logActivity('MOVED', `Employee moved to Qiwa stage`);
-                    closeDetailModal();
-                    fetchEmployees();
-                    showToast('Moved to Qiwa');
-                }
-            });
-        };
-
-        window.completeQiwa = (id) => {
-            askConfirmation('Complete Qiwa', 'Mark Qiwa as done and move to Waiting for Contract Approval?', async () => {
-                const { error } = await supabaseClient.from('employees').update({ qiwa_status: 'done' }).eq('id', id);
-                if (!error) {
-                    await logActivity('UPDATED', `Qiwa completed, waiting contract approval`);
-                    closeDetailModal();
-                    fetchEmployees();
-                    showToast('Qiwa Done');
-                }
-            });
-        };
-
-        window.approveContract = (id) => {
-            askConfirmation('Approve Contract', 'Confirm contract approval and move employee to Gosi stage?', async () => {
-                const { error } = await supabaseClient.from('employees').update({ gosi_status: 'in_progress' }).eq('id', id);
-                if (!error) {
-                    await logActivity('APPROVED', `Contract approved, moved to Gosi`);
-                    closeDetailModal();
-                    fetchEmployees();
-                    showToast('Contract Approved');
-                }
-            });
-        };
-
-        window.completeGosi = (id) => {
-            askConfirmation('Complete Gosi', 'Mark Gosi as done and move to Mudad?', async () => {
-                const { error } = await supabaseClient.from('employees').update({ gosi_status: 'done', mudad_status: 'in_progress' }).eq('id', id);
-                if (!error) {
-                    await logActivity('UPDATED', `Gosi completed, moved to Mudad`);
-                    closeDetailModal();
-                    fetchEmployees();
-                    showToast('Gosi Done');
-                }
-            });
-        };
-
-        window.completeMudad = (id) => {
-            askConfirmation('Complete Mudad', 'Mark Mudad as done and move employee to Finished?', async () => {
-                const { error } = await supabaseClient.from('employees').update({ mudad_status: 'done' }).eq('id', id);
-                if (!error) {
-                    await logActivity('COMPLETED', `All stages finished`);
-                    closeDetailModal();
-                    fetchEmployees();
-                    showToast('Mudad Done - Employee Finished');
-                }
-            });
-        };
-
-        async function logActivity(action, msg) {
-            await supabaseClient.from('activity_logs').insert({
-                user_email: currentUser.email,
-                action_type: action,
-                message: msg
-            });
-        }
-
-        // --- Activity Logs ---
-        function setupRealtime() {
-            const logView = document.getElementById('activityLogView');
-            const renderLog = (l) => {
-                const div = document.createElement('div');
-                div.className = "bg-white rounded-xl p-4 flex items-start gap-4 shadow-sm border border-gray-100";
-                div.innerHTML = `
-                    <div class="shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <span class="material-symbols-outlined text-[20px]">${l.action_type === 'ADDED' ? 'person_add' : 'update'}</span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start mb-1">
-                            <h3 class="font-semibold text-gray-900 text-sm truncate">${l.user_email.split('@')[0]}</h3>
-                            <span class="text-[10px] text-gray-400 ml-2">${new Date(l.created_at).toLocaleTimeString()}</span>
-                        </div>
-                        <p class="text-xs text-gray-600">${l.message}</p>
-                    </div>
-                `;
-                logView.prepend(div);
-            };
-
-            supabaseClient.from('activity_logs').select('*').order('created_at', {ascending:false}).limit(8)
-                .then(({data}) => data?.forEach(renderLog));
-
-            supabaseClient.channel('activity_logs').on(
-                'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'activity_logs' },
-                payload => {
-                    renderLog(payload.new);
-                    showToast('New Activity');
-                }
-            ).subscribe();
-        }
-
-        // --- Utilities ---
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toastMsg').textContent = msg;
-            t.classList.remove('modal-hidden');
-            t.classList.add('modal-visible');
-            setTimeout(() => {
-                t.classList.remove('modal-visible');
-                t.classList.add('modal-hidden');
-            }, 3000);
-        }
-
-        function askConfirmation(title, text, cb) {
-            const m = document.getElementById('confirmModal');
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalText').textContent = text;
-            m.classList.remove('modal-hidden');
-            m.classList.add('modal-visible');
-
-            document.getElementById('modalConfirm').onclick = () => {
-                cb();
-                m.classList.remove('modal-visible');
-                m.classList.add('modal-hidden');
-            };
-            document.getElementById('modalCancel').onclick = () => {
-                m.classList.remove('modal-visible');
-                m.classList.add('modal-hidden');
-            };
-        }
-    </script>
 </body>
 </html>
